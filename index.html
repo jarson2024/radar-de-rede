@@ -1,0 +1,3213 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Radar de Rede</title>
+<meta name="theme-color" content="#0b1114">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* ============================================================
+   RADAR DE REDE — painel de instrumentos para medir internet
+   Paleta: carvão azulado + fósforo âmbar (mostrador de instrumento)
+   Escala semântica de 5 notas separada do âmbar da marca.
+   ============================================================ */
+
+:root{
+  --bg:#eaeef0;
+  --panel:#ffffff;
+  --panel2:#f4f7f8;
+  --sunk:#eef2f4;
+  --line:#ccd6da;
+  --line-soft:#e1e8ea;
+  --ink:#0e1a1f;
+  --ink2:#42565f;
+  --ink3:#6d818b;
+  --accent:#b35a00;
+  --accent-ink:#ffffff;
+  --accent-soft:#fdf0e0;
+  --trace:#b35a00;
+  --trace-fill:rgba(179,90,0,.16);
+  --grid:#dde5e8;
+  --carga-fundo:rgba(14,26,31,.065);
+  --n1:#bf2338;
+  --n2:#c9611a;
+  --n3:#9a7a00;
+  --n4:#3c8a2c;
+  --n5:#0b8a67;
+  --shadow:0 1px 2px rgba(14,26,31,.06), 0 8px 24px -12px rgba(14,26,31,.22);
+  --radius:14px;
+}
+
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0a1013;
+    --panel:#121b20;
+    --panel2:#18242a;
+    --sunk:#0d161a;
+    --line:#25343c;
+    --line-soft:#1c282e;
+    --ink:#e7eff3;
+    --ink2:#a0b4be;
+    --ink3:#6f8792;
+    --accent:#ff9f1c;
+    --accent-ink:#1a1205;
+    --accent-soft:#2b1e0b;
+    --trace:#ffae3d;
+    --trace-fill:rgba(255,174,61,.18);
+    --grid:#1d2a31;
+    --carga-fundo:rgba(255,255,255,.055);
+    --n1:#ff5064;
+    --n2:#ff8a3d;
+    --n3:#f2c53d;
+    --n4:#7fd957;
+    --n5:#2ee6a8;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -16px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0a1013;
+  --panel:#121b20;
+  --panel2:#18242a;
+  --sunk:#0d161a;
+  --line:#25343c;
+  --line-soft:#1c282e;
+  --ink:#e7eff3;
+  --ink2:#a0b4be;
+  --ink3:#6f8792;
+  --accent:#ff9f1c;
+  --accent-ink:#1a1205;
+  --accent-soft:#2b1e0b;
+  --trace:#ffae3d;
+  --trace-fill:rgba(255,174,61,.18);
+  --grid:#1d2a31;
+  --carga-fundo:rgba(255,255,255,.055);
+  --n1:#ff5064;
+  --n2:#ff8a3d;
+  --n3:#f2c53d;
+  --n4:#7fd957;
+  --n5:#2ee6a8;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -16px rgba(0,0,0,.8);
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:"IBM Plex Sans","Segoe UI",system-ui,-apple-system,sans-serif;
+  font-size:15px;
+  line-height:1.55;
+  padding:0 0 64px;
+}
+h1,h2,h3{font-family:"IBM Plex Sans Condensed","IBM Plex Sans","Segoe UI",sans-serif;margin:0;text-wrap:balance;letter-spacing:.005em}
+button,input,select{font:inherit;color:inherit}
+.mono{font-family:"IBM Plex Mono",ui-monospace,"Consolas",monospace;font-variant-numeric:tabular-nums}
+
+.wrap{max-width:1120px;margin:0 auto;padding:0 16px}
+
+/* ---------- topo ---------- */
+.top{
+  border-bottom:1px solid var(--line);
+  background:var(--panel);
+  position:sticky;top:0;z-index:40;
+}
+.top-in{display:flex;align-items:center;gap:12px;padding:12px 16px;max-width:1120px;margin:0 auto}
+.logo{
+  width:34px;height:34px;border-radius:9px;flex:none;
+  background:var(--accent);color:var(--accent-ink);
+  display:grid;place-items:center;font-weight:700;font-size:17px;
+  font-family:"IBM Plex Sans Condensed",sans-serif;
+}
+.top h1{font-size:19px;font-weight:700;line-height:1.1}
+.top .sub{font-size:11.5px;color:var(--ink3);letter-spacing:.08em;text-transform:uppercase;font-weight:500}
+.top-spacer{flex:1}
+.ghost{
+  background:transparent;border:1px solid var(--line);color:var(--ink2);
+  border-radius:9px;padding:7px 12px;font-size:13px;cursor:pointer;font-weight:500;
+}
+.ghost:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ---------- veredito principal ---------- */
+.verdict{
+  margin-top:18px;border-radius:var(--radius);
+  background:var(--panel);border:1px solid var(--line);
+  box-shadow:var(--shadow);overflow:hidden;
+}
+.verdict-bar{height:5px;background:var(--line);transition:background .4s}
+.verdict-in{padding:20px;display:grid;gap:18px;grid-template-columns:minmax(0,1fr)}
+@media(min-width:720px){.verdict-in{grid-template-columns:210px minmax(0,1fr);align-items:center;padding:24px}}
+.score-box{display:flex;align-items:baseline;gap:10px}
+.score{font-family:"IBM Plex Mono",monospace;font-size:62px;font-weight:600;line-height:.9;font-variant-numeric:tabular-nums}
+.score-max{font-size:15px;color:var(--ink3)}
+.grade{
+  display:inline-block;margin-top:10px;padding:5px 13px;border-radius:999px;
+  font-family:"IBM Plex Sans Condensed",sans-serif;font-weight:700;font-size:15px;
+  letter-spacing:.06em;text-transform:uppercase;
+}
+.verdict-text{font-size:15.5px;color:var(--ink2);max-width:62ch}
+.verdict-text strong{color:var(--ink)}
+
+/* ---------- métricas ---------- */
+.metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line-soft);border-top:1px solid var(--line-soft)}
+@media(min-width:560px){.metrics{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(min-width:900px){.metrics{grid-template-columns:repeat(6,minmax(0,1fr))}}
+.metric{background:var(--panel);padding:13px 14px 14px}
+.metric .k{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);font-weight:600}
+.metric .v{font-family:"IBM Plex Mono",monospace;font-size:25px;font-weight:500;line-height:1.15;margin-top:3px;font-variant-numeric:tabular-nums}
+.metric .u{font-size:12px;color:var(--ink3);font-weight:400}
+.metric .n{font-size:11.5px;margin-top:2px;font-weight:600}
+
+/* ---------- painéis ---------- */
+.panel{
+  margin-top:18px;background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;
+}
+.phead{padding:15px 18px;border-bottom:1px solid var(--line-soft);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.pnum{
+  font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink3);
+  border:1px solid var(--line);border-radius:6px;padding:2px 7px;flex:none;
+}
+.phead h2{font-size:17.5px;font-weight:700}
+.phead p{margin:2px 0 0;font-size:13px;color:var(--ink3);width:100%}
+.pbody{padding:18px}
+
+/* ---------- controles ---------- */
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+.field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.field label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);font-weight:600}
+select,input[type=number]{
+  background:var(--sunk);border:1px solid var(--line);border-radius:10px;
+  padding:11px 12px;min-height:44px;font-size:14.5px;color:var(--ink);
+  font-family:"IBM Plex Mono",monospace;max-width:100%;
+}
+select{font-family:"IBM Plex Sans",sans-serif;min-width:190px}
+input[type=number]{width:120px}
+select:focus-visible,input:focus-visible,button:focus-visible,.chip:focus-visible{
+  outline:2px solid var(--accent);outline-offset:2px;
+}
+.btn{
+  background:var(--accent);color:var(--accent-ink);border:1px solid transparent;
+  border-radius:10px;padding:12px 20px;min-height:44px;font-weight:600;font-size:15px;
+  cursor:pointer;display:inline-flex;align-items:center;gap:8px;
+}
+.btn:hover{filter:brightness(1.08)}
+.btn:disabled{opacity:.45;cursor:not-allowed;filter:none}
+.btn.sec{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.sec:hover{border-color:var(--accent);color:var(--accent);filter:none}
+.btn.stop{background:var(--n1);color:#fff}
+
+/* ---------- presets ---------- */
+.presets{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+.preset{
+  background:var(--sunk);border:1px solid var(--line);border-radius:8px;
+  padding:7px 12px;font-size:13px;cursor:pointer;color:var(--ink2);font-weight:500;min-height:36px;
+}
+.preset:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ---------- servidores ---------- */
+.srv-grid{display:grid;gap:9px;grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+.chip{
+  text-align:left;background:var(--panel2);border:1px solid var(--line);
+  border-radius:11px;padding:11px 12px;cursor:pointer;display:block;width:100%;
+  transition:border-color .15s, background .15s;
+}
+.chip:hover{border-color:var(--accent)}
+.chip[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.chip .cidade{font-weight:600;font-size:14.5px;display:flex;align-items:center;gap:6px}
+.chip .prov{font-size:11.5px;color:var(--ink3);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip .ms{font-family:"IBM Plex Mono",monospace;font-size:21px;font-weight:500;margin-top:6px;font-variant-numeric:tabular-nums}
+.chip .ms small{font-size:11px;color:var(--ink3);font-weight:400}
+.flag{font-size:11px;border:1px solid var(--line);border-radius:5px;padding:0 5px;color:var(--ink3);font-weight:600;letter-spacing:.04em}
+
+/* ---------- gráfico ---------- */
+.chart-wrap{position:relative;background:var(--sunk);border:1px solid var(--line-soft);border-radius:12px;padding:10px;margin-top:16px}
+canvas{display:block;width:100%;height:230px}
+#canvasBanda{height:170px}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:11.5px;color:var(--ink3);margin-top:8px;padding:0 2px}
+.legend i{display:inline-block;width:11px;height:3px;border-radius:2px;vertical-align:middle;margin-right:5px}
+
+/* linha do tempo da partida */
+.timeline{display:flex;gap:1px;height:26px;margin-top:12px;border-radius:6px;overflow:hidden;background:var(--sunk);border:1px solid var(--line-soft)}
+.tl-seg{flex:1 1 0;min-width:1px;background:var(--line-soft)}
+
+/* ---------- status ---------- */
+.status{
+  display:flex;align-items:center;gap:9px;margin-top:14px;font-size:13.5px;color:var(--ink2);
+  background:var(--panel2);border:1px solid var(--line-soft);border-radius:10px;padding:11px 13px;
+}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--ink3);flex:none}
+.dot.live{background:var(--n5);animation:pulse 1.4s infinite}
+.dot.warn{background:var(--n3)}
+.dot.err{background:var(--n1)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+@media (prefers-reduced-motion: reduce){
+  .dot.live{animation:none}
+  *{transition:none !important}
+}
+
+/* ---------- barra de progresso ---------- */
+.bar{height:8px;background:var(--sunk);border-radius:99px;overflow:hidden;margin-top:12px;border:1px solid var(--line-soft)}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .25s linear}
+
+/* ---------- resultados em grade ---------- */
+.rgrid{display:grid;gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);border-radius:11px;overflow:hidden;margin-top:16px;grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(min-width:640px){.rgrid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.rgrid>div{background:var(--panel);padding:12px 13px}
+.rgrid .k{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);font-weight:600}
+.rgrid .v{font-family:"IBM Plex Mono",monospace;font-size:21px;font-weight:500;margin-top:3px;font-variant-numeric:tabular-nums}
+.rgrid .v small{font-size:11.5px;color:var(--ink3)}
+
+/* ---------- atividades ---------- */
+.acts{display:grid;gap:9px;grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.act{
+  display:flex;gap:12px;align-items:flex-start;padding:12px 13px;
+  background:var(--panel2);border:1px solid var(--line-soft);border-radius:11px;
+  border-left-width:3px;border-left-style:solid;
+}
+.act .sel{
+  font-family:"IBM Plex Sans Condensed",sans-serif;font-weight:700;font-size:11px;
+  letter-spacing:.07em;text-transform:uppercase;padding:3px 8px;border-radius:5px;flex:none;margin-top:1px;
+}
+.act .nome{font-weight:600;font-size:14.5px;line-height:1.25}
+.act .ex{font-size:12px;color:var(--ink3);margin-top:1px}
+.act .por{font-size:12px;color:var(--ink2);margin-top:4px}
+
+/* ---------- histórico ---------- */
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+.tscroll{overflow-x:auto;margin-top:4px}
+th{
+  text-align:left;font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);
+  font-weight:600;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap;
+}
+td{padding:9px 10px;border-bottom:1px solid var(--line-soft);white-space:nowrap}
+td.mono{font-variant-numeric:tabular-nums}
+.empty{color:var(--ink3);font-size:13.5px;padding:14px 2px}
+
+
+
+
+.aviso-dados{
+  margin-top:11px;font-size:12.5px;color:var(--ink2);background:var(--panel2);
+  border:1px solid var(--line-soft);border-left:3px solid var(--n3);
+  border-radius:9px;padding:10px 12px;max-width:70ch;line-height:1.5;
+}
+.aviso-dados b{color:var(--ink)}
+
+/* ---------- rótulos de seção dentro de um painel ---------- */
+.sub-rotulo{
+  font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);
+  font-weight:600;margin:18px 0 7px;display:flex;align-items:center;gap:9px;flex-wrap:wrap;
+}
+.sub-rotulo:first-of-type{margin-top:16px}
+.selo-espera{
+  font-family:"IBM Plex Sans",sans-serif;font-size:10.5px;letter-spacing:0;text-transform:none;
+  font-weight:500;color:var(--ink3);border:1px solid var(--line);border-radius:5px;padding:2px 7px;
+}
+.selo-espera.pronto{color:var(--n5);border-color:var(--n5)}
+.rgrid.esperando .v{color:var(--ink3);opacity:.5}
+
+/* ---------- comparação livre x carga ---------- */
+.cmp-titulo{
+  font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);
+  font-weight:600;margin:20px 0 8px;
+}
+table.cmp{width:100%;border-collapse:collapse;font-size:13.5px}
+table.cmp th{
+  text-align:right;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);
+  font-weight:600;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap;
+}
+table.cmp th:first-child,table.cmp td:first-child{text-align:left}
+table.cmp td{
+  padding:9px 10px;border-bottom:1px solid var(--line-soft);white-space:nowrap;text-align:right;
+  font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;
+}
+table.cmp td:first-child{font-family:"IBM Plex Sans",sans-serif;font-weight:500}
+table.cmp td:last-child{font-family:"IBM Plex Sans",sans-serif;font-weight:600;font-size:12.5px}
+table.cmp tr.pior td.dif{color:var(--n1)}
+table.cmp tr.igual td.dif{color:var(--ink3)}
+
+/* no celular a tabela vira blocos: o efeito não pode ficar escondido
+   atrás de uma rolagem lateral, é a coluna que mais importa */
+@media(max-width:620px){
+  table.cmp,table.cmp tbody,table.cmp tr,table.cmp td{display:block;width:100%}
+  table.cmp thead{display:none}
+  table.cmp tr{
+    padding:12px 0;border-bottom:1px solid var(--line-soft);
+    position:relative;border-radius:0;
+  }
+  table.cmp tr:last-child{border-bottom:none}
+  table.cmp td{
+    text-align:left;padding:1px 0;border:none;font-size:13px;white-space:normal;
+  }
+  table.cmp td:first-child{
+    font-size:14.5px;font-weight:600;padding-right:105px;margin-bottom:5px;
+  }
+  table.cmp td.ef{
+    position:absolute;top:12px;right:0;width:auto;padding:0;
+    font-size:12px;text-align:right;
+  }
+  table.cmp td[data-r]::before{
+    content:attr(data-r) " ";
+    font-family:"IBM Plex Sans",sans-serif;font-weight:400;
+    color:var(--ink3);font-variant-numeric:normal;
+  }
+  .tscroll:has(table.cmp){overflow-x:visible}
+}
+
+.cmp-veredito{
+  margin-top:14px;padding:14px 15px;border-radius:11px;background:var(--panel2);
+  border:1px solid var(--line-soft);border-left:3px solid var(--accent);
+  font-size:14px;color:var(--ink2);line-height:1.55;max-width:72ch;
+}
+.cmp-veredito b{color:var(--ink)}
+
+/* ---------- veredito de oscilação do download ---------- */
+.osc-veredito{
+  margin-top:14px;padding:14px 15px;border-radius:11px;background:var(--panel2);
+  border:1px solid var(--line-soft);border-left:3px solid var(--line);
+  font-size:14px;color:var(--ink2);line-height:1.55;max-width:72ch;
+}
+.osc-veredito b{color:var(--ink)}
+.osc-veredito .marca{
+  display:inline-block;font-family:"IBM Plex Sans Condensed",sans-serif;font-weight:700;
+  font-size:11px;letter-spacing:.07em;text-transform:uppercase;padding:3px 9px;border-radius:5px;margin-right:9px;
+}
+
+/* ---------- ações de melhoria ---------- */
+.acoes{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+.acao{
+  background:var(--panel2);border:1px solid var(--line-soft);border-radius:12px;
+  padding:14px 15px;border-left:3px solid var(--line);
+}
+.acao-topo{display:flex;align-items:flex-start;gap:11px;flex-wrap:wrap}
+.acao .prio{
+  font-family:"IBM Plex Sans Condensed",sans-serif;font-weight:700;font-size:10.5px;
+  letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:5px;flex:none;margin-top:2px;
+}
+.acao h3{font-size:16px;font-weight:700;line-height:1.25;flex:1;min-width:180px}
+.acao .ganho{
+  font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:500;
+  border:1px solid var(--line);border-radius:6px;padding:3px 8px;color:var(--ink2);white-space:nowrap;
+}
+.acao .porque{font-size:13.5px;color:var(--ink2);margin-top:8px;max-width:70ch}
+.acao ol{margin:9px 0 0;padding-left:20px;font-size:13.5px;color:var(--ink2);display:flex;flex-direction:column;gap:4px}
+.acao ol b{color:var(--ink);font-weight:600}
+.acao .tudo-certo{font-size:13.5px;color:var(--ink2);margin-top:6px}
+
+/* ---------- vigia de rota ---------- */
+.rota-grid{display:grid;gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);border-radius:11px;overflow:hidden;grid-template-columns:repeat(1,minmax(0,1fr))}
+@media(min-width:560px){.rota-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(min-width:900px){.rota-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.rota-item{background:var(--panel);padding:12px 14px}
+.rota-item .k{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);font-weight:600}
+.rota-item .v{font-size:15.5px;font-weight:600;margin-top:3px;line-height:1.3;word-break:break-word}
+.rota-item .v.mudou{color:var(--accent)}
+.rota-item .sub{font-size:12px;color:var(--ink3);font-weight:400;margin-top:1px}
+
+.mudancas{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+.mud{
+  display:flex;gap:11px;align-items:flex-start;padding:11px 13px;border-radius:10px;
+  background:var(--panel2);border:1px solid var(--line-soft);border-left:3px solid var(--accent);
+}
+.mud .hora{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink3);flex:none;padding-top:1px}
+.mud .txt{font-size:13.5px;color:var(--ink);line-height:1.45}
+.mud .txt b{color:var(--accent)}
+.mud.boa{border-left-color:var(--n5)}
+.mud.boa .txt b{color:var(--n5)}
+.mud.ruim{border-left-color:var(--n1)}
+.mud.ruim .txt b{color:var(--n1)}
+
+/* ---------- notas ---------- */
+.note{font-size:12.5px;color:var(--ink3);margin-top:14px;line-height:1.6;max-width:74ch}
+.note b{color:var(--ink2);font-weight:600}
+footer{margin-top:26px;padding-top:18px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink3);line-height:1.7}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="top-in">
+    <div class="logo">R</div>
+    <div>
+      <h1>Radar de Rede</h1>
+      <div class="sub">Latência · Jitter · Carga</div>
+    </div>
+    <div class="top-spacer"></div>
+    <a class="ghost" href="rota-xbox.html" id="linkXbox" style="text-decoration:none">Rota do Xbox</a>
+    <button class="ghost" id="btnTema" type="button">Tema</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- ======= VEREDITO ======= -->
+  <section class="verdict" id="verdict">
+    <div class="verdict-bar" id="vbar"></div>
+    <div class="verdict-in">
+      <div>
+        <div class="score-box">
+          <span class="score mono" id="vscore">--</span>
+          <span class="score-max">/ 100</span>
+        </div>
+        <span class="grade" id="vgrade">medindo…</span>
+      </div>
+      <div class="verdict-text" id="vtext">
+        Medindo o servidor mais próximo de você. Em poucos segundos aparece aqui a nota da sua conexão e para o que ela serve.
+      </div>
+    </div>
+    <div class="metrics">
+      <div class="metric"><div class="k">Latência</div><div class="v mono" id="mPing">--<span class="u"> ms</span></div><div class="n" id="nPing">&nbsp;</div></div>
+      <div class="metric"><div class="k">Jitter</div><div class="v mono" id="mJit">--<span class="u"> ms</span></div><div class="n" id="nJit">&nbsp;</div></div>
+      <div class="metric"><div class="k">Perda</div><div class="v mono" id="mLoss">--<span class="u"> %</span></div><div class="n" id="nLoss">&nbsp;</div></div>
+      <div class="metric"><div class="k">Pico (p99)</div><div class="v mono" id="mP99">--<span class="u"> ms</span></div><div class="n" id="nP99">&nbsp;</div></div>
+      <div class="metric"><div class="k">Download</div><div class="v mono" id="mBanda">--<span class="u"> Mbps</span></div><div class="n" id="nBanda">&nbsp;</div></div>
+      <div class="metric"><div class="k">Sob carga</div><div class="v mono" id="mBufa">--<span class="u"> ms</span></div><div class="n" id="nBufa">&nbsp;</div></div>
+    </div>
+  </section>
+
+  <!-- ======= SERVIDORES ======= -->
+  <section class="panel">
+    <div class="phead">
+      <span class="pnum">01</span>
+      <h2>Servidores reais</h2>
+      <p>Máquinas de verdade em data centers de nuvem. Escolha uma para usar nos testes abaixo.</p>
+    </div>
+    <div class="pbody">
+      <div class="controls">
+        <button class="btn sec" id="btnMedirTodos" type="button">Medir todos os servidores</button>
+        <button class="btn sec" id="btnBR" type="button">Só os do Brasil</button>
+      </div>
+      <div class="srv-grid" id="srvGrid" style="margin-top:14px"></div>
+      <p class="note">
+        A medida é o tempo de ida e volta de uma requisição segura (HTTPS). Ela fica alguns milissegundos acima do ping
+        do jogo, mas a variação — que é o que importa para jitter — é a mesma.
+        <br><br>
+        <b>Por que não tem Rio, Curitiba e Belo Horizonte:</b> só existe data center aberto a teste de navegador em São Paulo.
+        Isso não atrapalha o seu diagnóstico: quase todo servidor de jogo brasileiro fica em São Paulo mesmo, então
+        <b>o card de São Paulo é o número que vale para jogar no Brasil</b>. Estão aqui os três maiores provedores de lá
+        porque cada um chega por um caminho diferente da sua operadora.
+      </p>
+    </div>
+  </section>
+
+  <!-- ======= PARTIDA ======= -->
+  <section class="panel">
+    <div class="phead">
+      <span class="pnum">02</span>
+      <h2>Simulação de partida</h2>
+      <p>Envia pacotes em ritmo constante, como um jogo online faz, durante o tempo que você escolher.</p>
+    </div>
+    <div class="pbody">
+      <div class="controls">
+        <div class="field">
+          <label for="selSrvPartida">Servidor</label>
+          <select id="selSrvPartida"></select>
+        </div>
+        <div class="field">
+          <label for="inpMin">Duração (minutos)</label>
+          <input type="number" id="inpMin" value="3" min="0.5" max="120" step="0.5">
+        </div>
+        <div class="field">
+          <label for="selTaxa">Ritmo</label>
+          <select id="selTaxa">
+            <option value="100">10 pacotes/s — FPS</option>
+            <option value="200" selected>5 pacotes/s — futebol / MOBA</option>
+            <option value="500">2 pacotes/s — leve</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="selCenario">Como está a internet</label>
+          <select id="selCenario">
+            <option value="livre">Livre, só o jogo</option>
+            <option value="carga">Com download rodando o tempo todo</option>
+            <option value="alterna" selected>Alternando livre e com download</option>
+          </select>
+        </div>
+        <button class="btn" id="btnPartida" type="button">Iniciar partida</button>
+      </div>
+      <div class="presets">
+        <button class="preset" type="button" data-min="1">1 min</button>
+        <button class="preset" type="button" data-min="3">3 min</button>
+        <button class="preset" type="button" data-min="10">10 min</button>
+        <button class="preset" type="button" data-min="30">30 min</button>
+        <button class="preset" type="button" data-min="60">1 hora</button>
+      </div>
+      <div class="aviso-dados" id="avisoDados" hidden></div>
+
+      <div class="chart-wrap">
+        <canvas id="canvasPing"></canvas>
+      </div>
+      <div class="legend">
+        <span><i style="background:var(--trace)"></i>latência: linha no pior pacote, faixa até o melhor</span>
+        <span><i style="background:var(--ink3)"></i>mediana da partida</span>
+        <span><i style="background:var(--n1)"></i>pacote perdido</span>
+        <span id="legCarga" hidden><i style="background:var(--ink3);opacity:.35"></i>fundo escuro: download rodando</span>
+      </div>
+      <div class="timeline" id="timeline" aria-label="Qualidade segundo a segundo"></div>
+      <div class="bar"><i id="barPartida"></i></div>
+      <div class="status"><span class="dot" id="dotPartida"></span><span id="txtPartida">Pronto para começar.</span></div>
+
+      <div class="rgrid">
+        <div><div class="k">Média</div><div class="v mono" id="pMedia">--<small> ms</small></div></div>
+        <div><div class="k">Mediana</div><div class="v mono" id="pMediana">--<small> ms</small></div></div>
+        <div><div class="k">Jitter</div><div class="v mono" id="pJitter">--<small> ms</small></div></div>
+        <div><div class="k">Melhor</div><div class="v mono" id="pMin">--<small> ms</small></div></div>
+        <div><div class="k">Pior pico</div><div class="v mono" id="pP95">--<small> ms</small></div></div>
+        <div><div class="k">p99</div><div class="v mono" id="pP99">--<small> ms</small></div></div>
+        <div><div class="k">Travadas</div><div class="v mono" id="pSpikes">--<small> /min</small></div></div>
+        <div><div class="k">Perda</div><div class="v mono" id="pPerda">--<small> %</small></div></div>
+      </div>
+      <div id="compara" hidden>
+        <div class="cmp-titulo">Com a internet livre contra com download rodando</div>
+        <div class="tscroll">
+          <table class="cmp">
+            <thead>
+              <tr><th>O que</th><th>Livre</th><th>Com download</th><th>Diferença</th><th>Efeito</th></tr>
+            </thead>
+            <tbody id="cmpBody"></tbody>
+          </table>
+        </div>
+        <div class="cmp-veredito" id="cmpVeredito"></div>
+      </div>
+
+      <p class="note" id="notaPartida">
+        <b>Travada</b> é um pacote que demorou mais que o dobro da mediana. É o que você sente como
+        “o jogador teleportou”. Uma partida boa tem menos de 2 por minuto. <b>Pior pico</b> é o pacote mais
+        atrasado da partida inteira: o susto isolado que decide um gol.
+        <br><br>
+        <b>Em teste longo no celular, deixe a tela ligada e esta página aberta.</b> Com a tela bloqueada o
+        navegador segura os pacotes e a medição sai furada. Se isso acontecer, o resultado avisa no fim.
+      </p>
+    </div>
+  </section>
+
+  <!-- ======= DOWNLOAD ======= -->
+  <section class="panel">
+    <div class="phead">
+      <span class="pnum">03</span>
+      <h2>Download real</h2>
+      <p>Baixa a quantidade de dados que você pedir e mostra se a velocidade se mantém firme ou oscila.</p>
+    </div>
+    <div class="pbody">
+      <div class="controls">
+        <div class="field">
+          <label for="inpMB">Quantos MB baixar</label>
+          <input type="number" id="inpMB" value="200" min="10" max="20000" step="10">
+        </div>
+        <div class="field">
+          <label for="selCon">Conexões ao mesmo tempo</label>
+          <select id="selCon">
+            <option value="1">1 — como um arquivo só</option>
+            <option value="4" selected>4 — como a Steam</option>
+            <option value="8">8 — usar tudo</option>
+          </select>
+        </div>
+        <button class="btn" id="btnDown" type="button">Baixar</button>
+      </div>
+      <div class="presets">
+        <button class="preset" type="button" data-mb="50">50 MB</button>
+        <button class="preset" type="button" data-mb="200">200 MB</button>
+        <button class="preset" type="button" data-mb="500">500 MB</button>
+        <button class="preset" type="button" data-mb="1000">1 GB</button>
+        <button class="preset" type="button" data-mb="5000">5 GB</button>
+      </div>
+
+      <div class="chart-wrap">
+        <canvas id="canvasBanda"></canvas>
+      </div>
+      <div class="legend">
+        <span><i style="background:var(--trace)"></i>velocidade instantânea</span>
+        <span><i style="background:var(--ink3)"></i>média até agora</span>
+      </div>
+      <div class="bar"><i id="barDown"></i></div>
+      <div class="status"><span class="dot" id="dotDown"></span><span id="txtDown">Pronto para começar.</span></div>
+
+      <div class="sub-rotulo">Durante o download</div>
+      <div class="rgrid">
+        <div><div class="k">Agora</div><div class="v mono" id="dAgora">--<small> Mbps</small></div></div>
+        <div><div class="k">Baixado</div><div class="v mono" id="dTotal">--<small> MB</small></div></div>
+        <div><div class="k">Tempo</div><div class="v mono" id="dTempo">--<small> s</small></div></div>
+        <div><div class="k">Falta</div><div class="v mono" id="dFalta">--<small> s</small></div></div>
+      </div>
+
+      <div class="sub-rotulo">Resultado, contado só no fim <span id="dSelo" class="selo-espera">aparece quando o teste terminar</span></div>
+      <div class="rgrid" id="gradeFinal">
+        <div><div class="k">Velocidade firme</div><div class="v mono" id="dMed">--<small> Mbps</small></div></div>
+        <div><div class="k">Pico</div><div class="v mono" id="dPico">--<small> Mbps</small></div></div>
+        <div><div class="k">Vale</div><div class="v mono" id="dVale">--<small> Mbps</small></div></div>
+        <div><div class="k">Estabilidade</div><div class="v mono" id="dEst">--<small> %</small></div></div>
+        <div><div class="k">Quedas</div><div class="v mono" id="dQuedas">--</div></div>
+        <div><div class="k">Maior queda</div><div class="v mono" id="dMaiorQueda">--<small> %</small></div></div>
+        <div><div class="k">Tempo oscilando</div><div class="v mono" id="dTempoOsc">--<small> %</small></div></div>
+        <div><div class="k">1 GB levaria</div><div class="v mono" id="dGB">--</div></div>
+      </div>
+      <div class="osc-veredito" id="oscVeredito" hidden></div>
+      <p class="note">
+        O resultado só aparece quando o download termina, e é medido apenas no trecho em que a linha estava
+        cheia: sem o primeiro segundo e meio de arrancada e sem o final, quando as conexões vão terminando uma a uma.
+        <b>Abaixo de 100 MB o número fica impreciso</b>: para medir a velocidade real do seu plano, use 200 MB ou mais.
+        Os dados vêm do servidor de medição da Cloudflare e são descartados na hora. Nada é gravado no seu aparelho.
+        <b>Atenção com dados móveis:</b> baixar 1 GB aqui consome 1 GB do seu plano.
+      </p>
+    </div>
+  </section>
+
+  <!-- ======= CARGA ======= -->
+  <section class="panel">
+    <div class="phead">
+      <span class="pnum">04</span>
+      <h2>Latência com a internet ocupada</h2>
+      <p>Mede o ping sozinho, depois durante um download pesado. É o teste que revela se você trava quando alguém baixa algo em casa.</p>
+    </div>
+    <div class="pbody">
+      <div class="controls">
+        <div class="field">
+          <label for="selSrvCarga">Servidor de referência</label>
+          <select id="selSrvCarga"></select>
+        </div>
+        <button class="btn" id="btnCarga" type="button">Rodar teste de carga</button>
+      </div>
+
+      <div class="bar"><i id="barCarga"></i></div>
+      <div class="status"><span class="dot" id="dotCarga"></span><span id="txtCarga">O teste leva cerca de 40 segundos.</span></div>
+
+      <div class="rgrid">
+        <div><div class="k">Sem carga</div><div class="v mono" id="cLivre">--<small> ms</small></div></div>
+        <div><div class="k">Baixando</div><div class="v mono" id="cCarga">--<small> ms</small></div></div>
+        <div><div class="k">Aumento</div><div class="v mono" id="cDelta">--<small> ms</small></div></div>
+        <div><div class="k">Jitter na carga</div><div class="v mono" id="cJit">--<small> ms</small></div></div>
+        <div><div class="k">Perda na carga</div><div class="v mono" id="cPerda">--<small> %</small></div></div>
+        <div><div class="k">Recuperação</div><div class="v mono" id="cRec">--<small> ms</small></div></div>
+        <div><div class="k">Banda no teste</div><div class="v mono" id="cBanda">--<small> Mbps</small></div></div>
+        <div><div class="k">Nota</div><div class="v mono" id="cNota">--</div></div>
+      </div>
+      <p class="note">
+        O teste enche a linha de propósito por cerca de 20 segundos, então <b>ele consome dados</b>:
+        numa conexão de 100 Mbps são uns 250 MB. Evite rodar no 4G.
+        <br><br>
+        Esse aumento tem nome: <b>bufferbloat</b>. O roteador segura pacotes numa fila quando a linha enche, e o
+        jogo sente isso como lag mesmo com a velocidade contratada em dia. Aumento acima de 100 ms significa
+        partida injogável enquanto alguém baixa.
+      </p>
+    </div>
+  </section>
+
+  <!-- ======= LOJAS DE JOGOS ======= -->
+  <section class="panel" id="painelLojas">
+    <div class="phead">
+      <span class="pnum">05</span>
+      <h2>Servidores das lojas de jogos</h2>
+      <p>Distância até os servidores de onde você realmente baixa jogos. Quanto menor o número, mais rápido o download começa a engrenar.</p>
+    </div>
+    <div class="pbody">
+      <div class="controls">
+        <button class="btn sec" id="btnLojas" type="button">Medir as lojas</button>
+      </div>
+      <div class="srv-grid" id="lojasGrid" style="margin-top:14px"></div>
+      <p class="note">
+        Aqui a medida é só a <b>distância até o servidor</b>. A velocidade em Mbps do painel 03 continua vindo do
+        servidor de medição da Cloudflare, porque <b>loja de jogo não deixa o navegador baixar arquivo grande para medir</b>:
+        elas bloqueiam por segurança. Então o número de Mbps que você vê é a velocidade da sua linha, e estes números
+        aqui dizem quais lojas estão perto de você.
+      </p>
+    </div>
+  </section>
+
+  <!-- ======= PARA QUE SERVE ======= -->
+  <section class="panel">
+    <div class="phead">
+      <span class="pnum">06</span>
+      <h2>Para o que sua internet serve</h2>
+      <p>Cada atividade tem exigência própria. Os selos usam os números medidos até agora.</p>
+    </div>
+    <div class="pbody">
+      <div class="acts" id="acts"></div>
+      <p class="note">
+        Rode a <b>simulação de partida</b> no servidor onde você realmente joga antes de confiar nos selos de jogo.
+        Uma medida de 10 segundos não pega as travadas que só aparecem depois de alguns minutos.
+      </p>
+    </div>
+  </section>
+
+
+  <!-- ======= COMO MELHORAR ======= -->
+  <section class="panel" id="painelMelhorar">
+    <div class="phead">
+      <span class="pnum">07</span>
+      <h2>Como deixar melhor</h2>
+      <p>Lista de ações em ordem de impacto, montada a partir dos seus números. A primeira é a que mais rende.</p>
+    </div>
+    <div class="pbody">
+      <div class="controls">
+        <div class="field">
+          <label for="selLigacao">Como este aparelho está ligado</label>
+          <select id="selLigacao">
+            <option value="wifi24">Wi-Fi 2,4 GHz</option>
+            <option value="wifi5" selected>Wi-Fi 5 GHz</option>
+            <option value="cabo">Cabo de rede</option>
+            <option value="celular">Dados móveis (4G / 5G)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="inpPlano">Velocidade do seu plano (Mega)</label>
+          <input type="number" id="inpPlano" value="0" min="0" max="10000" step="10" placeholder="opcional">
+        </div>
+      </div>
+      <div class="acoes" id="acoes"></div>
+      <p class="note">
+        As ações aparecem conforme você roda os testes. Quanto mais painéis você rodar, mais certeira fica a lista.
+      </p>
+    </div>
+  </section>
+
+  <!-- ======= VIGIA DE ROTA ======= -->
+  <section class="panel" id="painelRota">
+    <div class="phead">
+      <span class="pnum">08</span>
+      <h2>Vigia de rota</h2>
+      <p>Mostra por onde sua conexão sai para a internet e avisa na hora se você mudar alguma coisa no roteador.</p>
+    </div>
+    <div class="pbody">
+      <div class="rota-grid" id="rotaGrid">
+        <div class="rota-item"><div class="k">Operadora</div><div class="v" id="rOperadora">lendo…</div></div>
+        <div class="rota-item"><div class="k">Seu endereço na internet</div><div class="v mono" id="rIP">lendo…</div></div>
+        <div class="rota-item"><div class="k">Onde a rede acha que você está</div><div class="v" id="rCidade">lendo…</div></div>
+        <div class="rota-item"><div class="k">Porta de entrada da sua conexão</div><div class="v" id="rEntrada">lendo…</div></div>
+        <div class="rota-item"><div class="k">Assinatura de latência</div><div class="v mono" id="rAssinatura">--</div></div>
+        <div class="rota-item"><div class="k">Ligação deste aparelho</div><div class="v" id="rLigacao">--</div></div>
+      </div>
+
+      <div class="controls" style="margin-top:16px">
+        <button class="btn" id="btnVigia" type="button">Ligar o vigia</button>
+        <button class="btn sec" id="btnMarcoZero" type="button">Marcar como está agora</button>
+      </div>
+      <div class="status"><span class="dot" id="dotRota"></span><span id="txtRota">Toque em “Ligar o vigia”, vá mexer no roteador e volte. As mudanças aparecem aqui embaixo.</span></div>
+
+      <div class="mudancas" id="mudancas"></div>
+      <p class="note">
+        O vigia percebe: troca de operadora, VPN ligada ou desligada, reinício do roteador que troca o endereço,
+        mudança de DNS que muda o caminho, troca de Wi-Fi para cabo ou para o 4G, e qualquer alteração que mexa
+        no tempo de resposta até São Paulo. <b>Deixe esta aba aberta enquanto mexe nas configurações.</b>
+      </p>
+    </div>
+  </section>
+
+  <!-- ======= HISTÓRICO ======= -->
+  <section class="panel">
+    <div class="phead">
+      <span class="pnum">09</span>
+      <h2>Histórico por horário</h2>
+      <p>Compare madrugada com horário de pico. Guardado só neste aparelho.</p>
+    </div>
+    <div class="pbody">
+      <div class="tscroll">
+        <table>
+          <thead>
+            <tr><th>Quando</th><th>Teste</th><th>Servidor</th><th>Latência</th><th>Jitter</th><th>Perda</th><th>Banda</th><th>Nota</th></tr>
+          </thead>
+          <tbody id="histBody"></tbody>
+        </table>
+      </div>
+      <div class="empty" id="histVazio">Nenhum teste guardado ainda. Rode qualquer teste acima e ele aparece aqui.</div>
+      <div class="controls" style="margin-top:14px">
+        <button class="btn sec" id="btnCopiar" type="button">Copiar relatório</button>
+        <button class="btn sec" id="btnLimpar" type="button">Apagar histórico</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    Radar de Rede · mede do aparelho onde a página está aberta até data centers reais de Amazon, Google, Microsoft e Cloudflare.<br>
+    Nenhum dado sai daqui: as medições acontecem no seu navegador e o histórico fica só neste aparelho.
+  </footer>
+</div>
+
+<script>
+"use strict";
+
+/* ============================================================
+   1. SERVIDORES REAIS
+   Cada um tem endereços candidatos; o primeiro que responder é usado.
+   ============================================================ */
+const SERVERS = [
+  { id:'edge', cidade:'Borda mais próxima', prov:'Cloudflare · o ponto de rede mais perto de você', flag:'BR', br:true,
+    urls:['https://cloudflare.com/cdn-cgi/trace','https://1.1.1.1/cdn-cgi/trace','https://speed.cloudflare.com/cdn-cgi/trace'] },
+  { id:'gru-aws', cidade:'São Paulo', prov:'Amazon AWS · sa-east-1', flag:'BR', br:true,
+    urls:['https://dynamodb.sa-east-1.amazonaws.com/','https://sts.sa-east-1.amazonaws.com/'] },
+  { id:'gru-gcp', cidade:'São Paulo', prov:'Google Cloud · southamerica-east1', flag:'BR', br:true,
+    urls:['https://southamerica-east1-aiplatform.googleapis.com/','https://southamerica-east1-run.googleapis.com/'] },
+  { id:'gru-az', cidade:'São Paulo', prov:'Microsoft Azure · Brazil South', flag:'BR', br:true,
+    urls:['https://brazilsouth.batch.azure.com/','https://brazilsouth.api.cognitive.microsoft.com/'] },
+  { id:'scl', cidade:'Santiago', prov:'Google Cloud · southamerica-west1', flag:'CL', br:false,
+    urls:['https://southamerica-west1-aiplatform.googleapis.com/','https://southamerica-west1-run.googleapis.com/'] },
+  { id:'iad', cidade:'Virgínia, EUA', prov:'Amazon AWS · us-east-1 · servidores NA', flag:'US', br:false,
+    urls:['https://dynamodb.us-east-1.amazonaws.com/','https://sts.us-east-1.amazonaws.com/'] },
+  { id:'sfo', cidade:'Califórnia, EUA', prov:'Amazon AWS · us-west-1', flag:'US', br:false,
+    urls:['https://dynamodb.us-west-1.amazonaws.com/'] },
+  { id:'dub', cidade:'Irlanda', prov:'Amazon AWS · eu-west-1 · servidor EU', flag:'EU', br:false,
+    urls:['https://dynamodb.eu-west-1.amazonaws.com/'] },
+  { id:'fra', cidade:'Frankfurt', prov:'Amazon AWS · eu-central-1', flag:'EU', br:false,
+    urls:['https://dynamodb.eu-central-1.amazonaws.com/'] },
+  { id:'nrt', cidade:'Tóquio', prov:'Amazon AWS · ap-northeast-1', flag:'JP', br:false,
+    urls:['https://dynamodb.ap-northeast-1.amazonaws.com/'] },
+  { id:'syd', cidade:'Sydney', prov:'Amazon AWS · ap-southeast-2 · Oceania', flag:'AU', br:false,
+    urls:['https://dynamodb.ap-southeast-2.amazonaws.com/'] },
+  { id:'sin', cidade:'Singapura', prov:'Amazon AWS · ap-southeast-1 · Ásia', flag:'SG', br:false,
+    urls:['https://dynamodb.ap-southeast-1.amazonaws.com/'] },
+  { id:'bom', cidade:'Mumbai', prov:'Amazon AWS · ap-south-1 · Índia', flag:'IN', br:false,
+    urls:['https://dynamodb.ap-south-1.amazonaws.com/'] }
+];
+
+const DOWN_URL = 'https://speed.cloudflare.com/__down?bytes=';
+
+/* estado global do app */
+const APP = {
+  srvAtual: 'edge',
+  urlAtiva: {},          // id -> url que funcionou
+  pingAtual: {},         // id -> ms
+  rodando: null,         // 'partida' | 'download' | 'carga' | null
+  tickPartida: 200,      // intervalo entre pacotes da partida em andamento
+  medianaPartida: null,  // mediana real, para a linha de referência do gráfico
+  rota: null,            // última leitura de por onde a conexão sai
+  assinatura: null,      // latência base da rota atual
+  estabilidadeDownload: null,
+  bandaCarga: null,
+  metrics: { ping:null, jitter:null, perda:null, p99:null, banda:null, bufa:null, srv:'edge' }
+};
+
+/* ============================================================
+   2. UTILIDADES DE MATEMÁTICA
+   ============================================================ */
+/* número no padrão brasileiro: vírgula decimal */
+const num = (v,d=1) => (v===null||v===undefined||!isFinite(v)) ? '--' : v.toFixed(d).replace('.', ',');
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+
+function media(a){ return a.length ? a.reduce((s,x)=>s+x,0)/a.length : null; }
+function maior(a){ let m = -Infinity; for(let i=0;i<a.length;i++) if(a[i]>m) m=a[i]; return a.length?m:null; }
+function menor(a){ let m =  Infinity; for(let i=0;i<a.length;i++) if(a[i]<m) m=a[i]; return a.length?m:null; }
+const TETO_ORDENACAO = 20000;
+function percentil(a,p){
+  if(!a.length) return null;
+  let base = a;
+  if(a.length > TETO_ORDENACAO){        // partida longa: amostra uniforme, mesmo resultado, sem travar
+    const passo = a.length/TETO_ORDENACAO;
+    base = new Array(TETO_ORDENACAO);
+    for(let i=0;i<TETO_ORDENACAO;i++) base[i] = a[Math.floor(i*passo)];
+  }
+  const s = base.slice().sort((x,y)=>x-y);
+  const i = clamp(Math.ceil(p/100*s.length)-1, 0, s.length-1);
+  return s[i];
+}
+function mediana(a){ return percentil(a,50); }
+/* jitter = média da diferença absoluta entre pacotes seguidos (base da RFC 3550) */
+function jitter(a){
+  if(a.length<2) return null;
+  let s=0; for(let i=1;i<a.length;i++) s += Math.abs(a[i]-a[i-1]);
+  return s/(a.length-1);
+}
+function desvio(a){
+  if(a.length<2) return null;
+  const m = media(a);
+  return Math.sqrt(a.reduce((s,x)=>s+(x-m)*(x-m),0)/(a.length-1));
+}
+
+/* mapeia um valor (menor é melhor) para nota 0-100 usando pontos-âncora */
+function notaInversa(v, pts){
+  if(v===null||v===undefined||!isFinite(v)) return null;
+  if(v<=pts[0][0]) return 100;
+  if(v>=pts[pts.length-1][0]) return 0;
+  for(let i=1;i<pts.length;i++){
+    if(v<=pts[i][0]){
+      const [x0,y0]=pts[i-1], [x1,y1]=pts[i];
+      return y0 + (y1-y0)*(v-x0)/(x1-x0);
+    }
+  }
+  return 0;
+}
+const FAIXAS = [
+  { min:90, nome:'Excelente', cor:'var(--n5)' },
+  { min:75, nome:'Ótimo',     cor:'var(--n4)' },
+  { min:55, nome:'Bom',       cor:'var(--n3)' },
+  { min:32, nome:'Ruim',      cor:'var(--n2)' },
+  { min:-1, nome:'Péssimo',   cor:'var(--n1)' }
+];
+function faixa(nota){
+  if(nota===null) return { nome:'--', cor:'var(--ink3)' };
+  return FAIXAS.find(f => nota >= f.min);
+}
+
+/* ============================================================
+   3. MEDIÇÃO DE LATÊNCIA
+   Round-trip real de uma requisição HTTPS. Depois do aquecimento
+   a conexão fica aberta, então o tempo é praticamente só o RTT.
+   ============================================================ */
+async function pingURL(url, timeout){
+  const ctl = new AbortController();
+  const tm = setTimeout(()=>ctl.abort(), timeout||2500);
+  const sep = url.indexOf('?')>=0 ? '&' : '?';
+  const alvo = url + sep + 'r=' + Math.random().toString(36).slice(2,9);
+  const t0 = performance.now();
+  try{
+    await fetch(alvo, { mode:'no-cors', cache:'no-store', credentials:'omit', signal:ctl.signal, redirect:'follow' });
+    clearTimeout(tm);
+    return performance.now() - t0;
+  }catch(e){
+    clearTimeout(tm);
+    return null; // abortado ou falha de rede = pacote perdido
+  }
+}
+
+/* descobre qual endereço do servidor responde e aquece a conexão */
+async function prepararServidor(srv){
+  if(APP.urlAtiva[srv.id]){
+    await pingURL(APP.urlAtiva[srv.id], 3000);
+    await pingURL(APP.urlAtiva[srv.id], 3000);
+    return APP.urlAtiva[srv.id];
+  }
+  for(const u of srv.urls){
+    const a = await pingURL(u, 4000);
+    if(a !== null){
+      await pingURL(u, 3000); // segundo tiro: conexão já aberta
+      await pingURL(u, 3000); // terceiro: TLS e DNS já resolvidos
+      APP.urlAtiva[srv.id] = u;
+      return u;
+    }
+  }
+  return null;
+}
+const srvPorId = id => SERVERS.find(s => s.id === id);
+
+/* segurar a tela acesa: no celular, tela bloqueada congela a medição */
+let travaTela = null;
+async function manterTelaAcesa(ligar){
+  try{
+    if(ligar && 'wakeLock' in navigator){
+      travaTela = await navigator.wakeLock.request('screen');
+    }else if(!ligar && travaTela){
+      await travaTela.release(); travaTela = null;
+    }
+  }catch(e){ travaTela = null; }
+}
+document.addEventListener('visibilitychange', () => {
+  if(document.visibilityState === 'visible' && APP.rodando) manterTelaAcesa(true);
+});
+
+/* conta quanto tempo a página passou em segundo plano durante um teste */
+const FUNDO = { desde:null, total:0 };
+document.addEventListener('visibilitychange', () => {
+  if(!APP.rodando) return;
+  if(document.visibilityState === 'hidden'){ FUNDO.desde = performance.now(); }
+  else if(FUNDO.desde !== null){ FUNDO.total += performance.now() - FUNDO.desde; FUNDO.desde = null; }
+});
+
+/* deixa claro que os outros testes ficam indisponíveis enquanto um roda */
+function travarUI(qual){
+  APP.rodando = qual;
+  if(qual){ FUNDO.total = 0; FUNDO.desde = null; }
+  manterTelaAcesa(!!qual);
+  const mapa = { partida:'btnPartida', download:'btnDown', carga:'btnCarga' };
+  Object.keys(mapa).forEach(k => {
+    const b = document.getElementById(mapa[k]);
+    if(!b) return;
+    if(qual && k !== qual){
+      b.disabled = true;
+      if(!b.dataset.rotulo) b.dataset.rotulo = b.textContent;
+      b.textContent = 'Aguardando o outro teste';
+    }else{
+      b.disabled = false;
+      if(b.dataset.rotulo && k !== qual){ b.textContent = b.dataset.rotulo; delete b.dataset.rotulo; }
+      if(!qual && b.dataset.rotulo){ b.textContent = b.dataset.rotulo; delete b.dataset.rotulo; }
+    }
+  });
+  ['btnMedirTodos','btnBR'].forEach(id => { const b = document.getElementById(id); if(b) b.disabled = !!qual; });
+  // campos do teste que está rodando ficam travados para não mudar no meio
+  const campos = { partida:['selSrvPartida','inpMin','selTaxa'], download:['inpMB','selCon'], carga:['selSrvCarga'] };
+  Object.keys(campos).forEach(k => campos[k].forEach(id => {
+    const e = document.getElementById(id); if(e) e.disabled = !!qual;
+  }));
+  document.querySelectorAll('.preset').forEach(b => { b.disabled = !!qual; b.style.opacity = qual ? .4 : 1; });
+}
+
+/* ============================================================
+   4. PAINEL DE SERVIDORES
+   ============================================================ */
+const grid = document.getElementById('srvGrid');
+
+function montarServidores(){
+  grid.innerHTML = '';
+  SERVERS.forEach(s => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'chip';
+    b.dataset.id = s.id;
+    b.setAttribute('aria-pressed', s.id === APP.srvAtual ? 'true' : 'false');
+    b.innerHTML =
+      '<div class="cidade"><span class="flag">'+s.flag+'</span>'+s.cidade+'</div>' +
+      '<div class="prov">'+s.prov+'</div>' +
+      '<div class="ms" data-ms>—<small> ms</small></div>';
+    b.addEventListener('click', () => {
+      APP.srvAtual = s.id;
+      document.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', c.dataset.id===s.id ? 'true':'false'));
+      document.getElementById('selSrvPartida').value = s.id;
+      medirUm(s, true);
+    });
+    grid.appendChild(b);
+  });
+
+  [['selSrvPartida', APP.srvAtual], ['selSrvCarga','edge']].forEach(([id, val]) => {
+    const sel = document.getElementById(id);
+    sel.innerHTML = '';
+    SERVERS.forEach(s => {
+      const o = document.createElement('option');
+      o.value = s.id;
+      o.textContent = s.cidade + ' — ' + s.prov.split(' · ')[0];
+      sel.appendChild(o);
+    });
+    sel.value = val;
+  });
+  document.getElementById('selSrvPartida').addEventListener('change', e => {
+    APP.srvAtual = e.target.value;
+    document.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', c.dataset.id===APP.srvAtual ? 'true':'false'));
+  });
+}
+
+function pintarChip(id, ms){
+  const el = grid.querySelector('.chip[data-id="'+id+'"] [data-ms]');
+  if(!el) return;
+  if(ms === null){ el.innerHTML = '<span style="font-size:14px;color:var(--ink3)">fora do ar</span>'; return; }
+  const n = notaInversa(ms, [[20,100],[60,86],[120,70],[200,55],[320,40],[500,10]]);
+  el.innerHTML = Math.round(ms) + '<small> ms</small>';
+  el.style.color = faixa(n).cor;
+}
+
+async function medirUm(srv, atualizaTopo){
+  const url = await prepararServidor(srv);
+  if(!url){ APP.pingAtual[srv.id] = null; pintarChip(srv.id, null); return null; }
+  const amostras = [];
+  let enviados = 0;
+  for(let i=0;i<8;i++){
+    const v = await pingURL(url, 2500);
+    if(i === 0) continue;            // primeira ainda carrega resquício de handshake
+    enviados++;
+    if(v !== null) amostras.push(v);
+    if(atualizaTopo && amostras.length){          // o número já aparece no primeiro pacote
+      APP.metrics.ping = mediana(amostras);
+      APP.metrics.jitter = jitter(amostras);
+      APP.metrics.perda = (enviados - amostras.length) / enviados * 100;
+      APP.metrics.p99 = percentil(amostras, 99);
+      APP.metrics.srv = srv.id;
+      pintarChip(srv.id, APP.metrics.ping);
+      atualizarVeredito();
+    }
+    await new Promise(r => setTimeout(r, 90));
+  }
+  if(!amostras.length){ pintarChip(srv.id, null); return null; }
+  const m = mediana(amostras);
+  APP.pingAtual[srv.id] = m;
+  pintarChip(srv.id, m);
+  if(atualizaTopo){
+    APP.metrics.ping = m;
+    APP.metrics.jitter = jitter(amostras);
+    APP.metrics.perda = (enviados - amostras.length) / enviados * 100;
+    APP.metrics.p99 = percentil(amostras, 99);
+    APP.metrics.srv = srv.id;
+    atualizarVeredito();
+  }
+  return m;
+}
+
+async function medirTodos(apenasBR){
+  if(APP.rodando) return;
+  const btnA = document.getElementById('btnMedirTodos');
+  const btnB = document.getElementById('btnBR');
+  btnA.disabled = btnB.disabled = true;
+  const rotulo = btnA.textContent;
+  btnA.textContent = 'Medindo…';
+  const lista = SERVERS.filter(s => apenasBR ? s.br : true);
+  for(const s of lista){ await medirUm(s, s.id === APP.srvAtual); }
+  btnA.textContent = rotulo;
+  btnA.disabled = btnB.disabled = false;
+}
+document.getElementById('btnMedirTodos').addEventListener('click', () => medirTodos(false));
+document.getElementById('btnBR').addEventListener('click', () => medirTodos(true));
+
+/* ============================================================
+   5. GRÁFICO DE LATÊNCIA (mostrador de fósforo âmbar)
+   ============================================================ */
+function ctxOf(canvas){
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const r = canvas.getBoundingClientRect();
+  const w = Math.max(r.width, 260), h = canvas.clientHeight || 220;
+  canvas.width = Math.round(w*dpr); canvas.height = Math.round(h*dpr);
+  const c = canvas.getContext('2d');
+  c.setTransform(dpr,0,0,dpr,0,0);
+  return { c, w, h };
+}
+function css(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+const cvPing = document.getElementById('canvasPing');
+/* Cada ponto do gráfico guarda o melhor e o pior pacote do trecho que ele
+   representa. Quando a partida passa de MAX_PONTOS, dois pontos viram um e a
+   janela dobra — assim o traçado cobre a partida do começo ao fim, de 30
+   segundos a 2 horas, sem jogar fora onde travou. */
+let serie = [];        // {mx, mn, perda} | null
+let pendentes = [];
+let compressao = 1;
+const MAX_PONTOS = 900;
+
+function zerarSerie(){ serie = []; pendentes = []; compressao = 1; APP.medianaPartida = null; }
+
+/* cada pacote entra com a informação de se, naquele instante, havia
+   download pesado rodando — é o que pinta o fundo do gráfico */
+function empurrar(v, sobCarga){
+  pendentes.push({ v:v, c:!!sobCarga });
+  if(pendentes.length < compressao) return;
+  const vals = pendentes.filter(x => x.v !== null).map(x => x.v);
+  const houvePerda = vals.length < pendentes.length;
+  const comCarga = pendentes.filter(x => x.c).length*2 >= pendentes.length;
+  serie.push(vals.length
+    ? { mx:maior(vals), mn:menor(vals), perda:houvePerda, carga:comCarga }
+    : null);
+  pendentes = [];
+  if(serie.length > MAX_PONTOS) condensar();
+}
+
+function condensar(){
+  const nova = [];
+  for(let i=0;i<serie.length;i+=2){
+    const a = serie[i], b = serie[i+1];
+    if(b === undefined){ nova.push(a); break; }
+    if(a === null && b === null){ nova.push(null); continue; }
+    if(a === null){ nova.push({ mx:b.mx, mn:b.mn, perda:true, carga:b.carga }); continue; }
+    if(b === null){ nova.push({ mx:a.mx, mn:a.mn, perda:true, carga:a.carga }); continue; }
+    nova.push({ mx:Math.max(a.mx,b.mx), mn:Math.min(a.mn,b.mn),
+                perda:a.perda||b.perda, carga:a.carga||b.carga });
+  }
+  serie = nova;
+  compressao *= 2;
+}
+
+const trechoMax = p => p === null ? null : (typeof p === 'number' ? p : p.mx);
+const trechoMin = p => p === null ? null : (typeof p === 'number' ? p : p.mn);
+const trechoPerdeu = p => p === null || (typeof p === 'object' && p.perda);
+
+function desenharPing(){
+  const { c, w, h } = ctxOf(cvPing);
+  const padL = 42, padR = 10, padT = 26, padB = 20;
+  const gw = w - padL - padR, gh = h - padT - padB;
+  c.clearRect(0,0,w,h);
+
+  const vals = serie.filter(p => p !== null).map(trechoMax);
+  const valsMin = serie.filter(p => p !== null).map(trechoMin);
+  let topo = 60;
+  if(vals.length){
+    const p98 = percentil(vals, 98);
+    topo = Math.max(20, p98 * 1.35);
+  }
+  const escalas = [20,40,60,80,100,150,200,300,400,600,800,1200,2000,3000];
+  topo = escalas.find(e => e >= topo) || topo;
+
+  const corGrid = css('--grid'), corInk3 = css('--ink3'), corTrace = css('--trace');
+  const corFill = css('--trace-fill'), corN1 = css('--n1');
+  const eixo = v => String(Math.round(v));
+
+  c.font = '11px "IBM Plex Mono", monospace';
+  c.textBaseline = 'middle';
+  for(let i=0;i<=4;i++){
+    const y = padT + gh*i/4;
+    const val = topo*(1-i/4);
+    c.strokeStyle = corGrid; c.lineWidth = 1;
+    c.beginPath(); c.moveTo(padL, Math.round(y)+.5); c.lineTo(w-padR, Math.round(y)+.5); c.stroke();
+    c.fillStyle = corInk3; c.textAlign = 'right';
+    c.fillText(Math.round(val) + '', padL-7, y);
+  }
+  c.textAlign = 'left';
+  c.fillStyle = corInk3;
+  c.fillText('ms', 4, 10);
+
+  if(!vals.length){
+    c.fillStyle = corInk3; c.textAlign = 'center';
+    c.font = '13px "IBM Plex Sans", sans-serif';
+    c.fillText('O traçado aparece aqui quando a partida começar.', padL+gw/2, padT+gh/2);
+    return;
+  }
+
+  const n = serie.length;
+  const x = i => padL + (n<=1 ? gw : gw*i/(n-1));
+  const y = v => padT + gh*(1 - clamp(v,0,topo)/topo);
+
+  // fundo dos trechos em que havia download pesado rodando
+  const corCarga = css('--carga-fundo');
+  if(corCarga){
+    c.fillStyle = corCarga;
+    let i = 0;
+    while(i < n){
+      if(serie[i] && serie[i].carga){
+        let j = i;
+        while(j+1 < n && serie[j+1] && serie[j+1].carga) j++;
+        c.fillRect(x(i), padT, Math.max(1.5, x(j)-x(i)), gh);
+        i = j+1;
+      }else i++;
+    }
+  }
+
+  // faixa entre o melhor e o pior pacote de cada trecho
+  const cheios = serie.map((p,i)=>p===null?-1:i).filter(i=>i>=0);
+  if(cheios.length){
+    c.beginPath();
+    cheios.forEach((i,k) => { const px = x(i), py = y(trechoMax(serie[i])); k ? c.lineTo(px,py) : c.moveTo(px,py); });
+    for(let k=cheios.length-1;k>=0;k--){ const i = cheios[k]; c.lineTo(x(i), y(trechoMin(serie[i]))); }
+    c.closePath();
+    c.fillStyle = corFill; c.fill();
+  }
+
+  // mediana real dos pacotes medidos
+  const med = (APP.medianaPartida !== null && APP.medianaPartida !== undefined)
+    ? APP.medianaPartida : mediana(vals);
+  c.setLineDash([4,4]); c.strokeStyle = corInk3; c.lineWidth = 1;
+  c.beginPath(); c.moveTo(padL, y(med)); c.lineTo(w-padR, y(med)); c.stroke();
+  c.setLineDash([]);
+
+  // traçado do pior pacote de cada trecho
+  c.strokeStyle = corTrace; c.lineWidth = n > 400 ? 1 : 1.7;
+  c.lineJoin = 'round'; c.lineCap = 'round';
+  c.beginPath(); let mov = false;
+  serie.forEach((p,i) => {
+    if(p === null){ mov = false; return; }
+    const v = trechoMax(p);
+    if(!mov){ c.moveTo(x(i), y(v)); mov = true; } else c.lineTo(x(i), y(v));
+  });
+  c.stroke();
+
+  // pacotes perdidos: risco discreto no fundo + marca firme na base
+  const larg = Math.max(1, Math.min(2.5, gw/Math.max(n,1)));
+  serie.forEach((p,i) => {
+    if(!trechoPerdeu(p)) return;
+    c.globalAlpha = .28; c.fillStyle = corN1;
+    c.fillRect(x(i)-larg/2, padT, larg, gh);
+    c.globalAlpha = 1;
+    c.fillRect(x(i)-larg/2, padT+gh-4, larg, 4);
+  });
+
+  // ponto atual
+  const iUlt = cheios.length ? cheios[cheios.length-1] : -1;
+  if(iUlt >= 0){
+    c.fillStyle = corTrace;
+    c.beginPath(); c.arc(x(iUlt), y(trechoMax(serie[iUlt])), 3.2, 0, Math.PI*2); c.fill();
+  }
+
+  // quanto tempo cada ponto representa, quando o traçado já foi condensado
+  if(compressao > 1 && APP.tickPartida){
+    c.textAlign = 'right'; c.fillStyle = corInk3;
+    c.font = '10.5px "IBM Plex Sans", sans-serif';
+    c.fillText('cada traço = ' + num(compressao*APP.tickPartida/1000,1) + ' s', w-padR, 10);
+  }
+}
+
+/* linha do tempo segundo a segundo */
+const tl = document.getElementById('timeline');
+function montarTimeline(segs){
+  tl.innerHTML = '';
+  const alvo = clamp(segs, 20, 180);
+  for(let i=0;i<alvo;i++){
+    const d = document.createElement('div');
+    d.className = 'tl-seg';
+    tl.appendChild(d);
+  }
+  return alvo;
+}
+function notaDoTrecho(trecho, env, perd){
+  if(!trecho.length && !env) return null;
+  return notaGeral({
+    ping: mediana(trecho), jitter: jitter(trecho),
+    perda: env ? perd/env*100 : 0, p99: percentil(trecho, 99)
+  });
+}
+
+/* pinta um trecho com a nota daquele trecho, não com a nota acumulada:
+   é assim que um tranco no minuto 15 aparece vermelho no minuto 15 */
+function pintarTimeline(i, nota){
+  const segs = tl.children;
+  const k = clamp(i, 0, segs.length-1);
+  if(segs[k]){
+    segs[k].style.background = faixa(nota).cor;
+    segs[k].title = 'trecho ' + (k+1) + ': ' + faixa(nota).nome;
+  }
+}
+
+/* ============================================================
+   6. SIMULAÇÃO DE PARTIDA
+   ============================================================ */
+const btnPartida = document.getElementById('btnPartida');
+let partidaAtiva = false, pararPartida = false;
+
+document.querySelectorAll('.preset[data-min]').forEach(b => {
+  b.addEventListener('click', () => { document.getElementById('inpMin').value = b.dataset.min; });
+});
+
+/* =========================================================
+   A carga: um download pesado que liga e desliga durante a
+   partida, para medir o jogo do jeito que ele acontece de
+   verdade na sua casa — com alguém baixando alguma coisa.
+   ========================================================= */
+function criarCarga(){
+  return {
+    ativa: false,
+    ctl: null,
+    baixados: 0,
+    _base: 0,
+    _t0: 0,
+    segundosLigada: 0,
+    ligar(conexoes){
+      if(this.ativa) return;
+      this.ativa = true;
+      this._base = this.baixados;
+      this._t0 = performance.now();
+      this.ctl = new AbortController();
+      const eu = this;
+      baixar(2e10, conexoes || 4, function(b){ eu.baixados = eu._base + b; }, this.ctl.signal).catch(function(){});
+    },
+    desligar(){
+      if(!this.ativa) return;
+      this.ativa = false;
+      this.segundosLigada += (performance.now() - this._t0)/1000;
+      if(this.ctl) this.ctl.abort();
+      this.ctl = null;
+    },
+    segundos(){
+      return this.segundosLigada + (this.ativa ? (performance.now() - this._t0)/1000 : 0);
+    }
+  };
+}
+
+/* Quanto tempo de partida fica com download ligado, por cenário.
+   No modo alternado o bloco de carga tem teto de 45 s: numa partida de meia
+   hora, ficar metade do tempo baixando gastaria vários GB do seu plano sem
+   melhorar a medida — 45 s por ciclo já dá amostra de sobra. */
+const CARGA_MAX_BLOCO = 45000;
+function planoDeCarga(cenario, totalMs){
+  if(cenario === 'livre') return { tipo:'livre', fracaoComCarga:0 };
+  if(cenario === 'carga'){
+    // mesmo no modo cheio, um começo livre dá a linha de base para comparar
+    const base = Math.min(20000, totalMs*0.15);
+    return { tipo:'carga', baseMs:base, fracaoComCarga: 1 - base/totalMs };
+  }
+  const ciclo = clamp(totalMs/6, 40000, 240000);
+  const cargaMs = Math.min(ciclo/2, CARGA_MAX_BLOCO);
+  return { tipo:'alterna', cicloMs:ciclo, cargaMs:cargaMs, fracaoComCarga: cargaMs/ciclo };
+}
+
+/* o cenário manda: diz se neste instante da partida a carga deve estar ligada */
+function cargaDeveEstarLigada(plano, dt){
+  if(plano.tipo === 'livre') return false;
+  if(plano.tipo === 'carga') return dt >= plano.baseMs;
+  const pos = dt % plano.cicloMs;                 // cada ciclo começa livre
+  return pos >= (plano.cicloMs - plano.cargaMs);
+}
+
+btnPartida.addEventListener('click', async () => {
+  if(partidaAtiva){ pararPartida = true; return; }
+  if(APP.rodando){ return; }
+
+  const srv = srvPorId(document.getElementById('selSrvPartida').value);
+  const minutos = clamp(parseFloat(document.getElementById('inpMin').value) || 3, 0.5, 120);
+  const intervalo = parseInt(document.getElementById('selTaxa').value, 10);
+  const cenario = document.getElementById('selCenario').value;
+  const totalMs = minutos*60000;
+  const plano = planoDeCarga(cenario, totalMs);
+
+  const dot = document.getElementById('dotPartida');
+  const txt = document.getElementById('txtPartida');
+  const barra = document.getElementById('barPartida');
+
+  partidaAtiva = true; pararPartida = false; travarUI('partida');
+  btnPartida.textContent = 'Parar'; btnPartida.classList.add('stop');
+  dot.className = 'dot warn';
+  txt.textContent = 'Abrindo conexão com ' + srv.cidade + '…';
+  zerarSerie(); APP.tickPartida = intervalo; desenharPing();
+  esconderComparacao();
+  const legC = document.getElementById('legCarga');
+  if(legC) legC.hidden = (plano.tipo === 'livre');
+  const nSegs = montarTimeline(Math.round(minutos*60));
+
+  const url = await prepararServidor(srv);
+  if(!url){
+    dot.className = 'dot err';
+    txt.textContent = 'Não consegui falar com ' + srv.cidade + '. Escolha outro servidor.';
+    encerrarPartida(); return;
+  }
+
+  const amostras = [], amLivre = [], amCarga = [];
+  let enviados = 0, perdidos = 0, emVoo = 0;
+  let envLivre = 0, perdLivre = 0, envCarga = 0, perdCarga = 0;
+  const marcaFinal = { idx:0, env:0, perd:0, seg:0 };
+  const carga = criarCarga();
+  const conexoesCarga = 4;
+  const t0 = performance.now();
+  dot.className = 'dot live';
+
+  const timeout = Math.max(1200, Math.min(4000, intervalo*12));
+
+  await new Promise(resolve => {
+    const tick = setInterval(() => {
+      const dt = performance.now() - t0;
+      if(dt >= totalMs || pararPartida){ clearInterval(tick); resolve(); return; }
+
+      // liga ou desliga o download conforme o cenário pede para este instante
+      const deveCarregar = cargaDeveEstarLigada(plano, dt);
+      if(deveCarregar !== carga.ativa){
+        if(deveCarregar) carga.ligar(conexoesCarga); else carga.desligar();
+      }
+
+      if(emVoo > 8) return;
+      emVoo++; enviados++;
+      const sobCarga = carga.ativa;
+      if(sobCarga) envCarga++; else envLivre++;
+      pingURL(url, timeout).then(v => {
+        emVoo--;
+        if(v === null){
+          perdidos++;
+          if(sobCarga) perdCarga++; else perdLivre++;
+          empurrar(null, sobCarga);
+        }else{
+          amostras.push(v);
+          (sobCarga ? amCarga : amLivre).push(v);
+          empurrar(v, sobCarga);
+        }
+      });
+    }, intervalo);
+
+    /* o traçado repinta rápido; a conta pesada (ordenar milhares de pacotes)
+       roda a cada 2 s para não engasgar em celular durante partida longa */
+    let volta = 0;
+    let marcaIdx = 0, marcaEnv = 0, marcaPerd = 0, segAtual = 0;
+    const pintar = setInterval(() => {
+      const dt = performance.now() - t0;
+      if(dt >= totalMs || pararPartida){ clearInterval(pintar); return; }
+      desenharPing();
+      const frac = dt/totalMs;
+      barra.style.width = (frac*100).toFixed(1) + '%';
+
+      if(volta++ % 5 === 0){
+        const parcial = estatisticas(amostras, enviados, perdidos, dt/1000);
+        atualizarCaixaPartida(parcial);
+        APP.medianaPartida = parcial.mediana;
+        if(amLivre.length >= 8 && amCarga.length >= 8){
+          montarComparacao(
+            estatisticas(amLivre, envLivre, perdLivre, (dt - carga.segundos()*1000)/1000),
+            estatisticas(amCarga, envCarga, perdCarga, carga.segundos()),
+            carga, true);
+        }
+      }
+
+      // fechou um trecho da linha do tempo: pinta com a qualidade só desse trecho
+      const seg = clamp(Math.floor(frac*nSegs), 0, nSegs-1);
+      if(seg !== segAtual){
+        const trecho = amostras.slice(marcaIdx);
+        const envT = enviados - marcaEnv, perdT = perdidos - marcaPerd;
+        const nt = notaDoTrecho(trecho, envT, perdT);
+        if(nt !== null) pintarTimeline(segAtual, nt);
+        marcaIdx = amostras.length; marcaEnv = enviados; marcaPerd = perdidos;
+        segAtual = seg;
+        marcaFinal.idx = marcaIdx; marcaFinal.env = marcaEnv; marcaFinal.perd = marcaPerd; marcaFinal.seg = seg;
+      }
+
+      const falta = Math.max(0, (totalMs-dt)/1000);
+      const caiu = enviados >= 5 && amostras.length === 0;
+      const envAgora = enviados - marcaEnv, perdAgora = perdidos - marcaPerd;
+      const perdendoAgora = envAgora >= 4 && (perdAgora/envAgora) > 0.4;
+      dot.className = caiu ? 'dot err' : (perdendoAgora ? 'dot warn' : 'dot live');
+      const modo = carga.ativa
+        ? 'baixando ' + num(carga.baixados/1073741824, 2) + ' GB'
+        : (plano.tipo === 'livre' ? 'internet livre' : 'trecho livre');
+      txt.textContent = caiu
+        ? 'Sem resposta de ' + srv.cidade + ' — a conexão caiu ou o caminho está bloqueado. O teste continua tentando.'
+        : srv.cidade + ' · ' + modo + ' · ' + amostras.length + ' pacotes · falta ' + tempoTexto(falta);
+    }, 400);
+  });
+
+  carga.desligar();
+
+  // espera os pacotes em voo e fecha o último trecho do traçado
+  await new Promise(r => setTimeout(r, 900));
+  {
+    const trechoFinal = amostras.slice(marcaFinal.idx);
+    const nt = notaDoTrecho(trechoFinal, enviados - marcaFinal.env, perdidos - marcaFinal.perd);
+    if(nt !== null) pintarTimeline(marcaFinal.seg, nt);
+  }
+  if(pendentes.length){
+    const vs = pendentes.filter(x => x.v !== null).map(x => x.v);
+    const cc = pendentes.filter(x => x.c).length*2 >= pendentes.length;
+    serie.push(vs.length ? { mx:maior(vs), mn:menor(vs), perda:vs.length < pendentes.length, carga:cc } : null);
+    pendentes = [];
+  }
+  desenharPing();
+  barra.style.width = '100%';
+
+  const duracao = (performance.now()-t0)/1000;
+  const segCarga = carga.segundos();
+  const segLivre = Math.max(0, duracao - segCarga);
+  if(segCarga > 8 && carga.baixados > 0){
+    APP.bandaCarga = carga.baixados*8/1e6/segCarga;   // só para estimar consumo
+    atualizarAvisoDados();
+  }
+
+  const fim = estatisticas(amostras, enviados, perdidos, duracao);
+  atualizarCaixaPartida(fim);
+
+  const stLivre = amLivre.length >= 8 ? estatisticas(amLivre, envLivre, perdLivre, segLivre) : null;
+  const stCarga = amCarga.length >= 8 ? estatisticas(amCarga, envCarga, perdCarga, segCarga) : null;
+
+  /* a referência da sua internet é o estado normal dela: o trecho livre.
+     O trecho com download vira a medida de quanto ela piora sob pressão. */
+  const base = stLivre || fim;
+  APP.metrics.ping = base.mediana;
+  APP.metrics.jitter = base.jitter;
+  APP.metrics.perda = base.perda;
+  APP.metrics.p99 = base.p99;
+  APP.metrics.srv = srv.id;
+  if(stLivre && stCarga) APP.metrics.bufa = stCarga.mediana - stLivre.mediana;
+  atualizarVeredito();
+
+  if(stLivre && stCarga) montarComparacao(stLivre, stCarga, carga, false);
+  else esconderComparacao();
+
+  if(FUNDO.desde !== null){ FUNDO.total += performance.now() - FUNDO.desde; FUNDO.desde = null; }
+  const segFundo = FUNDO.total/1000;
+  dot.className = segFundo > 5 ? 'dot warn' : 'dot';
+  const extra = (stLivre && stCarga)
+    ? ' Com download rodando o ping foi de ' + num(stLivre.mediana,0) + ' para ' + num(stCarga.mediana,0) + ' ms.'
+    : '';
+  txt.textContent = 'Terminou: ' + amostras.length + ' pacotes em ' + tempoTexto(duracao) +
+                    ' até ' + srv.cidade + '. Nota ' + faixa(fim.nota).nome + '.' + extra +
+                    (segCarga > 1 ? ' O teste baixou ' + num(carga.baixados/1073741824,2) + ' GB.' : '') +
+                    (segFundo > 5 ? ' Atenção: a página ficou ' + tempoTexto(segFundo) +
+                     ' fora da tela e esse trecho pode ter menos pacotes do que deveria.' : '');
+  salvarHistorico({ tipo:'Partida ' + num(minutos, minutos % 1 ? 1 : 0) + ' min' + (plano.tipo === 'livre' ? '' : ' (com carga)'),
+                    srv:srv.cidade, ping:base.mediana, jit:base.jitter, perda:base.perda, banda:null, nota:fim.nota });
+  encerrarPartida();
+});
+
+/* =========================================================
+   Tabela: internet livre contra internet com download rodando
+   ========================================================= */
+const EFEITOS = [
+  { nome:'igual',        cor:'var(--n5)' },
+  { nome:'dá pra sentir',cor:'var(--n3)' },
+  { nome:'atrapalha',    cor:'var(--n2)' },
+  { nome:'estraga',      cor:'var(--n1)' }
+];
+function efeito(dif, limites){
+  if(dif === null || dif === undefined || !isFinite(dif)) return EFEITOS[0];
+  if(dif < limites[0]) return EFEITOS[0];
+  if(dif < limites[1]) return EFEITOS[1];
+  if(dif < limites[2]) return EFEITOS[2];
+  return EFEITOS[3];
+}
+
+function esconderComparacao(){
+  const cx = document.getElementById('compara');
+  if(cx) cx.hidden = true;
+}
+
+function montarComparacao(livre, carga, estadoCarga, parcial){
+  const cx = document.getElementById('compara');
+  const tb = document.getElementById('cmpBody');
+  if(!cx || !tb) return;
+  cx.hidden = false;
+
+  const linhas = [
+    { nome:'Latência (mediana)', a:livre.mediana, b:carga.mediana, d:1, un:' ms', lim:[10,30,80] },
+    { nome:'Jitter',             a:livre.jitter,  b:carga.jitter,  d:1, un:' ms', lim:[3,10,25] },
+    { nome:'Pior pico',          a:livre.p95,     b:carga.p95,     d:0, un:' ms', lim:[60,180,450] },
+    { nome:'Travadas por minuto',a:livre.spm,     b:carga.spm,     d:1, un:'',    lim:[1,4,12] },
+    { nome:'Perda de pacote',    a:livre.perda,   b:carga.perda,   d:2, un:' %',  lim:[0.3,1,3] }
+  ];
+
+  tb.innerHTML = '';
+  let piorEfeito = 0;
+  linhas.forEach(function(l){
+    const temAB = l.a !== null && l.a !== undefined && l.b !== null && l.b !== undefined;
+    const dif = temAB ? l.b - l.a : null;
+    const ef = efeito(dif, l.lim);
+    const idx = EFEITOS.indexOf(ef);
+    if(idx > piorEfeito) piorEfeito = idx;
+    const tr = document.createElement('tr');
+    tr.className = idx === 0 ? 'igual' : (idx >= 2 ? 'pior' : '');
+    tr.innerHTML =
+      '<td>' + l.nome + '</td>' +
+      '<td data-r="livre">' + num(l.a, l.d) + l.un + '</td>' +
+      '<td data-r="com download">' + num(l.b, l.d) + l.un + '</td>' +
+      '<td class="dif" data-r="diferença">' + (dif === null ? '--' : (dif > 0 ? '+' : '') + num(dif, l.d) + l.un) + '</td>' +
+      '<td class="ef" style="color:' + ef.cor + '">' + ef.nome + '</td>';
+    tb.appendChild(tr);
+  });
+
+  const v = document.getElementById('cmpVeredito');
+  if(!v) return;
+  const salto = (carga.mediana !== null && livre.mediana !== null) ? carga.mediana - livre.mediana : null;
+  const gb = estadoCarga ? estadoCarga.baixados/1073741824 : 0;
+  const cauda = parcial ? ' <b>Ainda medindo</b>, esses números vão se firmar até o fim da partida.' : '';
+
+  let texto;
+  if(piorEfeito === 0){
+    texto = 'Sua internet <b>não muda</b> quando alguém está baixando. Isso é raro e muito bom: significa que o ' +
+            'roteador dá passagem ao jogo mesmo com a linha cheia. Pode jogar em qualquer horário da casa.';
+  }else if(piorEfeito === 1){
+    texto = 'Com download rodando o jogo fica <b>um pouco mais pesado</b>' +
+            (salto !== null ? ', com o ping subindo ' + num(salto,0) + ' ms' : '') +
+            '. Dá para jogar sem sofrer, mas em partida decisiva vale pedir para pausarem o download.';
+  }else if(piorEfeito === 2){
+    texto = 'Quando a casa usa a internet, o jogo <b>sente de verdade</b>' +
+            (salto !== null ? ': o ping sobe ' + num(salto,0) + ' ms' : '') +
+            '. Você vai notar jogador correndo estranho e passe saindo atrasado. O painel 07 mostra o ajuste ' +
+            'de roteador que resolve isso.';
+  }else{
+    texto = 'Com download rodando sua partida <b>fica injogável</b>' +
+            (salto !== null ? ': o ping salta ' + num(salto,0) + ' ms' : '') +
+            '. É o caso clássico de fila no roteador, e tem conserto: veja a primeira ação do painel 07.';
+  }
+  if(gb > 0.05) texto += ' O teste baixou ' + num(gb,2) + ' GB para deixar a linha cheia de verdade.';
+  v.innerHTML = texto + cauda;
+}
+
+function encerrarPartida(){
+  partidaAtiva = false; pararPartida = false; travarUI(null);
+  btnPartida.textContent = 'Iniciar partida'; btnPartida.classList.remove('stop');
+}
+function tempoTexto(s){
+  // arredonda o total antes de repartir, senão 119,7 s vira "1 min 60 s"
+  const tot = Math.round(s);
+  if(tot < 60) return tot + ' s';
+  const m = Math.floor(tot/60), r = tot%60;
+  if(m < 60) return m + ' min ' + (r<10?'0':'') + r + ' s';
+  const h = Math.floor(m/60), mm = m%60;
+  return h + ' h ' + (mm<10?'0':'') + mm + ' min';
+}
+
+function estatisticas(a, enviados, perdidos, durSeg){
+  if(!a.length){
+    // nenhum pacote voltou: se já houve tentativas suficientes, isso é queda de conexão
+    const caiu = enviados >= 5;
+    return { media:null, mediana:null, jitter:null, min:null, p95:null, p99:null,
+             spikes:null, spm:null, total:0,
+             perda: caiu ? 100 : null, nota: caiu ? 0 : null };
+  }
+  const med = mediana(a);
+  const jit = jitter(a);
+  const perda = enviados ? perdidos/enviados*100 : 0;
+  const limite = Math.max(med*2, med+40);
+  const spikes = a.filter(v => v > limite).length;
+  const p99 = percentil(a,99), pior = maior(a);
+  const nota = notaGeral({ ping:med, jitter:jit, perda:perda, p99:p99, banda:APP.metrics.banda, bufa:APP.metrics.bufa });
+  const min = durSeg && durSeg > 5 ? durSeg/60 : null;
+  return { media:media(a), mediana:med, jitter:jit, min:menor(a), p95:pior, p99:p99,
+           spikes:spikes, spm: min ? spikes/min : null, perda:perda, nota:nota, total:a.length };
+}
+
+function atualizarCaixaPartida(s){
+  const set = (id,v,d) => { const e = document.getElementById(id); const sm = e.querySelector('small'); e.textContent = num(v,d===undefined?1:d); if(sm) e.appendChild(sm); };
+  set('pMedia', s.media); set('pMediana', s.mediana); set('pJitter', s.jitter);
+  set('pMin', s.min); set('pP95', s.p95); set('pP99', s.p99); set('pPerda', s.perda, 2);
+  const e = document.getElementById('pSpikes'), sm = e.querySelector('small');
+  e.textContent = (s.spm === null || s.spm === undefined) ? (s.spikes === null ? '--' : String(s.spikes)) : num(s.spm,1);
+  if(sm){
+    sm.textContent = (s.spm === null || s.spm === undefined) ? ' no total' : ' /min';
+    e.appendChild(sm);
+  }
+  e.title = s.spikes === null ? '' : s.spikes + ' travadas no total';
+  if(s.spm !== null && s.spm !== undefined){
+    e.style.color = s.spm < 2 ? 'var(--n5)' : s.spm < 6 ? 'var(--n3)' : 'var(--n1)';
+  }
+}
+
+/* ============================================================
+   7. DOWNLOAD REAL
+   ============================================================ */
+const btnDown = document.getElementById('btnDown');
+let downAtivo = false, downCtl = null;
+let serieBanda = [];
+
+document.querySelectorAll('.preset[data-mb]').forEach(b => {
+  b.addEventListener('click', () => { document.getElementById('inpMB').value = b.dataset.mb; });
+});
+
+function desenharBanda(){
+  const cv = document.getElementById('canvasBanda');
+  const { c, w, h } = ctxOf(cv);
+  const padL = 48, padR = 10, padT = 26, padB = 18;
+  const gw = w-padL-padR, gh = h-padT-padB;
+  c.clearRect(0,0,w,h);
+  const corGrid = css('--grid'), corInk3 = css('--ink3'), corTrace = css('--trace'), corFill = css('--trace-fill');
+
+  let topo = 100;
+  if(serieBanda.length) topo = Math.max(10, maior(serieBanda)*1.25);
+
+  c.font = '11px "IBM Plex Mono", monospace'; c.textBaseline = 'middle';
+  for(let i=0;i<=4;i++){
+    const y = padT+gh*i/4;
+    c.strokeStyle = corGrid; c.lineWidth = 1;
+    c.beginPath(); c.moveTo(padL, Math.round(y)+.5); c.lineTo(w-padR, Math.round(y)+.5); c.stroke();
+    c.fillStyle = corInk3; c.textAlign = 'right';
+    c.fillText(Math.round(topo*(1-i/4))+'', padL-7, y);
+  }
+  c.textAlign = 'left'; c.fillStyle = corInk3;
+  c.fillText('Mbps', 4, 10);
+
+  if(!serieBanda.length){
+    c.fillStyle = corInk3; c.textAlign='center';
+    c.font = '13px "IBM Plex Sans", sans-serif';
+    c.fillText('A curva de velocidade aparece aqui durante o download.', padL+gw/2, padT+gh/2);
+    return;
+  }
+  const n = serieBanda.length;
+  const x = i => padL + (n<=1?gw:gw*i/(n-1));
+  const y = v => padT + gh*(1-clamp(v,0,topo)/topo);
+
+  c.beginPath(); c.moveTo(x(0), y(serieBanda[0]));
+  serieBanda.forEach((v,i) => c.lineTo(x(i), y(v)));
+  c.lineTo(x(n-1), padT+gh); c.lineTo(x(0), padT+gh); c.closePath();
+  c.fillStyle = corFill; c.fill();
+
+  const m = media(serieBanda);
+  c.setLineDash([4,4]); c.strokeStyle = corInk3; c.lineWidth = 1;
+  c.beginPath(); c.moveTo(padL, y(m)); c.lineTo(w-padR, y(m)); c.stroke(); c.setLineDash([]);
+
+  c.strokeStyle = corTrace; c.lineWidth = 1.8; c.lineJoin='round';
+  c.beginPath(); c.moveTo(x(0), y(serieBanda[0]));
+  serieBanda.forEach((v,i) => c.lineTo(x(i), y(v)));
+  c.stroke();
+  c.fillStyle = corTrace;
+  c.beginPath(); c.arc(x(n-1), y(serieBanda[n-1]), 3.2, 0, Math.PI*2); c.fill();
+}
+
+/* Baixa em pedaços até completar o total, com N conexões.
+
+   `estado.ativos` diz quantas conexões ainda estão puxando dados. Isso importa
+   para a precisão: enquanto todas estão ativas, a velocidade medida é a da sua
+   linha. Quando a primeira termina, o que sobra é a cauda do teste, e a queda
+   ali é fim de download, não internet ruim.
+
+   Cada pedaço tem vigia próprio: se parar de chegar byte por alguns segundos,
+   a conexão é cortada e o pedaço volta para a fila. Sem isso, uma única conexão
+   pendurada segurava o teste inteiro para sempre. */
+const INATIVIDADE_MS = 7000;   // sem receber nada por esse tempo = conexão pendurada
+const TENTATIVAS_PEDACO = 2;
+
+async function baixar(totalBytes, conexoes, onProgresso, sinal, estado){
+  let recebido = 0;
+  const PEDACO = 26214400; // 25 MB por requisição
+  const pedidos = Math.ceil(totalBytes/PEDACO);
+  let proximo = 0;
+  const refazer = [];                    // pedaços que penduraram e voltam para a fila
+  const tentativas = {};
+  if(estado){ estado.ativos = conexoes; estado.total = conexoes; estado.travadas = 0; }
+
+  function proximoPedaco(){
+    if(refazer.length) return refazer.shift();
+    if(proximo < pedidos) return proximo++;
+    return -1;
+  }
+
+  async function trabalhador(){
+    try{
+      while(true){
+        if(sinal.aborted) return;
+        const meu = proximoPedaco();
+        if(meu < 0) return;
+        const falta = totalBytes - meu*PEDACO;
+        const bytes = Math.min(PEDACO, Math.max(0, falta));
+        if(bytes <= 0) continue;
+
+        const ctl = new AbortController();
+        const abortarJunto = function(){ ctl.abort(); };
+        sinal.addEventListener('abort', abortarJunto);
+        let ultimoByte = performance.now();
+        const vigia = setInterval(function(){
+          if(performance.now() - ultimoByte > INATIVIDADE_MS) ctl.abort();
+        }, 1000);
+
+        try{
+          const r = await fetch(DOWN_URL + bytes + '&r=' + Math.random().toString(36).slice(2),
+                                { cache:'no-store', signal:ctl.signal });
+          if(!r.body){
+            const b = await r.blob();
+            recebido += b.size; onProgresso(recebido);
+          }else{
+            const reader = r.body.getReader();
+            while(true){
+              const passo = await reader.read();
+              if(passo.done) break;
+              ultimoByte = performance.now();
+              recebido += passo.value.length;
+              onProgresso(recebido);
+            }
+          }
+        }catch(e){
+          if(sinal.aborted) return;
+          // pendurou ou falhou: devolve o pedaço para a fila, até um limite
+          tentativas[meu] = (tentativas[meu] || 0) + 1;
+          if(estado) estado.travadas = (estado.travadas || 0) + 1;
+          if(tentativas[meu] < TENTATIVAS_PEDACO) refazer.push(meu);
+        }finally{
+          clearInterval(vigia);
+          sinal.removeEventListener('abort', abortarJunto);
+        }
+      }
+    }finally{
+      if(estado) estado.ativos--;
+    }
+  }
+  await Promise.all(Array.from({length:conexoes}, trabalhador));
+  return recebido;
+}
+
+btnDown.addEventListener('click', async () => {
+  if(downAtivo){ if(downCtl) downCtl.abort(); return; }
+  if(APP.rodando) return;
+
+  const mb = clamp(parseFloat(document.getElementById('inpMB').value) || 200, 10, 20000);
+  const con = parseInt(document.getElementById('selCon').value, 10);
+  const totalBytes = mb*1048576;
+
+  const dot = document.getElementById('dotDown'), txt = document.getElementById('txtDown');
+  const barra = document.getElementById('barDown');
+
+  downAtivo = true; travarUI('download');
+  downCtl = new AbortController();
+  btnDown.textContent = 'Parar'; btnDown.classList.add('stop');
+  dot.className = 'dot live'; txt.textContent = 'Abrindo as conexões…';
+  serieBanda = []; desenharBanda();
+  prepararGradeDown();
+
+  /* Cada amostra guarda o instante, o total baixado até ali e se naquele
+     momento TODAS as conexões ainda estavam ativas. O resultado final é
+     calculado só sobre as amostras em regime. */
+  const amostras = [];
+  const estado = { ativos: con, total: con };
+  const RAMPA_S = 1.5;          // tempo que o TCP leva para engrenar
+  const PASSO_MS = 250;         // amostragem fina
+
+  let recebido = 0, ultBytes = 0, ultT = performance.now();
+  const t0 = performance.now();
+
+  const amostrador = setInterval(() => {
+    const agora = performance.now();
+    const dt = (agora-ultT)/1000;
+    if(dt <= 0) return;
+    const mbps = (recebido-ultBytes)*8/1e6/dt;
+    const seg = (agora-t0)/1000;
+    ultBytes = recebido; ultT = agora;
+
+    amostras.push({ t:seg, bytes:recebido, mbps:mbps, cheio: estado.ativos >= estado.total });
+    serieBanda.push(mbps);
+    if(serieBanda.length > 900) serieBanda.shift();
+    desenharBanda();
+
+    const frac = clamp(recebido/totalBytes, 0, 1);
+    barra.style.width = (frac*100).toFixed(1)+'%';
+
+    // a previsão de tempo usa a velocidade já observada, sem a arrancada
+    const emRegime = amostras.filter(a => a.t >= RAMPA_S);
+    const vAtual = emRegime.length >= 2
+      ? (emRegime[emRegime.length-1].bytes - emRegime[0].bytes)*8/1e6/(emRegime[emRegime.length-1].t - emRegime[0].t)
+      : (seg > 0 ? recebido*8/1e6/seg : 0);
+    const falta = vAtual > 0 ? (totalBytes-recebido)*8/1e6/vAtual : null;
+
+    atualizarAndamentoDown(mbps, recebido, seg, falta);
+    txt.textContent = num(recebido/1048576,0) + ' de ' + num(mb, mb % 1 ? 1 : 0) + ' MB · ' + num(mbps,1) + ' Mbps agora' +
+      (estado.ativos < estado.total ? ' · terminando' : '') +
+      (estado.travadas ? ' · ' + estado.travadas + ' conexão refeita' + (estado.travadas > 1 ? 's' : '') : '');
+  }, PASSO_MS);
+
+  /* teto de segurança: um download que passa muito do previsto encerra sozinho
+     com o que já mediu, em vez de deixar o botão preso em "Parar" */
+  const TETO_MS = Math.max(180000, Math.min(1800000, mb*1400));
+  const teto = setTimeout(function(){ if(downCtl) downCtl.abort(); }, TETO_MS);
+
+  await baixar(totalBytes, con, b => { recebido = b; }, downCtl.signal, estado);
+  clearTimeout(teto);
+  clearInterval(amostrador);
+
+  const decorrido = (performance.now()-t0)/1000;
+  barra.style.width = '100%';
+  atualizarAndamentoDown(null, recebido, decorrido, 0);
+  desenharBanda();
+
+  const parou = recebido < totalBytes*0.97;
+  const r = analisarDownload(amostras, RAMPA_S);
+
+  if(r){
+    APP.metrics.banda = r.firme;
+    APP.estabilidadeDownload = r.estabilidade;
+    atualizarAvisoDados();
+    mostrarResultadoDown(r, decorrido, recebido);
+    atualizarVeredito();
+    dot.className = 'dot';
+    txt.textContent = (parou ? 'Parado em ' : 'Baixou ') + num(recebido/1048576,0) + ' MB em ' + tempoTexto(decorrido) +
+      ' · velocidade firme de ' + num(r.firme,1) + ' Mbps · ' + r.veredito.nome.toLowerCase() + '.';
+    salvarHistorico({ tipo:'Download ' + num(recebido/1048576,0) + ' MB', srv:'Cloudflare',
+      ping:null, jit:null, perda:null, banda:r.firme, nota:r.nota });
+  }else{
+    const medio = decorrido > 0 ? recebido*8/1e6/decorrido : 0;
+    APP.metrics.banda = medio > 0 ? medio : APP.metrics.banda;
+    atualizarVeredito();
+    dot.className = 'dot warn';
+    // o que falta é tempo com a linha cheia; em conexão rápida 200 MB acabam antes disso
+    const sugerido = Math.max(Math.round(mb*2/50)*50, Math.round(Math.max(medio,10)*12/8/50)*50);
+    txt.textContent = decorrido < 12
+      ? 'Sua linha é rápida: os ' + num(recebido/1048576,0) + ' MB acabaram em ' + tempoTexto(decorrido) +
+        ', curto demais para medir oscilação. Precisa de uns 12 segundos baixando. Tente ' + sugerido + ' MB.'
+      : 'Não deu para medir a oscilação: o download terminou ou foi cortado antes de firmar. Tente de novo com ' +
+        sugerido + ' MB.';
+    marcarGradeIncompleta();
+  }
+
+  downAtivo = false; travarUI(null); downCtl = null;
+  btnDown.textContent = 'Baixar'; btnDown.classList.remove('stop');
+});
+
+/* =========================================================
+   Leitura do download: separa o trecho em regime e mede a oscilação
+   ========================================================= */
+function analisarDownload(amostras, rampaS){
+  // só vale o trecho depois da arrancada e antes de qualquer conexão terminar
+  const regime = amostras.filter(a => a.t >= rampaS && a.cheio);
+  if(regime.length < 6) return null;
+
+  const ini = regime[0], fim = regime[regime.length-1];
+  const dur = fim.t - ini.t;
+  if(dur < 2) return null;
+
+  const firme = (fim.bytes - ini.bytes)*8/1e6/dur;
+  const vals = regime.map(a => a.mbps).filter(v => isFinite(v) && v >= 0);
+  if(vals.length < 5 || !firme) return null;
+
+  const m = media(vals), d = desvio(vals);
+  const estab = clamp(100 - (d/m*100), 0, 100);
+
+  // quedas: cada vez que a velocidade mergulha abaixo de 70% da média
+  const piso = m*0.70, pisoLeve = m*0.85;
+  let quedas = 0, dentro = false, tempoOsc = 0;
+  vals.forEach(v => {
+    if(v < piso){ if(!dentro){ quedas++; dentro = true; } }
+    else if(v > pisoLeve){ dentro = false; }
+    if(v < pisoLeve) tempoOsc++;
+  });
+  const pctOsc = tempoOsc/vals.length*100;
+  const vale = menor(vals), pico = maior(vals);
+  const maiorQueda = clamp((1 - vale/m)*100, 0, 100);
+
+  // a nota junta as três coisas que doem: espalhar, mergulhar e mergulhar muito
+  const nota = clamp(
+    notaInversa(100-estab, [[4,100],[8,90],[15,74],[25,52],[40,26],[70,0]])*0.5 +
+    notaInversa(quedas/Math.max(dur/60,0.2), [[0,100],[1,88],[3,70],[8,42],[20,10],[40,0]])*0.2 +
+    notaInversa(maiorQueda, [[10,100],[25,86],[45,64],[65,38],[85,10],[100,0]])*0.3, 0, 100);
+
+  // um nível só manda em tudo que o painel escreve, para o selo nunca
+  // dizer "oscila" enquanto o texto embaixo diz "constante"
+  const veredito =
+    estab >= 92 && quedas === 0 && maiorQueda < 20
+      ? { nivel:4, nome:'Firme',           cor:'var(--n5)', adj:'bem constante' } :
+    estab >= 85 && quedas <= 1 && maiorQueda < 35
+      ? { nivel:3, nome:'Oscila pouco',    cor:'var(--n4)', adj:'quase sempre constante' } :
+    estab >= 72
+      ? { nivel:2, nome:'Oscila',          cor:'var(--n3)', adj:'com altos e baixos' } :
+    estab >= 55
+      ? { nivel:1, nome:'Oscila bastante', cor:'var(--n2)', adj:'bem irregular' } :
+        { nivel:0, nome:'Muito instável',  cor:'var(--n1)', adj:'aos trancos' };
+
+  return { firme:firme, media:m, estabilidade:estab, pico:pico, vale:vale,
+           quedas:quedas, quedasPorMin: quedas/Math.max(dur/60, 0.2),
+           maiorQueda:maiorQueda, pctOsc:pctOsc, amostras:vals.length,
+           duracaoRegime:dur, nota:nota, veredito:veredito };
+}
+
+/* =========================================================
+   Pintura do painel de download
+   ========================================================= */
+function porId(id, texto){
+  const e = document.getElementById(id);
+  if(!e) return;
+  const sm = e.querySelector('small');
+  e.textContent = texto;
+  if(sm) e.appendChild(sm);
+}
+
+function prepararGradeDown(){
+  const g = document.getElementById('gradeFinal');
+  if(g) g.classList.add('esperando');
+  const selo = document.getElementById('dSelo');
+  if(selo){ selo.textContent = 'aguardando o download terminar'; selo.classList.remove('pronto'); }
+  ['dMed','dPico','dVale','dEst','dQuedas','dMaiorQueda','dTempoOsc','dGB'].forEach(function(id){ porId(id, '--'); });
+  ['dAgora','dTotal','dTempo','dFalta'].forEach(function(id){ porId(id, '--'); });
+  const v = document.getElementById('oscVeredito');
+  if(v){ v.hidden = true; v.innerHTML = ''; }
+  const e = document.getElementById('dGB'); if(e) e.textContent = '--';
+}
+
+function marcarGradeIncompleta(){
+  const selo = document.getElementById('dSelo');
+  if(selo){ selo.textContent = 'tempo de download curto demais para medir'; selo.classList.remove('pronto'); }
+}
+
+function atualizarAndamentoDown(mbps, bytes, seg, falta){
+  porId('dAgora', mbps === null ? '--' : num(mbps,1));
+  porId('dTotal', num(bytes/1048576,0));
+  porId('dTempo', num(seg,1));
+  porId('dFalta', falta === null ? '--' : num(Math.max(0,falta),0));
+}
+
+function mostrarResultadoDown(r, decorrido, bytes){
+  const g = document.getElementById('gradeFinal');
+  if(g) g.classList.remove('esperando');
+  const selo = document.getElementById('dSelo');
+  if(selo){
+    selo.textContent = 'medido em ' + num(r.duracaoRegime,0) + ' s de download cheio';
+    selo.classList.add('pronto');
+  }
+  porId('dMed', num(r.firme,1));
+  porId('dPico', num(r.pico,1));
+  porId('dVale', num(r.vale,1));
+  porId('dEst', num(r.estabilidade,0));
+  porId('dQuedas', String(r.quedas));
+  porId('dMaiorQueda', num(r.maiorQueda,0));
+  porId('dTempoOsc', num(r.pctOsc,0));
+  const e = document.getElementById('dGB');
+  if(e) e.textContent = r.firme > 0 ? tempoTexto(8192/r.firme) : '--';
+
+  const eEst = document.getElementById('dEst');
+  if(eEst) eEst.style.color = r.veredito.cor;
+
+  const cx = document.getElementById('oscVeredito');
+  if(!cx) return;
+  cx.hidden = false;
+  cx.style.borderLeftColor = r.veredito.cor;
+
+  const partes = [];
+  partes.push('Sua linha entregou <b>' + num(r.firme,1) + ' Mbps</b> ' + r.veredito.adj +
+    ' durante ' + num(r.duracaoRegime,0) + ' segundos de download com todas as conexões abertas.');
+
+  if(r.quedas === 0){
+    partes.push('A velocidade <b>não mergulhou nenhuma vez</b> abaixo de 70% da média.');
+  }else{
+    partes.push('Caiu abaixo de 70% da média <b>' + r.quedas + (r.quedas === 1 ? ' vez' : ' vezes') + '</b>' +
+      (r.duracaoRegime > 30 ? ' (' + num(r.quedasPorMin,1) + ' por minuto)' : '') +
+      ', e no pior momento despencou <b>' + num(r.maiorQueda,0) + '%</b> abaixo da média.');
+  }
+
+  if(r.pctOsc > 25){
+    partes.push('Passou <b>' + num(r.pctOsc,0) + '% do tempo</b> abaixo do ritmo normal. ' +
+      'Isso faz o download de um jogo grande demorar bem mais que a conta simples sugere.');
+  }
+
+  const conclusao = [
+    'Essa oscilação atrapalha jogo em nuvem, chamada de vídeo e vídeo em alta resolução. Veja o painel 07: a causa costuma ser Wi-Fi ou congestionamento no horário.',
+    'Muito irregular para jogo em nuvem e chamada de vídeo. Para baixar arquivo grande ainda serve, só demora mais do que a média sugere.',
+    'Dá para baixar bem, mas jogo em nuvem e chamada de vídeo vão sentir esses altos e baixos.',
+    'Boa para baixar e para vídeo. Para jogo em nuvem, rode também o teste do painel 04.',
+    'Serve para tudo: baixar jogo, jogar em nuvem e assistir em 4K ao mesmo tempo.'
+  ];
+  partes.push(conclusao[r.veredito.nivel]);
+
+  cx.innerHTML = '<span class="marca" style="background:' + r.veredito.cor + ';color:var(--panel)">' +
+    r.veredito.nome + '</span>' + partes.join(' ');
+}
+
+function estabilidade(a){
+  if(a.length < 3) return null;
+  const m = media(a), d = desvio(a);
+  if(!m) return null;
+  return clamp(100 - (d/m*100), 0, 100);
+}
+/* ============================================================
+   8. LATÊNCIA SOB CARGA (bufferbloat)
+   ============================================================ */
+document.getElementById('btnCarga').addEventListener('click', async () => {
+  if(APP.rodando) return;
+  const btn = document.getElementById('btnCarga');
+  const srv = srvPorId(document.getElementById('selSrvCarga').value);
+  const dot = document.getElementById('dotCarga'), txt = document.getElementById('txtCarga');
+  const barra = document.getElementById('barCarga');
+
+  travarUI('carga'); btn.disabled = true;
+  dot.className = 'dot warn'; txt.textContent = 'Abrindo conexão…';
+  ['cLivre','cCarga','cDelta','cJit','cPerda','cRec','cBanda','cNota'].forEach(id => {
+    const e = document.getElementById(id), sm = e.querySelector('small');
+    e.textContent = '--';
+    e.style.fontSize = ''; e.style.color = '';
+    if(sm){ sm.hidden = false; e.appendChild(sm); }
+  });
+
+  const url = await prepararServidor(srv);
+  if(!url){
+    dot.className = 'dot err'; txt.textContent = 'Servidor sem resposta. Escolha outro.';
+    travarUI(null); btn.disabled = false; return;
+  }
+
+  const coletar = async (segundos, saida, quando) => {
+    const t0 = performance.now();
+    let enviados = 0, perdidos = 0, emVoo = 0;
+    return new Promise(res => {
+      const it = setInterval(() => {
+        const dt = performance.now()-t0;
+        if(quando) quando(dt/(segundos*1000));
+        if(dt >= segundos*1000){ clearInterval(it); setTimeout(res, 700); return; }
+        if(emVoo > 6) return;   // fila cheia: espera respirar antes de mandar mais
+        emVoo++; enviados++;
+        pingURL(url, 3000).then(v => { emVoo--; if(v===null) perdidos++; else saida.push(v); });
+      }, 180);
+    }).then(() => ({ enviados, perdidos }));
+  };
+
+  // fase 1: sem carga
+  dot.className = 'dot live'; txt.textContent = 'Fase 1 de 3 — medindo com a internet parada…';
+  const livre = [];
+  await coletar(10, livre, f => { barra.style.width = (f*30).toFixed(0)+'%'; });
+  const baseMed = mediana(livre) || 0;
+  const e1 = document.getElementById('cLivre'), s1 = e1.querySelector('small');
+  e1.textContent = num(baseMed,1); if(s1) e1.appendChild(s1);
+
+  // fase 2: com carga
+  txt.textContent = 'Fase 2 de 3 — medindo enquanto baixa a toda…';
+  const ctl = new AbortController();
+  let bytes = 0;
+  const tCarga0 = performance.now();
+  baixar(4e9, 6, b => { bytes = b; }, ctl.signal).catch(() => {});
+  await new Promise(r => setTimeout(r, 2500)); // deixa a fila do roteador encher
+
+  const carregado = [];
+  const r2 = await coletar(18, carregado, f => { barra.style.width = (30+f*50).toFixed(0)+'%'; });
+  const tCarga = (performance.now()-tCarga0)/1000;
+  ctl.abort();
+  const bandaCarga = bytes*8/1e6/tCarga;
+
+  // fase 3: recuperação
+  txt.textContent = 'Fase 3 de 3 — vendo quanto tempo leva para normalizar…';
+  const recup = [];
+  await coletar(8, recup, f => { barra.style.width = (80+f*20).toFixed(0)+'%'; });
+  barra.style.width = '100%';
+
+  const cargaMed = mediana(carregado) || 0;
+  const recMed = mediana(recup) || 0;
+  const delta = cargaMed - baseMed;
+  const jitCarga = jitter(carregado);
+  const perdaCarga = r2.enviados ? r2.perdidos/r2.enviados*100 : 0;
+  const notaBufa = notaInversa(delta, [[10,100],[30,85],[60,68],[100,48],[200,22],[400,0]]);
+
+  const put = (id, v, d) => { const e = document.getElementById(id), sm = e.querySelector('small'); e.textContent = num(v, d===undefined?1:d); if(sm) e.appendChild(sm); };
+  put('cCarga', cargaMed); put('cJit', jitCarga);
+
+  // "aumento" negativo confunde: quando o ping não sobe, diga isso com palavras
+  const eD = document.getElementById('cDelta'), smD = eD.querySelector('small');
+  if(delta <= 1){
+    eD.textContent = 'não subiu';
+    eD.style.fontSize = '17px';
+    eD.style.color = 'var(--n5)';
+    if(smD){ smD.hidden = true; eD.appendChild(smD); }   // some da vista, fica no DOM
+  }else{
+    eD.textContent = '+' + num(delta,1);
+    eD.style.fontSize = '';
+    eD.style.color = faixa(notaInversa(delta, [[10,100],[30,85],[60,68],[100,48],[200,22],[400,0]])).cor;
+    if(smD){ smD.hidden = false; eD.appendChild(smD); }
+  }
+  put('cPerda', perdaCarga, 2); put('cRec', recMed); put('cBanda', bandaCarga);
+  const eN = document.getElementById('cNota');
+  eN.textContent = faixa(notaBufa).nome;
+  eN.style.color = faixa(notaBufa).cor;
+
+  APP.metrics.bufa = delta;
+  if(APP.metrics.banda === null) APP.metrics.banda = bandaCarga;
+  atualizarVeredito();
+
+  dot.className = 'dot';
+  txt.textContent = delta < 30
+    ? 'Excelente: o ping quase não mexeu com a linha cheia. Dá para jogar enquanto a casa baixa coisas.'
+    : delta < 100
+      ? 'Dá para jogar com a casa usando a internet, mas você vai sentir o jogo mais pesado.'
+      : 'Seu ping dispara quando a internet enche. Jogar enquanto alguém baixa vai travar.';
+
+  salvarHistorico({ tipo:'Sob carga', srv:srv.cidade, ping:cargaMed, jit:jitCarga, perda:perdaCarga, banda:bandaCarga, nota:notaBufa });
+  travarUI(null); btn.disabled = false;
+});
+
+/* ============================================================
+   9. NOTA GERAL E VEREDITO
+   ============================================================ */
+function notaGeral(m){
+  const partes = [];
+  if(m.jitter !== null && m.jitter !== undefined)
+    partes.push([notaInversa(m.jitter, [[3,100],[8,86],[15,70],[30,48],[60,20],[120,0]]), 3.0]);
+  if(m.perda !== null && m.perda !== undefined)
+    partes.push([notaInversa(m.perda, [[0,100],[0.5,88],[1.5,70],[3,45],[6,18],[12,0]]), 2.6]);
+  if(m.ping !== null && m.ping !== undefined)
+    partes.push([notaInversa(m.ping, [[20,100],[45,88],[80,74],[130,58],[220,38],[400,12],[600,0]]), 1.8]);
+  if(m.p99 !== null && m.ping)
+    partes.push([notaInversa(m.p99 - m.ping, [[10,100],[30,84],[60,64],[120,38],[250,10],[500,0]]), 1.4]);
+  if(m.bufa !== null && m.bufa !== undefined)
+    partes.push([notaInversa(m.bufa, [[10,100],[30,85],[60,68],[100,48],[200,22],[400,0]]), 2.0]);
+  if(m.banda !== null && m.banda !== undefined)
+    partes.push([notaInversa(1000/Math.max(m.banda,0.5), [[1,100],[4,90],[10,76],[20,60],[50,35],[200,5]]), 1.2]);
+  if(!partes.length) return null;
+  const soma = partes.reduce((s,[n,p]) => s+n*p, 0);
+  const peso = partes.reduce((s,[,p]) => s+p, 0);
+  return clamp(soma/peso, 0, 100);
+}
+
+function atualizarVeredito(){
+  const m = APP.metrics;
+  const nota = notaGeral(m);
+  const f = faixa(nota);
+
+  document.getElementById('vscore').textContent = nota === null ? '--' : Math.round(nota);
+  document.getElementById('vscore').style.color = f.cor;
+  const g = document.getElementById('vgrade');
+  g.textContent = f.nome;
+  g.style.background = f.cor;
+  g.style.color = 'var(--panel)';
+  document.getElementById('vbar').style.background = f.cor;
+
+  const cel = (idV, idN, val, d, pts, sufixo) => {
+    const eV = document.getElementById(idV), sm = eV.querySelector('span');
+    eV.textContent = num(val, d); if(sm) eV.appendChild(sm);
+    const eN = document.getElementById(idN);
+    if(val === null || val === undefined){ eN.innerHTML = '&nbsp;'; eV.style.color = 'var(--ink)'; return; }
+    const n = pts ? notaInversa(val, pts) : notaInversa(1000/Math.max(val,0.5), [[1,100],[4,90],[10,76],[20,60],[50,35],[200,5]]);
+    const ff = faixa(n);
+    eN.textContent = ff.nome; eN.style.color = ff.cor;
+    eV.style.color = 'var(--ink)';
+  };
+  cel('mPing','nPing', m.ping, 0, [[20,100],[45,88],[80,74],[130,58],[220,38],[400,12],[600,0]]);
+  cel('mJit','nJit',  m.jitter, 1, [[3,100],[8,86],[15,70],[30,48],[60,20],[120,0]]);
+  cel('mLoss','nLoss',m.perda, 2, [[0,100],[0.5,88],[1.5,70],[3,45],[6,18],[12,0]]);
+  cel('mP99','nP99',  m.p99, 0, [[30,100],[70,84],[130,64],[250,38],[450,10],[900,0]]);
+  cel('mBanda','nBanda', m.banda, 0, null);
+  cel('mBufa','nBufa', m.bufa, 0, [[10,100],[30,85],[60,68],[100,48],[200,22],[400,0]]);
+
+  document.getElementById('vtext').innerHTML = textoVeredito(m, nota, f);
+  montarAtividades(m);
+  if(typeof montarAcoes === 'function') montarAcoes();
+}
+
+function textoVeredito(m, nota, f){
+  if(nota === null) return 'Medindo…';
+  const srv = srvPorId(m.srv);
+  const onde = srv ? srv.cidade : 'servidor';
+  const p = [];
+  p.push('Sua conexão está <strong>' + f.nome.toLowerCase() + '</strong> medindo contra <strong>' + onde + '</strong>.');
+
+  if(m.jitter !== null){
+    if(m.jitter < 8) p.push('O jitter de ' + num(m.jitter,1) + ' ms é baixo: os pacotes chegam em ritmo parelho, que é o que o jogo precisa.');
+    else if(m.jitter < 20) p.push('O jitter de ' + num(m.jitter,1) + ' ms é aceitável, mas você vai notar pequenos solavancos em jogo rápido.');
+    else p.push('O jitter de ' + num(m.jitter,1) + ' ms é alto: os pacotes chegam desencontrados e o jogo corrige a posição dos outros jogadores na marra.');
+  }
+  if(m.perda !== null && m.perda > 1) p.push('Perdendo ' + num(m.perda,2) + '% dos pacotes — acima de 1% já aparece como teleporte e tiro que não conta.');
+  if(m.bufa !== null){
+    if(m.bufa > 100) p.push('<strong>Com download rodando o ping sobe ' + num(m.bufa,0) + ' ms</strong>, o que inviabiliza jogar em horário de pico na sua casa.');
+    else if(m.bufa > 30) p.push('Com download rodando o ping sobe ' + num(m.bufa,0) + ' ms, dá para jogar mas fica mais pesado.');
+    else p.push('Com download rodando o ping quase não mexe, sinal de roteador bem configurado.');
+  }
+  if(m.banda !== null) p.push('A ' + num(m.banda,0) + ' Mbps medidos, 1 GB leva cerca de ' + tempoTexto(8192/Math.max(m.banda,0.5)) + '.');
+  if(m.bufa === null) p.push('Falta rodar o <strong>teste de carga</strong> (painel 04) para saber como fica em horário de pico.');
+  return p.join(' ');
+}
+
+/* ============================================================
+   10. PARA O QUE SERVE
+   ============================================================ */
+const ATIVIDADES = [
+  { nome:'FPS competitivo', ex:'Valorant, CS2, Call of Duty', ping:70,  jit:8,  perda:.5, banda:5,  bufa:60 },
+  { nome:'Futebol online',  ex:'EA FC, eFootball',            ping:110, jit:15, perda:1,  banda:5,  bufa:80 },
+  { nome:'MOBA',            ex:'League of Legends, Dota 2',   ping:130, jit:20, perda:1.5,banda:5,  bufa:100 },
+  { nome:'Battle royale',   ex:'Fortnite, PUBG, Free Fire',   ping:120, jit:18, perda:1.5,banda:8,  bufa:90 },
+  { nome:'Jogo em nuvem',   ex:'GeForce Now, Xbox Cloud',     ping:80,  jit:10, perda:.5, banda:25, bufa:50 },
+  { nome:'Servidor distante',ex:'partidas na Europa ou Ásia', ping:400, jit:30, perda:2,  banda:5,  bufa:120 },
+  { nome:'Chamada de vídeo',ex:'Meet, Zoom, WhatsApp',        ping:220, jit:30, perda:2,  banda:4,  bufa:150 },
+  { nome:'Streaming 4K',    ex:'Netflix, YouTube, Disney+',   ping:350, jit:80, perda:3,  banda:25, bufa:400 },
+  { nome:'Download pesado', ex:'Steam, atualização de jogo',  ping:600, jit:150,perda:4,  banda:30, bufa:400 },
+  { nome:'Jogar com alguém baixando', ex:'casa cheia, pico da noite', ping:150, jit:25, perda:2, banda:10, bufa:45 }
+];
+
+function avaliar(a, m){
+  const testes = [];
+  if(m.ping   !== null && m.ping   !== undefined) testes.push(['latência', m.ping / a.ping]);
+  if(m.jitter !== null && m.jitter !== undefined) testes.push(['jitter',   m.jitter / a.jit]);
+  if(m.perda  !== null && m.perda  !== undefined) testes.push(['perda',    m.perda / a.perda]);
+  if(m.banda  !== null && m.banda  !== undefined) testes.push(['velocidade', a.banda / Math.max(m.banda,0.1)]);
+  if(m.bufa   !== null && m.bufa   !== undefined) testes.push(['ping sob carga', m.bufa / a.bufa]);
+  if(!testes.length) return { sel:'?', cor:'var(--ink3)', por:'Rode um teste para saber.' };
+
+  const pior = testes.reduce((p,t) => t[1] > p[1] ? t : p);
+  const razao = pior[1];
+  if(razao <= 0.55) return { sel:'Perfeito', cor:'var(--n5)', por:'Sobra folga. O ponto mais apertado, e ainda assim tranquilo, é ' + pior[0] + '.' };
+  if(razao <= 0.85) return { sel:'Bom',      cor:'var(--n4)', por:'Passa com tranquilidade. O limite mais próximo é ' + pior[0] + '.' };
+  if(razao <= 1.15) return { sel:'No limite',cor:'var(--n3)', por:'Funciona, mas ' + pior[0] + ' está no talo. Vai oscilar.' };
+  if(razao <= 1.8)  return { sel:'Ruim',     cor:'var(--n2)', por:'Sua ' + pior[0] + ' passa do que esse uso aguenta.' };
+  return { sel:'Não serve', cor:'var(--n1)', por:'A ' + pior[0] + ' está muito acima do limite desse uso.' };
+}
+
+function montarAtividades(m){
+  const box = document.getElementById('acts');
+  box.innerHTML = '';
+  ATIVIDADES.forEach(a => {
+    const r = avaliar(a, m);
+    const d = document.createElement('div');
+    d.className = 'act';
+    d.style.borderLeftColor = r.cor;
+    d.innerHTML =
+      '<span class="sel" style="background:'+r.cor+';color:var(--panel)">'+r.sel+'</span>' +
+      '<div><div class="nome">'+a.nome+'</div><div class="ex">'+a.ex+'</div><div class="por">'+r.por+'</div></div>';
+    box.appendChild(d);
+  });
+}
+
+
+/* ============================================================
+   11. O QUE FAZER PARA MELHORAR
+   Cada regra olha os números medidos e devolve uma ação concreta.
+   A ordem na tela é por impacto: a primeira é a que mais rende.
+   ============================================================ */
+const LIGACAO = {
+  wifi24:  { nome:'Wi-Fi 2,4 GHz', semFio:true,  fraco:true  },
+  wifi5:   { nome:'Wi-Fi 5 GHz',   semFio:true,  fraco:false },
+  cabo:    { nome:'cabo de rede',  semFio:false, fraco:false },
+  celular: { nome:'dados móveis',  semFio:true,  fraco:true  }
+};
+function comoEstouLigado(){
+  const e = document.getElementById('selLigacao');
+  const v = e ? e.value : 'wifi5';
+  return Object.assign({ id:v }, LIGACAO[v] || LIGACAO.wifi5);
+}
+function planoContratado(){
+  const e = document.getElementById('inpPlano');
+  const v = e ? parseFloat(e.value) : NaN;
+  return (isFinite(v) && v > 0) ? v : null;
+}
+
+const REGRAS = [
+  {
+    id:'bufferbloat',
+    vale(m,l){ return m.bufa !== null && m.bufa !== undefined && m.bufa > 45; },
+    peso(m){ return 100 + Math.min(m.bufa, 400); },
+    monta(m,l){
+      if(l.id === 'celular') return {
+        titulo:'No 4G, não baixe nada enquanto joga',
+        ganho:'evita ' + num(m.bufa,0) + ' ms de lag',
+        porque:'Quando a conexão enche, seu ping sobe ' + num(m.bufa,0) + ' ms. Em rede de celular isso não tem ajuste: quem controla a fila é a torre da operadora, não um roteador seu.',
+        passos:[
+          'Pause atualização de aplicativo, backup de fotos e download antes de entrar na partida.',
+          'No Android, em <b>Configurações</b>, procure <b>Economia de dados</b> e ligue enquanto joga.',
+          'Se der para escolher, jogue no Wi-Fi: lá o conserto existe.'
+        ]};
+      return {
+      titulo:'Ligue o controle de fila do roteador',
+      ganho:'tira até ' + num(m.bufa,0) + ' ms de lag no pico',
+      porque:'Quando alguém baixa alguma coisa, seu ping sobe ' + num(m.bufa,0) + ' ms. O roteador está empilhando pacotes numa fila em vez de dar passagem ao jogo. Isso não é falta de velocidade: é o roteador se atrapalhando, e tem conserto na configuração.',
+      passos:[
+        'Abra o navegador e entre em <b>192.168.0.1</b> ou <b>192.168.1.1</b>. A senha costuma estar numa etiqueta embaixo do roteador.',
+        'Procure por <b>QoS</b>, <b>Controle de Banda</b>, <b>SQM</b> ou <b>Smart Queue</b>.',
+        'Ligue e coloque como limite <b>90% da sua velocidade real</b>, tanto na descida quanto na subida.',
+        'Se o seu roteador não tiver essa opção, esse é o principal motivo para trocar de aparelho.',
+        'Rode o painel 04 de novo e compare o número.'
+      ]};
+    }
+  },
+  {
+    id:'jitter-wifi',
+    vale(m,l){ return l.semFio && l.id !== 'celular' && m.jitter !== null && m.jitter > 12; },
+    peso(m){ return 95 + Math.min(m.jitter*2, 120); },
+    monta(m,l){ return {
+      titulo:'Passe um cabo de rede até este aparelho',
+      ganho:'jitter costuma cair para menos de 3 ms',
+      porque:'Seu jitter de ' + num(m.jitter,1) + ' ms no ' + l.nome + ' é o que faz o adversário teleportar na tela. O Wi-Fi divide o ar com vizinhos, micro-ondas e os outros aparelhos da casa, e isso vira pacote atrasado. Nenhum ajuste de Wi-Fi chega perto de um cabo.',
+      passos:[
+        'Um cabo <b>Cat 5e</b> de 10 metros custa pouco e resolve.',
+        'Ligue direto numa porta <b>LAN</b> do roteador, sem passar por repetidor.',
+        'No Windows, desligue o Wi-Fi para ter certeza de que está usando o cabo.',
+        'Refaça a simulação de partida e compare o jitter.'
+      ]};
+    }
+  },
+  {
+    id:'jitter-cabo',
+    vale(m,l){ return !l.semFio && m.jitter !== null && m.jitter > 10; },
+    peso(m){ return 90 + Math.min(m.jitter*2, 100); },
+    monta(m,l){ return {
+      titulo:'Investigue o cabo e a economia de energia da placa de rede',
+      ganho:'no cabo o jitter deveria ficar abaixo de 3 ms',
+      porque:'No cabo, jitter de ' + num(m.jitter,1) + ' ms não é normal. Quase sempre é cabo velho ou mal encaixado, ou o Windows desligando a placa de rede para poupar energia.',
+      passos:[
+        'Troque o cabo por outro e teste outra porta do roteador.',
+        'No Windows, abra o <b>Gerenciador de Dispositivos</b>, clique na placa de rede, vá na aba <b>Gerenciamento de Energia</b> e desmarque a opção de desligar o dispositivo.',
+        'Em <b>Opções de Energia</b>, use o plano <b>Alto Desempenho</b>.',
+        'Se continuar, teste outro computador no mesmo cabo para saber se o problema é o aparelho ou a rede.'
+      ]};
+    }
+  },
+  {
+    id:'perda',
+    vale(m,l){ return m.perda !== null && m.perda > 0.8; },
+    peso(m){ return 110 + Math.min(m.perda*15, 150); },
+    monta(m,l){ return {
+      titulo:'Perda de pacote: procure o ponto físico',
+      ganho:'cada 1% de perda atrapalha muito mais que 1%',
+      porque:'Você está perdendo ' + num(m.perda,2) + '% dos pacotes. Pacote perdido é o tiro que não conta e o passe que não sai. Isso quase nunca é falta de velocidade contratada: é caminho físico com defeito.',
+      passos:[
+        l.semFio ? 'Primeiro teste <b>no cabo</b>. Se a perda sumir, o problema é o Wi-Fi e não a operadora.'
+                 : 'Troque o cabo e mude a porta do roteador.',
+        'Olhe o cabo que vem da rua até a caixinha de fibra. Dobra apertada ou emenda mal feita causa perda.',
+        'Reinicie o roteador tirando da tomada por 30 segundos.',
+        'Se continuar no cabo, é da operadora. Use o botão <b>Copiar relatório</b> no fim da página e abra chamado com esses números.'
+      ]};
+    }
+  },
+  {
+    id:'entrada-longe',
+    vale(m,l){
+      if(!(APP.rota && APP.rota.entrada && !/s.o paulo|bras.lia/i.test(APP.rota.entrada))) return false;
+      // entrar por outra cidade só é problema se a latência estiver de fato alta
+      const base = APP.assinatura ? APP.assinatura['gru-aws'] : null;
+      const ref = (base !== null && base !== undefined) ? base : m.ping;
+      return ref === null || ref === undefined || ref > 35;
+    },
+    peso(m){ return 70; },
+    monta(m,l){ return {
+      titulo:'Sua conexão entra na internet por ' + APP.rota.entrada,
+      ganho:'costuma valer de 10 a 25 ms',
+      porque:'Você está em Brasília, mas o seu tráfego sobe para a internet passando por ' + APP.rota.entrada + '. Esse desvio é escolha de rota da operadora e cobra alguns milissegundos em tudo que você faz, inclusive nos servidores de jogo de São Paulo.',
+      passos:[
+        'Teste trocar o DNS do roteador para <b>1.1.1.1</b> e <b>8.8.8.8</b>. Às vezes muda o caminho.',
+        'Se você usa VPN ou proxy, desligue e veja se a porta de entrada muda.',
+        'Ligue o <b>vigia de rota</b> no painel 08 antes de mexer, para ver o efeito de cada mudança na hora.',
+        'Se nada mudar, é rota da operadora. Vale registrar chamado citando que você sai por ' + APP.rota.entrada + '.'
+      ]};
+    }
+  },
+  {
+    id:'ping-alto-br',
+    vale(m,l){ return m.ping !== null && m.ping > 60 && !!m.srv && /gru|edge/.test(m.srv); },
+    peso(m){ return 80 + Math.min(m.ping/2, 80); },
+    monta(m,l){ return {
+      titulo:'O caminho até São Paulo está dando volta',
+      ganho:'servidor brasileiro deveria ficar abaixo de 40 ms',
+      porque:'De Brasília, um servidor em São Paulo responde em torno de 20 a 30 ms. O seu está em ' + num(m.ping,0) + ' ms, o que indica rota longa ou algum aparelho no meio segurando o tráfego.',
+      passos:[
+        'Desligue qualquer <b>VPN</b>, proxy ou DNS com filtro.',
+        'Se houver dois roteadores em casa, ligue este aparelho no primeiro, o que vem da rua.',
+        l.semFio ? 'Teste no cabo. Wi-Fi fraco também empurra a latência para cima.' : 'Teste outra porta do roteador.',
+        'Compare no painel 01 os três servidores de São Paulo. Se um for bem melhor que os outros, é rota, não é a sua casa.'
+      ]};
+    }
+  },
+  {
+    id:'picos',
+    vale(m,l){ return m.p99 !== null && m.ping !== null && m.p99 > Math.max(m.ping*2.5, m.ping+45); },
+    peso(m){ return 85; },
+    monta(m,l){ return {
+      titulo:'Alguma coisa interrompe sua conexão de vez em quando',
+      ganho:'some com as travadas isoladas',
+      porque:'Sua latência normal é ' + num(m.ping,0) + ' ms, mas os piores momentos chegam a ' + num(m.p99,0) + ' ms. Esse tipo de pico não é lentidão, é interrupção. Costuma ser aparelho entrando em economia de energia, outro aparelho pesado na rede, ou interferência.',
+      passos:[
+        l.semFio ? 'Micro-ondas, telefone sem fio e Bluetooth atrapalham o Wi-Fi de 2,4 GHz. Use a rede de 5 GHz ou cabo.' : 'Desligue a economia de energia da placa de rede no Windows.',
+        'Veja se tem câmera, TV box ou celular fazendo backup automático na mesma hora.',
+        'No painel 02, rode uma partida de 10 minutos e olhe a linha do tempo. Se os trechos vermelhos aparecem espaçados e regulares, é algum aparelho em ciclo.',
+        'Feche programas que sincronizam em segundo plano, como nuvem e atualizador de jogos.'
+      ]};
+    }
+  },
+  {
+    id:'banda-abaixo-plano',
+    vale(m,l){ const pl = planoContratado(); return !!pl && m.banda !== null && m.banda < pl*0.55; },
+    peso(m){ return 75; },
+    monta(m,l){ const pl = planoContratado(); return {
+      titulo:'Você está recebendo bem menos que o plano contratado',
+      ganho:'faltam cerca de ' + num(pl - m.banda,0) + ' Mbps',
+      porque:'Seu plano é de ' + num(pl,0) + ' Mega e a medição deu ' + num(m.banda,0) + ' Mbps. Antes de reclamar com a operadora, vale eliminar o que está dentro de casa, porque na maioria das vezes o gargalo é o Wi-Fi ou o próprio aparelho.',
+      passos:[
+        l.id === 'wifi24' ? 'Wi-Fi de <b>2,4 GHz</b> raramente passa de 50 Mbps por limite da própria tecnologia. Use a rede de 5 GHz.' : 'Teste <b>no cabo</b>. É o único jeito de saber a velocidade real da linha.',
+        'Confira se o cabo é <b>Cat 5e</b> ou melhor e se a porta do roteador é <b>Gigabit</b>. Porta de 100 Mega trava em 94 Mbps.',
+        'Baixe pelo menos <b>500 MB</b> no painel 03. Medição curta sai menor que a realidade.',
+        'Se no cabo continuar baixo, aí sim é caso de chamado com a operadora.'
+      ]};
+    }
+  },
+  {
+    id:'oscilacao',
+    vale(m,l){ return APP.estabilidadeDownload !== null && APP.estabilidadeDownload !== undefined && APP.estabilidadeDownload < 70; },
+    peso(m){ return 60; },
+    monta(m,l){ return {
+      titulo:'Sua velocidade balança durante o download',
+      ganho:'download mais previsível',
+      porque:'A estabilidade do último download ficou em ' + num(APP.estabilidadeDownload,0) + '%. A velocidade sobe e desce em vez de ficar firme, o que atrapalha download grande e jogo em nuvem.',
+      passos:[
+        l.semFio ? 'Chegue mais perto do roteador ou passe um cabo. Sinal oscilando derruba a velocidade em ondas.' : 'Verifique se outro aparelho da casa está usando a rede ao mesmo tempo.',
+        'Rode o mesmo teste de madrugada e compare no painel 09. Se de madrugada fica firme, é congestionamento da operadora no horário de pico.',
+        'Se você tem repetidor de Wi-Fi, teste desligando. Repetidor costuma cortar a velocidade pela metade.'
+      ]};
+    }
+  },
+  {
+    id:'celular',
+    vale(m,l){ return l.id === 'celular'; },
+    peso(m){ return 50; },
+    monta(m,l){ return {
+      titulo:'Dados móveis não servem para jogo competitivo',
+      ganho:'expectativa realista',
+      porque:'Rede de celular tem jitter alto por natureza: a torre reparte o tempo entre todo mundo que está conectado. Dá para jogar casualmente e assistir vídeo, mas FPS e jogo em nuvem vão sofrer mesmo com o ping parecendo bom.',
+      passos:[
+        'Para jogar sério, use Wi-Fi ou cabo.',
+        'Se só tiver 4G, fique parado num lugar de sinal forte. Movimento troca de torre e derruba pacote.',
+        'Evite o pico da noite, quando a torre fica cheia.'
+      ]};
+    }
+  }
+];
+
+function montarAcoes(){
+  const caixa = document.getElementById('acoes');
+  if(!caixa) return;
+  const m = APP.metrics, l = comoEstouLigado();
+  caixa.innerHTML = '';
+
+  const temAlgo = m.ping !== null || m.jitter !== null || m.banda !== null || m.bufa !== null;
+  if(!temAlgo){
+    caixa.innerHTML = '<div class="acao"><div class="acao-topo"><h3>Rode um teste primeiro</h3></div>' +
+      '<div class="tudo-certo">Assim que a medição do painel 01 ou 02 terminar, a lista de ações aparece aqui, ' +
+      'em ordem de quanto cada uma rende no seu caso.</div></div>';
+    return;
+  }
+
+  const achadas = REGRAS
+    .filter(function(r){ try{ return r.vale(m, l); }catch(e){ return false; } })
+    .map(function(r){ return { id:r.id, peso:r.peso(m), dados:r.monta(m, l) }; })
+    .sort(function(a,b){ return b.peso - a.peso; });
+
+  if(!achadas.length){
+    const nota = notaGeral(m);
+    caixa.innerHTML =
+      '<div class="acao" style="border-left-color:var(--n5)">' +
+      '<div class="acao-topo"><span class="prio" style="background:var(--n5);color:var(--panel)">Nada a fazer</span>' +
+      '<h3>Sua internet já está no ponto</h3></div>' +
+      '<div class="tudo-certo">Os números que você mediu não deixam margem para melhora prática' +
+      (nota !== null ? ' (nota ' + Math.round(nota) + ' de 100)' : '') + '. ' +
+      'Para manter assim: deixe no cabo o aparelho em que você joga, não empilhe repetidor de Wi-Fi, ' +
+      'e rode a simulação de partida no horário de pico de vez em quando para flagrar uma piora antes que ela te pegue no meio de um jogo.' +
+      (m.bufa === null ? ' Falta rodar o teste do painel 04 para fechar o diagnóstico.' : '') +
+      '</div></div>';
+    return;
+  }
+
+  // a urgência vem do tamanho do problema, não da ordem em que a regra caiu
+  const seloDe = function(peso, indice){
+    if(peso >= 150) return { nome:'Faça primeiro', cor:'var(--n1)' };
+    if(peso >= 95)  return { nome:'Vale a pena',   cor:'var(--n2)' };
+    return { nome:'Se sobrar tempo', cor:'var(--n3)' };
+  };
+  achadas.forEach(function(a, i){
+    const selo = seloDe(a.peso, i);
+    const d = a.dados;
+    const el = document.createElement('div');
+    el.className = 'acao';
+    el.style.borderLeftColor = selo.cor;
+    el.innerHTML =
+      '<div class="acao-topo">' +
+        '<span class="prio" style="background:' + selo.cor + ';color:var(--panel)">' + selo.nome + '</span>' +
+        '<h3>' + d.titulo + '</h3>' +
+        '<span class="ganho">' + d.ganho + '</span>' +
+      '</div>' +
+      '<div class="porque">' + d.porque + '</div>' +
+      '<ol>' + d.passos.map(function(x){ return '<li>' + x + '</li>'; }).join('') + '</ol>';
+    caixa.appendChild(el);
+  });
+}
+
+
+/* ============================================================
+   12. VIGIA DE ROTA
+   Lê por onde a conexão sai para a internet e compara com a
+   leitura anterior. Qualquer mudança no roteador aparece aqui.
+   ============================================================ */
+const META_URL  = 'https://speed.cloudflare.com/meta';
+const TRACE_URL = 'https://cloudflare.com/cdn-cgi/trace';
+
+/* tenta algumas vezes: a leitura falha de vez em quando quando o site
+   acabou de disparar muita requisição, e uma falha boba não pode
+   deixar o painel de rota vazio */
+async function lerRota(tentativas){
+  const max = tentativas === undefined ? 3 : tentativas;
+  for(let i=0;i<max;i++){
+    const r = await lerRotaUmaVez();
+    if(r && r.ip) return r;
+    if(i < max-1) await new Promise(function(f){ setTimeout(f, 700*(i+1)); });
+  }
+  return null;
+}
+
+/* a Cloudflare devolve os nomes sem acento; aqui ficam em português */
+const CIDADES = {
+  'Sao Paulo':'São Paulo', 'Rio De Janeiro':'Rio de Janeiro', 'Brasilia':'Brasília',
+  'Sao Jose':'São José', 'Curitiba':'Curitiba', 'Fortaleza':'Fortaleza',
+  'Porto Alegre':'Porto Alegre', 'Belo Horizonte':'Belo Horizonte', 'Campinas':'Campinas',
+  'Buenos Aires':'Buenos Aires', 'Santiago':'Santiago', 'Bogota':'Bogotá',
+  'Federal District':'Distrito Federal'
+};
+const cidadePT = v => v ? (CIDADES[v] || v) : v;
+
+async function lerRotaUmaVez(){
+  try{
+    const r = await fetch(META_URL + '?r=' + Math.random().toString(36).slice(2), { cache:'no-store' });
+    if(r.ok){
+      const j = await r.json();
+      return {
+        ip: j.clientIp || null,
+        asn: j.asn || null,
+        operadora: j.asOrganization || null,
+        cidade: cidadePT(j.city) || null,
+        regiao: cidadePT(j.region) || null,
+        pais: j.country || null,
+        entrada: (j.colo && j.colo.city) ? cidadePT(j.colo.city) : null,
+        sigla: (j.colo && j.colo.iata) ? j.colo.iata : null,
+        protocolo: j.httpProtocol || null
+      };
+    }
+  }catch(e){}
+  // reserva: o trace entrega menos campos, mas o suficiente para detectar mudança
+  try{
+    const r = await fetch(TRACE_URL + '?r=' + Math.random().toString(36).slice(2), { cache:'no-store' });
+    const t = await r.text();
+    const o = {};
+    t.trim().split('\n').forEach(function(linha){
+      const i = linha.indexOf('=');
+      if(i > 0) o[linha.slice(0,i)] = linha.slice(i+1);
+    });
+    return { ip:o.ip||null, asn:null, operadora:null, cidade:null, regiao:null,
+             pais:o.loc||null, entrada:null, sigla:o.colo||null, protocolo:o.http||null };
+  }catch(e){}
+  return null;
+}
+
+/* assinatura de latência: o "sotaque" da sua rota, em dois pontos de referência */
+async function lerAssinatura(){
+  const alvos = ['edge','gru-aws'];
+  const fora = {};
+  for(let k=0;k<alvos.length;k++){
+    const srv = srvPorId(alvos[k]);
+    if(!srv) continue;
+    const url = await prepararServidor(srv);
+    if(!url){ fora[alvos[k]] = null; continue; }
+    const a = [];
+    for(let i=0;i<5;i++){
+      const v = await pingURL(url, 2500);
+      if(v !== null) a.push(v);
+      await new Promise(function(r){ setTimeout(r, 60); });
+    }
+    fora[alvos[k]] = a.length ? mediana(a) : null;
+  }
+  return fora;
+}
+
+const elRota = {
+  operadora: document.getElementById('rOperadora'),
+  ip:        document.getElementById('rIP'),
+  cidade:    document.getElementById('rCidade'),
+  entrada:   document.getElementById('rEntrada'),
+  assinatura:document.getElementById('rAssinatura'),
+  ligacao:   document.getElementById('rLigacao')
+};
+
+/* o destaque de "isso mudou" fica aceso por um tempo, para dar
+   tempo de voltar do roteador e ver o que mexeu */
+const DESTAQUE = {};
+const DESTAQUE_MS = 60000;
+
+function pintarRota(rota, assin, mudou){
+  mudou = mudou || {};
+  const agora = Date.now();
+  Object.keys(mudou).forEach(function(k){ if(mudou[k]) DESTAQUE[k] = agora; });
+  const aceso = function(campo){ return DESTAQUE[campo] && (agora - DESTAQUE[campo]) < DESTAQUE_MS; };
+  setTimeout(function(){
+    const b = document.getElementById('btnTentarRota');
+    if(b && !b.dataset.ligado){
+      b.dataset.ligado = '1';
+      b.addEventListener('click', async function(){
+        b.textContent = 'Lendo…';
+        const r = await lerRota(4);
+        APP.rota = r; pintarRota(r, APP.assinatura, {}); montarAcoes();
+      });
+    }
+  }, 0);
+  const marca = function(el, campo){
+    if(!el) return;
+    el.classList.toggle('mudou', !!aceso(campo));
+  };
+  if(elRota.operadora){
+    if(rota && rota.operadora){
+      elRota.operadora.innerHTML = rota.operadora +
+        (rota.asn ? '<div class="sub">rede número ' + rota.asn + '</div>' : '');
+    }else if(rota && rota.ip){
+      elRota.operadora.innerHTML = 'não identificada<div class="sub">o endereço foi lido, o nome não</div>';
+    }else{
+      elRota.operadora.innerHTML = 'não consegui ler' +
+        '<div class="sub"><button type="button" class="preset" id="btnTentarRota" style="margin-top:5px">Tentar de novo</button></div>';
+    }
+    marca(elRota.operadora, 'operadora');
+  }
+  if(elRota.ip){
+    elRota.ip.textContent = rota && rota.ip ? rota.ip : '--';
+    marca(elRota.ip, 'ip');
+  }
+  if(elRota.cidade){
+    elRota.cidade.innerHTML = (rota && rota.cidade ? rota.cidade : '--') +
+      (rota && rota.regiao ? '<div class="sub">' + rota.regiao + '</div>' : '');
+    marca(elRota.cidade, 'cidade');
+  }
+  if(elRota.entrada){
+    elRota.entrada.innerHTML = (rota && rota.entrada ? rota.entrada : (rota && rota.sigla ? rota.sigla : '--')) +
+      (rota && rota.sigla ? '<div class="sub">código ' + rota.sigla + '</div>' : '');
+    marca(elRota.entrada, 'entrada');
+  }
+  if(elRota.assinatura){
+    if(assin){
+      const a = assin.edge, b = assin['gru-aws'];
+      elRota.assinatura.innerHTML = (a===null||a===undefined?'--':num(a,0)) + ' / ' + (b===null||b===undefined?'--':num(b,0)) +
+        '<div class="sub">borda / São Paulo, em ms</div>';
+    }else{
+      elRota.assinatura.innerHTML = '--<div class="sub">borda / São Paulo, em ms</div>';
+    }
+    marca(elRota.assinatura, 'latencia');
+  }
+  if(elRota.ligacao){
+    const l = comoEstouLigado();
+    const c = navigator.connection || {};
+    const detectado = c.type ? ({ wifi:'Wi-Fi', ethernet:'cabo', cellular:'celular' }[c.type] || c.type) : null;
+    elRota.ligacao.innerHTML = l.nome.charAt(0).toUpperCase() + l.nome.slice(1) +
+      (detectado ? '<div class="sub">o aparelho informa: ' + detectado + '</div>'
+                 : '<div class="sub">informado por você no painel 07</div>');
+  }
+}
+
+/* compara duas leituras e descreve em português o que mudou */
+function compararRota(antes, agora, assinAntes, assinAgora){
+  const eventos = [];
+  const mudou = {};
+  if(!antes || !agora) return { eventos:eventos, mudou:mudou };
+
+  if(antes.operadora && agora.operadora && antes.operadora !== agora.operadora){
+    mudou.operadora = true;
+    eventos.push({ tipo:'alerta', txt:'Você saiu da <b>' + antes.operadora + '</b> e agora está na <b>' + agora.operadora + '</b>. Isso acontece quando liga uma VPN, troca de operadora ou muda para o 4G do celular.' });
+  }
+  if(antes.ip && agora.ip && antes.ip !== agora.ip && !mudou.operadora){
+    mudou.ip = true;
+    eventos.push({ tipo:'neutro', txt:'Seu endereço na internet mudou de <b>' + antes.ip + '</b> para <b>' + agora.ip + '</b>. Normalmente é reinício do roteador ou troca de endereço pela operadora.' });
+  }else if(antes.ip && agora.ip && antes.ip !== agora.ip){
+    mudou.ip = true;
+  }
+  if(antes.entrada && agora.entrada && antes.entrada !== agora.entrada){
+    mudou.entrada = true;
+    eventos.push({ tipo:'alerta', txt:'A porta de entrada da sua conexão mudou de <b>' + antes.entrada + '</b> para <b>' + agora.entrada + '</b>. O caminho até a internet é outro agora.' });
+  }
+  if(antes.cidade && agora.cidade && antes.cidade !== agora.cidade){
+    mudou.cidade = true;
+    eventos.push({ tipo:'neutro', txt:'A rede passou a te enxergar em <b>' + agora.cidade + '</b>, antes era <b>' + antes.cidade + '</b>.' });
+  }
+
+  // mudança no tempo de resposta: só conta se for grande o bastante para não ser ruído
+  const par = [['edge','borda mais próxima'], ['gru-aws','São Paulo']];
+  par.forEach(function(x){
+    const chave = x[0], nome = x[1];
+    const a = assinAntes ? assinAntes[chave] : null;
+    const b = assinAgora ? assinAgora[chave] : null;
+    if(a === null || a === undefined || b === null || b === undefined) return;
+    const dif = b - a;
+    if(Math.abs(dif) >= 8 && Math.abs(dif) >= a*0.22){
+      mudou.latencia = true;
+      eventos.push({
+        tipo: dif < 0 ? 'boa' : 'ruim',
+        txt: 'O tempo de resposta até <b>' + nome + '</b> ' + (dif < 0 ? 'melhorou' : 'piorou') +
+             ': era ' + num(a,0) + ' ms e agora é <b>' + num(b,0) + ' ms</b> (' +
+             (dif < 0 ? '' : '+') + num(dif,0) + ' ms).'
+      });
+    }
+  });
+  return { eventos:eventos, mudou:mudou };
+}
+
+const registro = [];
+function anotarMudanca(ev){
+  registro.unshift({ hora:new Date(), tipo:ev.tipo, txt:ev.txt });
+  if(registro.length > 40) registro.pop();
+  desenharMudancas();
+}
+function desenharMudancas(){
+  const caixa = document.getElementById('mudancas');
+  if(!caixa) return;
+  caixa.innerHTML = '';
+  if(!registro.length) return;
+  registro.forEach(function(r){
+    const d = document.createElement('div');
+    d.className = 'mud' + (r.tipo === 'boa' ? ' boa' : (r.tipo === 'ruim' ? ' ruim' : ''));
+    d.innerHTML = '<span class="hora">' + r.hora.toLocaleTimeString('pt-BR') + '</span>' +
+                  '<span class="txt">' + r.txt + '</span>';
+    caixa.appendChild(d);
+  });
+}
+
+let vigiaLigado = false, vigiaTimer = null, vigiaOcupado = false;
+
+async function baterRota(comAssinatura){
+  if(vigiaOcupado) return;
+  vigiaOcupado = true;
+  try{
+    const rota = await lerRota();
+    let assin = APP.assinatura;
+    if(comAssinatura && !APP.rodando) assin = await lerAssinatura();
+
+    const r = compararRota(APP.rota, rota, APP.assinatura, assin);
+    if(APP.rota && r.eventos.length) r.eventos.forEach(anotarMudanca);
+
+    APP.rota = rota || APP.rota;
+    APP.assinatura = assin || APP.assinatura;
+    pintarRota(APP.rota, APP.assinatura, r.mudou);
+    montarAcoes();
+
+    if(r.eventos.length){
+      const dot = document.getElementById('dotRota');
+      const txt = document.getElementById('txtRota');
+      if(dot) dot.className = 'dot warn';
+      if(txt) txt.textContent = 'Mudança detectada às ' + new Date().toLocaleTimeString('pt-BR') + '. Veja abaixo o que mudou.';
+      setTimeout(function(){
+        if(vigiaLigado && dot) dot.className = 'dot live';
+        if(vigiaLigado && txt) txt.textContent = 'Vigia ligado. Pode ir mexer no roteador.';
+      }, 6000);
+    }
+    return r;
+  }finally{ vigiaOcupado = false; }
+}
+
+const btnVigia = document.getElementById('btnVigia');
+if(btnVigia) btnVigia.addEventListener('click', function(){
+  const dot = document.getElementById('dotRota');
+  const txt = document.getElementById('txtRota');
+  vigiaLigado = !vigiaLigado;
+  if(vigiaLigado){
+    btnVigia.textContent = 'Desligar o vigia';
+    btnVigia.classList.add('stop');
+    if(dot) dot.className = 'dot live';
+    if(txt) txt.textContent = 'Vigia ligado. Pode ir mexer no roteador: a mudança aparece aqui em até 15 segundos.';
+    let ciclo = 0;
+    baterRota(true);
+    vigiaTimer = setInterval(function(){ baterRota((++ciclo % 2) === 0); }, 15000);
+  }else{
+    btnVigia.textContent = 'Ligar o vigia';
+    btnVigia.classList.remove('stop');
+    clearInterval(vigiaTimer); vigiaTimer = null;
+    if(dot) dot.className = 'dot';
+    if(txt) txt.textContent = 'Vigia desligado.';
+  }
+});
+
+const btnMarco = document.getElementById('btnMarcoZero');
+if(btnMarco) btnMarco.addEventListener('click', async function(){
+  const txt = document.getElementById('txtRota');
+  btnMarco.disabled = true;
+  const rotulo = btnMarco.textContent;
+  btnMarco.textContent = 'Medindo…';
+  APP.rota = null; APP.assinatura = null;
+  registro.length = 0; desenharMudancas();
+  const rota = await lerRota();
+  const assin = APP.rodando ? null : await lerAssinatura();
+  APP.rota = rota; APP.assinatura = assin;
+  pintarRota(rota, assin, {});
+  montarAcoes();
+  if(txt) txt.textContent = 'Estado guardado às ' + new Date().toLocaleTimeString('pt-BR') +
+    '. Agora mexa no que quiser e ligue o vigia para ver a diferença.';
+  btnMarco.textContent = rotulo;
+  btnMarco.disabled = false;
+});
+
+const selLig = document.getElementById('selLigacao');
+if(selLig) selLig.addEventListener('change', function(){ montarAcoes(); pintarRota(APP.rota, APP.assinatura, {}); });
+const inpPl = document.getElementById('inpPlano');
+if(inpPl) inpPl.addEventListener('change', montarAcoes);
+
+/* o aparelho avisa sozinho quando troca de Wi-Fi para 4G, por exemplo */
+if(navigator.connection && navigator.connection.addEventListener){
+  navigator.connection.addEventListener('change', function(){
+    const c = navigator.connection;
+    const nome = c.type ? ({ wifi:'Wi-Fi', ethernet:'cabo de rede', cellular:'rede de celular' }[c.type] || c.type) : c.effectiveType;
+    anotarMudanca({ tipo:'alerta', txt:'O aparelho trocou de conexão: agora está em <b>' + nome + '</b>.' });
+    baterRota(true);
+  });
+}
+
+/* ============================================================
+   13. HISTÓRICO
+   ============================================================ */
+const CHAVE = 'radar-de-rede-historico-v1';
+function lerHistorico(){
+  try{ return JSON.parse(localStorage.getItem(CHAVE) || '[]'); }catch(e){ return []; }
+}
+function salvarHistorico(reg){
+  reg.quando = new Date().toISOString();
+  const h = lerHistorico();
+  h.unshift(reg);
+  try{ localStorage.setItem(CHAVE, JSON.stringify(h.slice(0,60))); }catch(e){}
+  montarHistorico();
+}
+function montarHistorico(){
+  const h = lerHistorico();
+  const tb = document.getElementById('histBody');
+  const vazio = document.getElementById('histVazio');
+  tb.innerHTML = '';
+  vazio.hidden = h.length > 0;
+  h.forEach(r => {
+    const d = new Date(r.quando);
+    const hora = d.toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+    const f = faixa(r.nota);
+    const tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td class="mono">'+hora+'</td>' +
+      '<td>'+r.tipo+'</td>' +
+      '<td>'+(r.srv||'--')+'</td>' +
+      '<td class="mono">'+(r.ping===null||r.ping===undefined?'--':num(r.ping,0)+' ms')+'</td>' +
+      '<td class="mono">'+(r.jit===null||r.jit===undefined?'--':num(r.jit,1)+' ms')+'</td>' +
+      '<td class="mono">'+(r.perda===null||r.perda===undefined?'--':num(r.perda,2)+'%')+'</td>' +
+      '<td class="mono">'+(r.banda===null||r.banda===undefined?'--':num(r.banda,0)+' Mbps')+'</td>' +
+      '<td style="color:'+f.cor+';font-weight:600">'+f.nome+'</td>';
+    tb.appendChild(tr);
+  });
+}
+document.getElementById('btnLimpar').addEventListener('click', () => {
+  try{ localStorage.removeItem(CHAVE); }catch(e){}
+  montarHistorico();
+});
+document.getElementById('btnCopiar').addEventListener('click', async () => {
+  const m = APP.metrics, nota = notaGeral(m), f = faixa(nota);
+  const srv = srvPorId(m.srv);
+  const linhas = [
+    'RADAR DE REDE — ' + new Date().toLocaleString('pt-BR'),
+    'Servidor de referência: ' + (srv ? srv.cidade + ' (' + srv.prov + ')' : '--'),
+    'Nota geral: ' + (nota===null?'--':Math.round(nota)) + '/100 — ' + f.nome,
+    'Latência: ' + num(m.ping,1) + ' ms',
+    'Jitter: ' + num(m.jitter,1) + ' ms',
+    'Perda: ' + num(m.perda,2) + ' %',
+    'Pico p99: ' + num(m.p99,1) + ' ms',
+    'Download: ' + num(m.banda,1) + ' Mbps',
+    'Aumento de ping sob carga: ' + num(m.bufa,1) + ' ms',
+    '',
+    'Para o que serve:'
+  ];
+  ATIVIDADES.forEach(a => { const r = avaliar(a,m); linhas.push('  ' + a.nome + ': ' + r.sel + ' — ' + r.por); });
+  const txt = linhas.join('\n');
+  const btn = document.getElementById('btnCopiar');
+  try{
+    await navigator.clipboard.writeText(txt);
+    btn.textContent = 'Copiado';
+  }catch(e){
+    const ta = document.createElement('textarea');
+    ta.value = txt; document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); btn.textContent = 'Copiado'; }
+    catch(err){ btn.textContent = 'Não deu para copiar'; }
+    ta.remove();
+  }
+  setTimeout(() => { btn.textContent = 'Copiar relatório'; }, 2200);
+});
+
+
+/* =========================================================
+   Aviso de consumo: partida com carga baixa dados de verdade
+   ========================================================= */
+function atualizarAvisoDados(){
+  const el = document.getElementById('avisoDados');
+  if(!el) return;
+  const selC = document.getElementById('selCenario');
+  const inpM = document.getElementById('inpMin');
+  if(!selC || !inpM) return;
+
+  const cenario = selC.value;
+  if(cenario === 'livre'){ el.hidden = true; return; }
+
+  const minutos = clamp(parseFloat(inpM.value) || 3, 0.5, 120);
+  const totalMs = minutos*60000;
+  const plano = planoDeCarga(cenario, totalMs);
+  const segCarga = totalMs/1000 * plano.fracaoComCarga;
+  const medida = (APP.metrics.banda && APP.metrics.banda > 1) ? APP.metrics.banda
+               : (APP.bandaCarga && APP.bandaCarga > 1) ? APP.bandaCarga : null;
+  const mbps = medida || 100;
+  const gb = mbps*segCarga/8/1024;
+  const medido = !!medida;
+
+  el.hidden = false;
+  el.innerHTML = 'Esse teste deixa a internet cheia por <b>' + tempoTexto(segCarga) + '</b> e vai baixar perto de ' +
+    '<b>' + (gb >= 1 ? num(gb,1) + ' GB' : num(gb*1024,0) + ' MB') + '</b>' +
+    (medido ? ' na sua velocidade medida de ' + num(mbps,0) + ' Mbps' : ' (estimativa; rode o painel 03 para afinar)') +
+    '. <b>Não use no 4G.</b>';
+}
+
+/* =========================================================
+   14. SERVIDORES DAS LOJAS DE JOGOS
+   Medem só a distância: loja de jogo não deixa o navegador
+   baixar arquivo grande, então a velocidade em Mbps continua
+   vindo do servidor de medição do painel 03.
+   ========================================================= */
+const LOJAS = [
+  { id:'blizzard', nome:'Battle.net', jogos:'Call of Duty, Overwatch, WoW',
+    urls:['https://blzmedia-a.akamaihd.net/','https://blzddist1-a.akamaihd.net/'] },
+  { id:'ea', nome:'EA / EA Sports', jogos:'EA FC, Battlefield, Apex',
+    urls:['https://eaassets-a.akamaihd.net/','https://origin-a.akamaihd.net/'] },
+  { id:'xbox', nome:'Xbox / Microsoft Store', jogos:'Game Pass e jogos do Xbox',
+    urls:['https://dlassets-ssl.xboxlive.com/','https://assets1.xboxlive.com/'] },
+  { id:'riot', nome:'Riot Games', jogos:'League of Legends, Valorant',
+    urls:['https://lol.dyn.riotcdn.net/','https://valorant.dyn.riotcdn.net/'] },
+  { id:'epic', nome:'Epic Games', jogos:'Fortnite, Rocket League',
+    urls:['https://epicgames-download1.akamaized.net/','https://cdn1.epicgames.com/'] },
+  { id:'garena', nome:'Garena', jogos:'Free Fire',
+    urls:['https://dl.garenanow.com/'] },
+  { id:'steam', nome:'Steam', jogos:'a loja da Valve',
+    urls:['https://cdn.akamai.steamstatic.com/','https://steamcdn-a.akamaihd.net/'] },
+  { id:'psn', nome:'PlayStation', jogos:'PS Store',
+    urls:['https://gst.prod.dl.playstation.net/','https://apollo.dl.playstation.net/'] }
+];
+
+const lojasGrid = document.getElementById('lojasGrid');
+const pingLoja = {};
+
+function montarLojas(){
+  if(!lojasGrid) return;
+  lojasGrid.innerHTML = '';
+  LOJAS.forEach(function(l){
+    const d = document.createElement('div');
+    d.className = 'chip';
+    d.style.cursor = 'default';
+    d.dataset.loja = l.id;
+    d.innerHTML =
+      '<div class="cidade">' + l.nome + '</div>' +
+      '<div class="prov">' + l.jogos + '</div>' +
+      '<div class="ms" data-ms>—<small> ms</small></div>';
+    lojasGrid.appendChild(d);
+  });
+}
+
+function pintarLoja(id, ms){
+  if(!lojasGrid) return;
+  const el = lojasGrid.querySelector('[data-loja="' + id + '"] [data-ms]');
+  if(!el) return;
+  if(ms === null){
+    el.innerHTML = '<span style="font-size:13px;color:var(--ink3)">não responde ao navegador</span>';
+    return;
+  }
+  const n = notaInversa(ms, [[20,100],[45,88],[80,72],[140,55],[250,35],[500,5]]);
+  el.innerHTML = Math.round(ms) + '<small> ms</small>';
+  el.style.color = faixa(n).cor;
+}
+
+async function medirLojas(){
+  if(APP.rodando) return;
+  const btn = document.getElementById('btnLojas');
+  if(btn){ btn.disabled = true; btn.textContent = 'Medindo…'; }
+  for(const l of LOJAS){
+    let melhor = null;
+    for(const u of l.urls){
+      await pingURL(u, 4000);
+      await pingURL(u, 4000);
+      const a = [];
+      for(let i=0;i<6;i++){
+        const v = await pingURL(u, 3000);
+        if(v !== null) a.push(v);
+      }
+      if(a.length >= 3){
+        const m = mediana(a);
+        if(melhor === null || m < melhor) melhor = m;
+      }
+    }
+    pingLoja[l.id] = melhor;
+    pintarLoja(l.id, melhor);
+  }
+  if(btn){ btn.disabled = false; btn.textContent = 'Medir de novo'; }
+}
+
+const btnLojas = document.getElementById('btnLojas');
+if(btnLojas) btnLojas.addEventListener('click', medirLojas);
+
+/* ============================================================
+   15. TEMA
+   ============================================================ */
+document.getElementById('btnTema').addEventListener('click', () => {
+  const r = document.documentElement;
+  const escuroAgora = r.getAttribute('data-theme') === 'dark' ||
+    (!r.getAttribute('data-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  r.setAttribute('data-theme', escuroAgora ? 'light' : 'dark');
+  try{ localStorage.setItem('radar-tema', escuroAgora ? 'light' : 'dark'); }catch(e){}
+  desenharPing(); desenharBanda();
+  SERVERS.forEach(s => { if(APP.pingAtual[s.id] !== undefined) pintarChip(s.id, APP.pingAtual[s.id]); });
+  atualizarVeredito();
+});
+try{
+  const t = localStorage.getItem('radar-tema');
+  if(t) document.documentElement.setAttribute('data-theme', t);
+}catch(e){}
+
+/* ============================================================
+   16. INÍCIO
+   ============================================================ */
+let redraw;
+window.addEventListener('resize', () => {
+  clearTimeout(redraw);
+  redraw = setTimeout(() => { desenharPing(); desenharBanda(); }, 160);
+});
+window.addEventListener('beforeunload', e => {
+  if(APP.rodando){ e.preventDefault(); e.returnValue = ''; }
+});
+
+/* aberto como arquivo solto: alguns navegadores bloqueiam o download de teste */
+if(location.protocol === 'file:'){
+  const aviso = document.createElement('div');
+  aviso.className = 'status';
+  aviso.style.margin = '18px 0 0';
+  aviso.innerHTML = '<span class="dot warn"></span><span>Você abriu o arquivo direto. A latência funciona, mas alguns ' +
+    'navegadores bloqueiam o teste de download nesse modo. Se o download não andar, use o atalho ' +
+    '<b>ABRIR NO CELULAR</b> no computador e acesse pelo endereço que ele mostrar.</span>';
+  document.querySelector('.wrap').insertBefore(aviso, document.getElementById('verdict'));
+}
+
+montarServidores();
+montarHistorico();
+montarTimeline(60);
+desenharPing();
+desenharBanda();
+montarAtividades(APP.metrics);
+
+montarAcoes();
+pintarRota(null, null, {});
+montarLojas();
+atualizarAvisoDados();
+['selCenario','inpMin'].forEach(function(id){
+  const e = document.getElementById(id);
+  if(e){ e.addEventListener('change', atualizarAvisoDados); e.addEventListener('input', atualizarAvisoDados); }
+});
+document.querySelectorAll('.preset[data-min]').forEach(function(b){
+  b.addEventListener('click', atualizarAvisoDados);
+});
+
+(async function inicio(){
+  lerRota().then(function(r){
+    APP.rota = r;
+    pintarRota(r, APP.assinatura, {});
+    montarAcoes();
+  });
+  const edge = srvPorId('edge');
+  await medirUm(edge, true);
+  const sp = srvPorId('gru-aws');
+  await medirUm(sp, false);
+  // guarda a assinatura de latência inicial, base de comparação do vigia
+  APP.assinatura = { edge: APP.pingAtual['edge'], 'gru-aws': APP.pingAtual['gru-aws'] };
+  pintarRota(APP.rota, APP.assinatura, {});
+  montarAcoes();
+})();
+</script>
+</body>
+</html>
