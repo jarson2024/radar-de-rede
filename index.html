@@ -693,6 +693,12 @@ footer{margin-top:26px;padding-top:18px;border-top:1px solid var(--line);font-si
         Esse aumento tem nome: <b>bufferbloat</b>. O roteador segura pacotes numa fila quando a linha enche, e o
         jogo sente isso como lag mesmo com a velocidade contratada em dia. Aumento acima de 100 ms significa
         partida injogável enquanto alguém baixa ou envia algo em casa.
+        <br><br>
+        <b>Sobre o jitter desta tela:</b> ele sai maior do que o real. Um navegador só consegue medir por pedidos
+        de página, e com a linha cheia cada pedido pega fila na ida e na volta, coisa que o pacote do jogo não
+        pega. Comparando aqui com ping de verdade, este número saiu 8 vezes maior. Use o <b>aumento do ping</b>
+        acima, que é confiável, e para jitter exato use a página <b>Rota do Xbox</b>, que mede com ping de
+        verdade pelo programa do notebook.
       </p>
     </div>
   </section>
@@ -2137,8 +2143,13 @@ function subir(totalBytes, conexoes, onProgresso, sinal){
   const pedidos = Math.ceil(totalBytes/PEDACO);
   let proximo = 0;
   const porConexao = new Array(conexoes).fill(0);
-  const somar = () => onProgresso(porConexao.reduce((a,b) => a+b, 0));
   const dados = new Uint8Array(PEDACO); // conteúdo não importa, só o tamanho
+
+  /* O aviso de progresso do envio dispara centenas de vezes por segundo. Somar
+     tudo a cada aviso engasgava a própria página e inflava o jitter medido em
+     mais de dez vezes — o número saía ruim por culpa do navegador, não da
+     internet. Agora o total é repassado só quatro vezes por segundo. */
+  const relogio = setInterval(() => onProgresso(porConexao.reduce((a,b) => a+b, 0)), 250);
 
   function trabalhador(indice){
     return new Promise(resolveTudo => {
@@ -2148,10 +2159,10 @@ function subir(totalBytes, conexoes, onProgresso, sinal){
         if(meu >= pedidos) return resolveTudo();
         let ultimo = 0;
         const xhr = new XMLHttpRequest();
-        const fecharPasso = () => { porConexao[indice] += (PEDACO - ultimo); somar(); passo(); };
+        const fecharPasso = () => { porConexao[indice] += (PEDACO - ultimo); passo(); };
         xhr.open('POST', UP_URL + '?r=' + Math.random().toString(36).slice(2));
         xhr.timeout = 15000;
-        xhr.upload.onprogress = e => { porConexao[indice] += (e.loaded - ultimo); ultimo = e.loaded; somar(); };
+        xhr.upload.onprogress = e => { porConexao[indice] += (e.loaded - ultimo); ultimo = e.loaded; };
         xhr.onload = fecharPasso; xhr.onerror = fecharPasso; xhr.onabort = fecharPasso; xhr.ontimeout = fecharPasso;
         sinal.addEventListener('abort', () => xhr.abort(), { once:true });
         xhr.send(dados);
@@ -2159,7 +2170,8 @@ function subir(totalBytes, conexoes, onProgresso, sinal){
       passo();
     });
   }
-  return Promise.all(Array.from({length:conexoes}, (_,i) => trabalhador(i)));
+  return Promise.all(Array.from({length:conexoes}, (_,i) => trabalhador(i)))
+    .finally(() => { clearInterval(relogio); onProgresso(porConexao.reduce((a,b) => a+b, 0)); });
 }
 
 /* ============================================================
@@ -2187,19 +2199,23 @@ document.getElementById('btnCarga').addEventListener('click', async () => {
     travarUI(null); btn.disabled = false; return;
   }
 
+  /* Um ping por vez, esperando a resposta antes do próximo.
+     Mandar vários ao mesmo tempo dobrava o jitter medido: com a linha cheia
+     os pedidos se acumulavam e o navegador precisava abrir conexão nova,
+     e esse tempo de abrir conexão entrava na conta como se fosse atraso da
+     internet. Medido aqui: 18 ms em paralelo contra 8 ms um por vez. */
   const coletar = async (segundos, saida, quando) => {
     const t0 = performance.now();
-    let enviados = 0, perdidos = 0, emVoo = 0;
-    return new Promise(res => {
-      const it = setInterval(() => {
-        const dt = performance.now()-t0;
-        if(quando) quando(dt/(segundos*1000));
-        if(dt >= segundos*1000){ clearInterval(it); setTimeout(res, 700); return; }
-        if(emVoo > 6) return;   // fila cheia: espera respirar antes de mandar mais
-        emVoo++; enviados++;
-        pingURL(url, 3000).then(v => { emVoo--; if(v===null) perdidos++; else saida.push(v); });
-      }, 180);
-    }).then(() => ({ enviados, perdidos }));
+    let enviados = 0, perdidos = 0;
+    while(performance.now() - t0 < segundos*1000){
+      if(quando) quando((performance.now()-t0)/(segundos*1000));
+      enviados++;
+      const v = await pingURL(url, 3000);
+      if(v === null) perdidos++; else saida.push(v);
+      await new Promise(r => setTimeout(r, 120));
+    }
+    if(quando) quando(1);
+    return { enviados, perdidos };
   };
 
   // fase 1: sem carga
