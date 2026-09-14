@@ -661,7 +661,7 @@ footer{margin-top:26px;padding-top:18px;border-top:1px solid var(--line);font-si
     <div class="phead">
       <span class="pnum">04</span>
       <h2>Latência com a internet ocupada</h2>
-      <p>Mede o ping sozinho, depois durante um download pesado. É o teste que revela se você trava quando alguém baixa algo em casa.</p>
+      <p>Mede o ping sozinho, depois com a descida <b>e</b> a subida cheias ao mesmo tempo. É o teste que revela se você trava quando alguém baixa ou envia algo em casa.</p>
     </div>
     <div class="pbody">
       <div class="controls">
@@ -677,21 +677,22 @@ footer{margin-top:26px;padding-top:18px;border-top:1px solid var(--line);font-si
 
       <div class="rgrid">
         <div><div class="k">Sem carga</div><div class="v mono" id="cLivre">--<small> ms</small></div></div>
-        <div><div class="k">Baixando</div><div class="v mono" id="cCarga">--<small> ms</small></div></div>
+        <div><div class="k">Linha cheia</div><div class="v mono" id="cCarga">--<small> ms</small></div></div>
         <div><div class="k">Aumento</div><div class="v mono" id="cDelta">--<small> ms</small></div></div>
         <div><div class="k">Jitter na carga</div><div class="v mono" id="cJit">--<small> ms</small></div></div>
         <div><div class="k">Perda na carga</div><div class="v mono" id="cPerda">--<small> %</small></div></div>
         <div><div class="k">Recuperação</div><div class="v mono" id="cRec">--<small> ms</small></div></div>
-        <div><div class="k">Banda no teste</div><div class="v mono" id="cBanda">--<small> Mbps</small></div></div>
+        <div><div class="k">Banda (desce / sobe)</div><div class="v mono" id="cBanda">--<small> Mbps</small></div></div>
         <div><div class="k">Nota</div><div class="v mono" id="cNota">--</div></div>
       </div>
       <p class="note">
-        O teste enche a linha de propósito por cerca de 20 segundos, então <b>ele consome dados</b>:
-        numa conexão de 100 Mbps são uns 250 MB. Evite rodar no 4G.
+        O teste enche a descida <b>e</b> a subida de propósito por cerca de 20 segundos, então <b>ele consome dados
+        nos dois sentidos</b>: numa conexão de 100 Mbps são uns 250 MB baixados e uma parte enviada também. Evite
+        rodar no 4G.
         <br><br>
         Esse aumento tem nome: <b>bufferbloat</b>. O roteador segura pacotes numa fila quando a linha enche, e o
         jogo sente isso como lag mesmo com a velocidade contratada em dia. Aumento acima de 100 ms significa
-        partida injogável enquanto alguém baixa.
+        partida injogável enquanto alguém baixa ou envia algo em casa.
       </p>
     </div>
   </section>
@@ -863,6 +864,7 @@ const SERVERS = [
 ];
 
 const DOWN_URL = 'https://speed.cloudflare.com/__down?bytes=';
+const UP_URL = 'https://speed.cloudflare.com/__up';
 
 /* estado global do app */
 const APP = {
@@ -2125,6 +2127,42 @@ function estabilidade(a){
   return clamp(100 - (d/m*100), 0, 100);
 }
 /* ============================================================
+   Gera carga de UPLOAD de verdade, junto com a de download. fetch() não avisa
+   o progresso do envio, então aqui usamos XMLHttpRequest, que tem esse aviso.
+   Sem isso, o teste de bufferbloat só pegaria travamento causado por quem
+   baixa algo em casa, e não por quem está enviando (upload de vídeo, backup).
+   ============================================================ */
+function subir(totalBytes, conexoes, onProgresso, sinal){
+  const PEDACO = 8388608; // 8 MB por envio
+  const pedidos = Math.ceil(totalBytes/PEDACO);
+  let proximo = 0;
+  const porConexao = new Array(conexoes).fill(0);
+  const somar = () => onProgresso(porConexao.reduce((a,b) => a+b, 0));
+  const dados = new Uint8Array(PEDACO); // conteúdo não importa, só o tamanho
+
+  function trabalhador(indice){
+    return new Promise(resolveTudo => {
+      const passo = () => {
+        if(sinal.aborted) return resolveTudo();
+        const meu = proximo++;
+        if(meu >= pedidos) return resolveTudo();
+        let ultimo = 0;
+        const xhr = new XMLHttpRequest();
+        const fecharPasso = () => { porConexao[indice] += (PEDACO - ultimo); somar(); passo(); };
+        xhr.open('POST', UP_URL + '?r=' + Math.random().toString(36).slice(2));
+        xhr.timeout = 15000;
+        xhr.upload.onprogress = e => { porConexao[indice] += (e.loaded - ultimo); ultimo = e.loaded; somar(); };
+        xhr.onload = fecharPasso; xhr.onerror = fecharPasso; xhr.onabort = fecharPasso; xhr.ontimeout = fecharPasso;
+        sinal.addEventListener('abort', () => xhr.abort(), { once:true });
+        xhr.send(dados);
+      };
+      passo();
+    });
+  }
+  return Promise.all(Array.from({length:conexoes}, (_,i) => trabalhador(i)));
+}
+
+/* ============================================================
    8. LATÊNCIA SOB CARGA (bufferbloat)
    ============================================================ */
 document.getElementById('btnCarga').addEventListener('click', async () => {
@@ -2172,19 +2210,23 @@ document.getElementById('btnCarga').addEventListener('click', async () => {
   const e1 = document.getElementById('cLivre'), s1 = e1.querySelector('small');
   e1.textContent = num(baseMed,1); if(s1) e1.appendChild(s1);
 
-  // fase 2: com carga
-  txt.textContent = 'Fase 2 de 3 — medindo enquanto baixa a toda…';
+  // fase 2: com carga — descida E subida cheias ao mesmo tempo, como um teste
+  // de bufferbloat completo. Só descida deixaria escapar o travamento causado
+  // por quem está ENVIANDO algo em casa (upload de vídeo, backup na nuvem).
+  txt.textContent = 'Fase 2 de 3 — enchendo a descida e a subida ao mesmo tempo…';
   const ctl = new AbortController();
-  let bytes = 0;
+  let bytesDesce = 0, bytesSobe = 0;
   const tCarga0 = performance.now();
-  baixar(4e9, 6, b => { bytes = b; }, ctl.signal).catch(() => {});
+  baixar(4e9, 6, b => { bytesDesce = b; }, ctl.signal).catch(() => {});
+  subir(2e9, 3, b => { bytesSobe = b; }, ctl.signal).catch(() => {});
   await new Promise(r => setTimeout(r, 2500)); // deixa a fila do roteador encher
 
   const carregado = [];
   const r2 = await coletar(18, carregado, f => { barra.style.width = (30+f*50).toFixed(0)+'%'; });
   const tCarga = (performance.now()-tCarga0)/1000;
   ctl.abort();
-  const bandaCarga = bytes*8/1e6/tCarga;
+  const bandaDescida = bytesDesce*8/1e6/tCarga;
+  const bandaSubida = bytesSobe*8/1e6/tCarga;
 
   // fase 3: recuperação
   txt.textContent = 'Fase 3 de 3 — vendo quanto tempo leva para normalizar…';
@@ -2215,13 +2257,17 @@ document.getElementById('btnCarga').addEventListener('click', async () => {
     eD.style.color = faixa(notaInversa(delta, [[10,100],[30,85],[60,68],[100,48],[200,22],[400,0]])).cor;
     if(smD){ smD.hidden = false; eD.appendChild(smD); }
   }
-  put('cPerda', perdaCarga, 2); put('cRec', recMed); put('cBanda', bandaCarga);
+  put('cPerda', perdaCarga, 2); put('cRec', recMed);
+
+  const eB = document.getElementById('cBanda'), smB = eB.querySelector('small');
+  eB.textContent = num(bandaDescida,0) + ' / ' + num(bandaSubida,0);
+  if(smB){ smB.hidden = false; eB.appendChild(smB); }
   const eN = document.getElementById('cNota');
   eN.textContent = faixa(notaBufa).nome;
   eN.style.color = faixa(notaBufa).cor;
 
   APP.metrics.bufa = delta;
-  if(APP.metrics.banda === null) APP.metrics.banda = bandaCarga;
+  if(APP.metrics.banda === null) APP.metrics.banda = bandaDescida;
   atualizarVeredito();
 
   dot.className = 'dot';
@@ -2231,7 +2277,7 @@ document.getElementById('btnCarga').addEventListener('click', async () => {
       ? 'Dá para jogar com a casa usando a internet, mas você vai sentir o jogo mais pesado.'
       : 'Seu ping dispara quando a internet enche. Jogar enquanto alguém baixa vai travar.';
 
-  salvarHistorico({ tipo:'Sob carga', srv:srv.cidade, ping:cargaMed, jit:jitCarga, perda:perdaCarga, banda:bandaCarga, nota:notaBufa });
+  salvarHistorico({ tipo:'Sob carga', srv:srv.cidade, ping:cargaMed, jit:jitCarga, perda:perdaCarga, banda:bandaDescida, nota:notaBufa });
   travarUI(null); btn.disabled = false;
 });
 
