@@ -1254,7 +1254,7 @@ function mostrarCadeia(caminho){
 const TIPO_SALTO = { roteador:'Seu roteador', 'operadora-interna':'Equipamento da operadora', operadora:'Operadora', transito:'Rede de transporte', destino:'Servidor', oculto:'Não responde' };
 const DICA_TIPO_SALTO = {
   roteador: 'É o roteador da sua própria casa: o primeiro ponto de todos, antes de qualquer coisa sair para a internet.',
-  'operadora-interna': 'Um aparelho de dentro da rede da sua operadora. Ainda não tem endereço "público" — é um passo interno, antes de sair para a internet de verdade.',
+  'operadora-interna': 'Normal, não é erro: um aparelho de dentro da rede da sua operadora. O endereço dele começa com 172, 10 ou 192.168 porque é de uso interno dela, não da internet aberta — quase toda operadora do Brasil tem um ou dois pontos assim antes de sair de verdade para a internet.',
   operadora: 'O ponto exato onde sua operadora te entrega para o resto da internet. Se o atraso aparece a partir daqui, a culpa já é dela.',
   transito: 'Uma empresa que só carrega dados de um lugar para o outro, tipo uma rodovia da internet. Não é sua operadora nem o servidor final — só uma parada no meio do caminho.',
   destino: 'O computador de destino: onde o jogo ou o site que você está medindo realmente está hospedado. É o último ponto da rota.',
