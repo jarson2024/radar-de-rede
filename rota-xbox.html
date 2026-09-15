@@ -1252,6 +1252,14 @@ function mostrarCadeia(caminho){
 }
 
 const TIPO_SALTO = { roteador:'Seu roteador', 'operadora-interna':'Equipamento da operadora', operadora:'Operadora', transito:'Rede de transporte', destino:'Servidor', oculto:'Não responde' };
+const DICA_TIPO_SALTO = {
+  roteador: 'É o roteador da sua própria casa: o primeiro ponto de todos, antes de qualquer coisa sair para a internet.',
+  'operadora-interna': 'Um aparelho de dentro da rede da sua operadora. Ainda não tem endereço "público" — é um passo interno, antes de sair para a internet de verdade.',
+  operadora: 'O ponto exato onde sua operadora te entrega para o resto da internet. Se o atraso aparece a partir daqui, a culpa já é dela.',
+  transito: 'Uma empresa que só carrega dados de um lugar para o outro, tipo uma rodovia da internet. Não é sua operadora nem o servidor final — só uma parada no meio do caminho.',
+  destino: 'O computador de destino: onde o jogo ou o site que você está medindo realmente está hospedado. É o último ponto da rota.',
+  oculto: 'Esse ponto existe no caminho, mas não respondeu ao teste. É muito comum — vários roteadores se escondem assim por segurança — e não quer dizer que tenha algo errado.',
+};
 
 function mostrarSaltos(saltos){
   const tb = $('tbSaltos');
@@ -1260,7 +1268,9 @@ function mostrarSaltos(saltos){
   const flush = () => {
     if(!ocultos) return;
     const tr = document.createElement('tr');
-    tr.innerHTML = '<td class="n" style="color:var(--ink3)">…</td><td colspan="3" style="color:var(--ink3)">' + ocultos + (ocultos === 1 ? ' salto escondido' : ' saltos escondidos') + ' pela rede, é normal</td>';
+    tr.innerHTML = '<td class="n" style="color:var(--ink3)">…</td><td colspan="3" style="color:var(--ink3)" ' +
+      'data-dica="Esses pontos existem no caminho mas nenhum deles respondeu ao teste. É muito comum — roteadores se escondem assim por segurança — e não atrapalha o resultado.">' +
+      ocultos + (ocultos === 1 ? ' salto escondido' : ' saltos escondidos') + ' pela rede, é normal</td>';
     tb.appendChild(tr); ocultos = 0;
   };
   saltos.forEach(s => {
@@ -1275,7 +1285,9 @@ function mostrarSaltos(saltos){
       '<td><div class="rnome"></div><div class="rcam mono"></div></td>' +
       '<td class="n">' + (s.ms === null ? '--' : num(s.ms, 1) + ' ms') + '</td>' +
       '<td class="n" style="color:' + corResp + '">' + (resp === null ? '--' : resp + ' de 6') + '</td>';
-    tr.querySelector('.rnome').textContent = (TIPO_SALTO[s.tipo] || 'Salto') + (dono ? ' · ' + dono : '');
+    const rnome = tr.querySelector('.rnome');
+    rnome.textContent = (TIPO_SALTO[s.tipo] || 'Salto') + (dono ? ' · ' + dono : '');
+    rnome.setAttribute('data-dica', DICA_TIPO_SALTO[s.tipo] || 'Uma parada no meio do caminho até o servidor.');
     tr.querySelector('.rcam').textContent = s.ip;
     tb.appendChild(tr);
   });
