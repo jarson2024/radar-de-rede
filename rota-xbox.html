@@ -386,8 +386,14 @@ button[data-dica],a[data-dica],select[data-dica],input[data-dica]{cursor:pointer
                     data-dica="Abre a tela do seu roteador no navegador, caso você precise conferir ou trocar a senha.">Abrir a tela do roteador</button>
           </div>
           <div class="erro-cx" id="erroEntrar" hidden></div>
+          <div class="erro-cx" id="avisoPortaFechada" hidden style="border-color:var(--n3);color:var(--ink)">
+            <b>Antes de digitar:</b> o acesso avançado está <b>desligado</b> no seu roteador agora, então a senha não vai
+            adiantar. Clique em <b>Abrir a tela do roteador</b>, entre lá e ligue em
+            <b>Administração → Sistema → Serviço SSH → "LAN only"</b>. Aperte <b>Aplicar</b> e volte aqui.
+          </div>
           <p class="nota" id="dicaSsh" hidden>Se der erro de conexão, ligue o acesso avançado no roteador:
-            <b>Administração → Sistema → Serviço SSH → LAN only</b>, e salve.</p>
+            <b>Administração → Sistema → Serviço SSH → LAN only</b>, e salve. Isso às vezes desliga sozinho quando o
+            roteador atualiza o firmware ou volta às configurações de fábrica.</p>
         </div>
       </div>
 
@@ -1640,6 +1646,9 @@ function mostrarPartida(r){
   $('pEntrar').hidden = !semRoteador;
   if(semRoteador){
     $('pContagem').hidden = true; $('pProcurando').hidden = true; $('pPartida').hidden = true; $('pResumo').hidden = true;
+    // Avisa antes de a pessoa digitar a senha à toa: a porta do acesso avançado
+    // fecha sozinha quando o roteador atualiza o firmware ou volta ao padrão.
+    $('avisoPortaFechada').hidden = (rot.porta_aberta !== false);
     if(rot.disponivel === false){
       $('erroEntrar').hidden = false;
       $('erroEntrar').textContent = 'Falta uma peça no Python para conversar com o roteador. Feche e abra o monitor de novo.';
