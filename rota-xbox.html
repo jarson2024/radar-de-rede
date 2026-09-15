@@ -465,6 +465,19 @@ button[data-dica],a[data-dica],select[data-dica],input[data-dica]{cursor:pointer
             <div class="texto" id="ppTexto" style="font-size:16px">Conexão limpa com o adversário até agora.</div>
           </div>
 
+          <div class="diag" id="boxAcelerador" style="padding:14px 16px;border-radius:11px;background:var(--panel2);border:1px solid var(--line-soft);margin-top:12px" hidden>
+            <div class="linha1">
+              <span class="pilula" id="acPilula" data-dica="Compara o ping que você já alcançou nesta partida com o menor tempo que a distância até o outro lado permite. Quando os dois já estão perto, nenhum acelerador consegue melhorar — a velocidade da luz não negocia.">vale um acelerador?</span>
+              <span class="desde" id="acOnde"></span>
+            </div>
+            <div class="texto" id="acTexto" style="font-size:15px">Calculando…</div>
+          </div>
+
+          <p class="nota"><b>Como calculo isso:</b> comparo o melhor ping que você já alcançou nesta partida com o menor
+            tempo que a distância até o outro lado permite — a velocidade da luz na fibra, sem enrolação no meio do
+            caminho. Quando os dois já estão perto, nenhum acelerador tem margem para melhorar. Dentro do Brasil essa
+            conta é confiável; fora, o cabo submarino não segue linha reta, então vira só uma estimativa.</p>
+
           <div class="grafico">
             <canvas id="cvPartida"></canvas>
             <div class="legenda" id="legPartida"></div>
@@ -479,6 +492,13 @@ button[data-dica],a[data-dica],select[data-dica],input[data-dica]{cursor:pointer
       <div class="pbody" id="pResumo" hidden>
         <div class="recom" id="resumoTexto"></div>
         <div class="placar" style="margin-top:14px" id="resumoPlacar"></div>
+        <div class="diag" id="boxAceleradorResumo" style="padding:14px 16px;border-radius:11px;background:var(--panel2);border:1px solid var(--line-soft);margin-top:14px" hidden>
+          <div class="linha1">
+            <span class="pilula" id="acrPilula" data-dica="Compara o melhor ping alcançado nesta partida com o menor tempo que a distância até o outro lado permite.">vale um acelerador?</span>
+            <span class="desde" id="acrOnde"></span>
+          </div>
+          <div class="texto" id="acrTexto" style="font-size:15px"></div>
+        </div>
         <button class="btn parar mini" id="btnBloquearResumo" type="button" style="margin-top:12px"
                 data-dica="Fecha a passagem de dados deste endereço no seu roteador. Veja os limites explicados no botão de bloquear durante a partida.">Bloquear este adversário</button>
         <div class="eventos" id="evResumo" style="margin-top:14px"></div>
@@ -1657,6 +1677,7 @@ function mostrarPartida(r){
   mostrarAdversario(p);
   mostrarNumeros(p);
   mostrarProblemaAtual(p);
+  mostrarAcelerador('boxAcelerador', 'acPilula', 'acOnde', 'acTexto', p.acelerador);
   mostrarEventosPartida(p.eventos || []);
   desenharPartida();
 }
@@ -1767,6 +1788,24 @@ function mostrarProblemaAtual(p){
   $('ppDesde').textContent = pr.atraso > 0 ? ('+' + num(pr.atraso,0) + ' ms acima do normal') : '';
 }
 
+const COR_VEREDITO = { ajudaria:'var(--n2)', talvez:'var(--n3)', nao_ajudaria:'var(--n5)', sem_info:'var(--ink3)' };
+const ROTULO_VEREDITO = { ajudaria:'vale tentar', talvez:'ganho pequeno', nao_ajudaria:'não precisa', sem_info:'sem dados' };
+
+function mostrarAcelerador(caixaId, pilulaId, ondeId, textoId, ac){
+  const caixa = $(caixaId);
+  if(!ac || ac.veredito === undefined){ caixa.hidden = true; return; }
+  caixa.hidden = false;
+  const pil = $(pilulaId), cor = COR_VEREDITO[ac.veredito] || 'var(--ink3)';
+  pil.textContent = ROTULO_VEREDITO[ac.veredito] || 'calculando…';
+  pil.style.background = cor; pil.style.color = (ac.veredito === 'talvez') ? '#1a1205' : '#fff';
+  caixa.style.borderLeft = '3px solid ' + cor;
+  $(textoId).textContent = ac.texto || '';
+  const partes = [];
+  if(ac.onde) partes.push(ac.onde);
+  if(ac.km) partes.push(num(ac.km,0) + ' km');
+  $(ondeId).textContent = partes.join(' · ');
+}
+
 const NOME_LADO = { voce:'seu lado', adversario:'lado dele', meio:'caminho' };
 
 function mostrarEventosPartida(lista){
@@ -1836,6 +1875,7 @@ function mostrarResumo(h){
     cx.appendChild(d);
   });
 
+  mostrarAcelerador('boxAceleradorResumo', 'acrPilula', 'acrOnde', 'acrTexto', h.acelerador);
   prepararBotaoBloqueio($('btnBloquearResumo'), h.ip, dono.nome, dono.pais);
 }
 
