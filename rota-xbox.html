@@ -355,6 +355,8 @@ button[data-dica],a[data-dica],select[data-dica],input[data-dica]{cursor:pointer
         <p>Lê no roteador com quem o Xbox está trocando dados agora. Quando uma partida começa, mostra o endereço do
           outro lado e vigia a conexão até o apito final.</p>
         <div class="esp"></div>
+        <button class="btn sec mini" id="btnSom" type="button"
+                data-dica="Toca um bipe alto na hora exata em que a conexão com o adversário piorar durante a partida — pico de atraso, travada ou perda de pacote. Serve para você saber, sem ficar de olho na tela, o momento em que algo deu errado. Clique para ligar ou desligar.">🔊 Som</button>
         <button class="btn" id="btnPartida" type="button" hidden
                 data-dica="Começa a vigiar o Xbox. Ele fica esperando você entrar numa partida e, assim que entrar, mostra tudo sozinho.">Vigiar partidas</button>
       </div>
@@ -919,7 +921,13 @@ async function carregarRede(){
   E.casaFonte = r.casa_fonte || null;
   const filas = (r.fila && r.fila.filas) || [];
   if(filas.length){
-    const bandas = filas.map(f => f.banda).filter(Boolean).join(' / ');
+    const legivel = txt => {
+      const m = /^(\d+(?:\.\d+)?)(K|M)?bit$/i.exec(txt || '');
+      if(!m) return txt;
+      let mbit = parseFloat(m[1]) * (m[2] && m[2].toUpperCase() === 'K' ? 0.001 : 1);
+      return num(mbit, mbit < 10 ? 1 : 0) + ' Mb/s';
+    };
+    const bandas = filas.map(f => legivel(f.banda)).filter(Boolean).join(' / ');
     const segurados = filas.reduce((s, f) => s + (f.segurados || 0), 0);
     chip('var(--n5)', 'Cake ligado' + (bandas ? ' <b>' + bandas + '</b>' : ''),
          'O Cake é o controlador de fila do seu roteador — o melhor que existe contra travada por download. ' +
@@ -1547,7 +1555,74 @@ try{ const t = localStorage.getItem('radar-tema'); if(t) document.documentElemen
 /* =========================================================
    Partida ao vivo: quem é o adversário e de quem é a culpa
    ========================================================= */
-const P = { amostras: [], seq: 0, idPartida: null, ligado: false, ocupado: false, timer: null, pulouContagem: false };
+const P = { amostras: [], seq: 0, idPartida: null, ligado: false, ocupado: false, timer: null, pulouContagem: false, ultimoBipSeq: 0 };
+
+/* =========================================================
+   Bipe quando a conexão piora durante a partida
+   ========================================================= */
+let audioCtx = null;
+function contextoDeAudio(){
+  // O navegador só libera som depois de algum toque na página — por isso
+  // isto é chamado de novo a cada bipe, não só uma vez.
+  if(!audioCtx){
+    try{ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    catch(e){ return null; }
+  }
+  if(audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
+  return audioCtx;
+}
+document.addEventListener('click', contextoDeAudio, { once: true });
+
+function somLigado(){
+  try{ return localStorage.getItem('radar-som') !== '0'; }catch(e){ return true; }
+}
+function alternarSom(){
+  const ligar = !somLigado();
+  try{ localStorage.setItem('radar-som', ligar ? '1' : '0'); }catch(e){}
+  atualizarBotaoSom();
+  if(ligar) tocarBip('atencao');   // um bipe de teste, para confirmar que está ouvindo
+}
+function atualizarBotaoSom(){
+  const b = $('btnSom');
+  if(!b) return;
+  const on = somLigado();
+  b.textContent = on ? '🔊 Som' : '🔇 Som';
+  b.setAttribute('aria-pressed', on ? 'true' : 'false');
+}
+
+/* 'ruim' = dois bipes graves e fortes (problema sério); 'atencao' = um bipe
+   curto e mais fraco (só um aviso leve). */
+function tocarBip(nivel){
+  if(!somLigado()) return;
+  const ctx = contextoDeAudio();
+  if(!ctx) return;
+  const t0 = ctx.currentTime;
+  const notas = nivel === 'ruim' ? [880, 880] : [520];
+  let t = t0;
+  notas.forEach(freq => {
+    const osc = ctx.createOscillator(), gain = ctx.createGain();
+    osc.type = 'square'; osc.frequency.value = freq;
+    osc.connect(gain); gain.connect(ctx.destination);
+    const pico = nivel === 'ruim' ? 0.4 : 0.22;
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.exponentialRampToValueAtTime(pico, t + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.22);
+    osc.start(t); osc.stop(t + 0.24);
+    t += 0.27;
+  });
+}
+
+/* Só apita o que aconteceu DEPOIS de abrir esta tela — nada de disparar um
+   monte de bipes de uma vez por problemas antigos da partida. */
+function apitarNovosEventos(lista){
+  const problemas = lista.filter(e => e.tipo !== 'inicio');
+  const novos = problemas.filter(e => e.seq > P.ultimoBipSeq);
+  if(problemas.length) P.ultimoBipSeq = Math.max(P.ultimoBipSeq, ...problemas.map(e => e.seq));
+  novos.forEach(e => tocarBip(e.nivel));
+}
+
+$('btnSom').addEventListener('click', alternarSom);
+atualizarBotaoSom();
 
 async function apiPost(caminho, corpo, prazoMs = 15000){
   const ctl = new AbortController();
@@ -1700,7 +1775,13 @@ function mostrarPartida(r){
     return;
   }
 
-  if(P.idPartida !== p.id || p.recomecou){ P.amostras = []; P.seq = 0; P.idPartida = p.id; }
+  if(P.idPartida !== p.id || p.recomecou){
+    P.amostras = []; P.seq = 0; P.idPartida = p.id;
+    // Partida nova (ou a tela acabou de abrir no meio de uma): começa a ouvir
+    // só daqui pra frente, sem apitar em cadeia por problemas que já passaram.
+    const jaAconteceu = (p.eventos || []).map(e => e.seq);
+    P.ultimoBipSeq = jaAconteceu.length ? Math.max(...jaAconteceu) : 0;
+  }
   if(p.amostras && p.amostras.length){
     P.amostras = P.amostras.concat(p.amostras).slice(-2400);
     P.seq = P.amostras[P.amostras.length-1].n;
@@ -1709,6 +1790,7 @@ function mostrarPartida(r){
   mostrarNumeros(p);
   mostrarProblemaAtual(p);
   mostrarAcelerador('boxAcelerador', 'acPilula', 'acOnde', 'acTexto', p.acelerador);
+  apitarNovosEventos(p.eventos || []);
   mostrarEventosPartida(p.eventos || []);
   desenharPartida();
 }
