@@ -827,7 +827,8 @@ const E = {
   intervaloLeitura: null,
   eventosVistos: 0,
   medindo: false,
-  casaPico: 0
+  casaPico: 0,
+  casaFonte: null   // de onde veio o tráfego da casa: 'roteador' (acesso avançado) ou 'upnp'
 };
 
 /* =========================================================
@@ -912,6 +913,19 @@ async function carregarRede(){
        'Há quanto tempo sua internet está no ar sem cair. Se este número zera sozinho, sua conexão está caindo.');
   if(rot.dupla_nat) chip('var(--n1)', '<b>Dois roteadores em sequência</b>: isso atrapalha o Xbox',
        'Você tem dois roteadores um atrás do outro. Isso deixa o Xbox em NAT fechado e atrapalha achar partida. O ideal é colocar o primeiro em modo ponte.');
+
+  // Cake é o controlador de fila do roteador: é ele que impede um download de
+  // encher a fila e estragar o ping do jogo.
+  E.casaFonte = r.casa_fonte || null;
+  const filas = (r.fila && r.fila.filas) || [];
+  if(filas.length){
+    const bandas = filas.map(f => f.banda).filter(Boolean).join(' / ');
+    const segurados = filas.reduce((s, f) => s + (f.segurados || 0), 0);
+    chip('var(--n5)', 'Cake ligado' + (bandas ? ' <b>' + bandas + '</b>' : ''),
+         'O Cake é o controlador de fila do seu roteador — o melhor que existe contra travada por download. ' +
+         'Ele segura a fila para o ping do jogo não subir quando alguém em casa começa a baixar algo. ' +
+         'Já segurou ' + segurados + ' pacotes de propósito para isso, e é por isso que sua internet não engasga sob carga.');
+  }
 
   if(nb.tipo === 'wifi'){
     chip('var(--n1)', '<b>Ligue o notebook no cabo</b> para a medida valer',
@@ -1116,8 +1130,16 @@ function mostrarCasa(m){
   const ult = E.amostras.length ? E.amostras[E.amostras.length-1].casa : null;
   $('casaDesce').textContent = ult ? num(ult.desce, ult.desce < 10 ? 1 : 0) : '--';
   $('casaSobe').textContent = ult ? num(ult.sobe, ult.sobe < 10 ? 1 : 0) : '--';
+  const base = 'Tráfego somado de todos os aparelhos. Fundo colorido no gráfico de cima marca os segundos com congestionamento.';
   if(m.casa_disponivel === false){
-    $('notaCasa').textContent = 'O roteador não está entregando o tráfego da casa. Confira se o UPnP está ligado nele.';
+    $('notaCasa').textContent = 'Não estou conseguindo ler o tráfego da casa. Entre no roteador aqui em cima (pelo acesso avançado) ' +
+      'ou ligue o UPnP nele — qualquer um dos dois resolve.';
+  }else if(E.casaFonte === 'roteador'){
+    $('notaCasa').textContent = 'Lido direto na porta da internet do roteador, pelo acesso avançado — não precisa de UPnP. ' + base;
+  }else if(E.casaFonte === 'upnp'){
+    $('notaCasa').textContent = 'Lido pelo UPnP do roteador. ' + base;
+  }else{
+    $('notaCasa').textContent = base;
   }
 }
 
