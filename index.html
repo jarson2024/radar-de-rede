@@ -425,6 +425,18 @@ table.cmp tr.igual td.dif{color:var(--ink3)}
 .note{font-size:12.5px;color:var(--ink3);margin-top:14px;line-height:1.6;max-width:74ch}
 .note b{color:var(--ink2);font-weight:600}
 footer{margin-top:26px;padding-top:18px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink3);line-height:1.7}
+
+/* ---------- dica ao passar o mouse ---------- */
+[data-dica]{cursor:help}
+button[data-dica],a[data-dica],select[data-dica],input[data-dica],label[data-dica]{cursor:pointer}
+#dica{position:fixed;z-index:200;max-width:330px;background:var(--panel);color:var(--ink);border:1px solid var(--line);
+  border-left:3px solid var(--accent);border-radius:11px;padding:11px 13px;font-size:13.5px;line-height:1.5;
+  box-shadow:0 6px 28px -8px rgba(0,0,0,.45);pointer-events:none;opacity:0;transform:translateY(4px);
+  transition:opacity .12s ease,transform .12s ease}
+#dica.on{opacity:1;transform:translateY(0)}
+#dica b{color:var(--accent);display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
+@media (prefers-reduced-motion: reduce){#dica{transition:none}}
+@media(max-width:600px){#dica{max-width:calc(100vw - 24px)}}
 </style>
 </head>
 <body>
@@ -437,8 +449,8 @@ footer{margin-top:26px;padding-top:18px;border-top:1px solid var(--line);font-si
       <div class="sub">Latência · Jitter · Carga</div>
     </div>
     <div class="top-spacer"></div>
-    <a class="ghost" href="rota-xbox.html" id="linkXbox" style="text-decoration:none">Rota do Xbox</a>
-    <button class="ghost" id="btnTema" type="button">Tema</button>
+    <a class="ghost" href="rota-xbox.html" id="linkXbox" style="text-decoration:none" data-dica="Vai para a página que vigia o seu Xbox: mostra o endereço do adversário durante a partida e diz de que lado está o problema. Precisa do monitor rodando no notebook.">Rota do Xbox</a>
+    <button class="ghost" id="btnTema" type="button" data-dica="Troca entre tela clara e tela escura. Só muda a aparência, não mexe em nenhuma medição.">Tema</button>
   </div>
 </div>
 
@@ -460,12 +472,12 @@ footer{margin-top:26px;padding-top:18px;border-top:1px solid var(--line);font-si
       </div>
     </div>
     <div class="metrics">
-      <div class="metric"><div class="k">Latência</div><div class="v mono" id="mPing">--<span class="u"> ms</span></div><div class="n" id="nPing">&nbsp;</div></div>
-      <div class="metric"><div class="k">Jitter</div><div class="v mono" id="mJit">--<span class="u"> ms</span></div><div class="n" id="nJit">&nbsp;</div></div>
-      <div class="metric"><div class="k">Perda</div><div class="v mono" id="mLoss">--<span class="u"> %</span></div><div class="n" id="nLoss">&nbsp;</div></div>
-      <div class="metric"><div class="k">Pico (p99)</div><div class="v mono" id="mP99">--<span class="u"> ms</span></div><div class="n" id="nP99">&nbsp;</div></div>
-      <div class="metric"><div class="k">Download</div><div class="v mono" id="mBanda">--<span class="u"> Mbps</span></div><div class="n" id="nBanda">&nbsp;</div></div>
-      <div class="metric"><div class="k">Sob carga</div><div class="v mono" id="mBufa">--<span class="u"> ms</span></div><div class="n" id="nBufa">&nbsp;</div></div>
+      <div class="metric" data-dica="O tempo que um dado leva para ir até o servidor e voltar. É o famoso ping: quanto menor, mais rápido o jogo responde ao seu comando. Abaixo de 40 ms é ótimo."><div class="k">Latência</div><div class="v mono" id="mPing">--<span class="u"> ms</span></div><div class="n" id="nPing">&nbsp;</div></div>
+      <div class="metric" data-dica="O quanto o ping fica variando de um momento para o outro. É o maior vilão dos jogos de futebol: ping alto mas parado incomoda menos do que ping baixo que fica pulando."><div class="k">Jitter</div><div class="v mono" id="mJit">--<span class="u"> ms</span></div><div class="n" id="nJit">&nbsp;</div></div>
+      <div class="metric" data-dica="Quantos por cento dos dados sumiram no caminho. É o que faz o jogador teleportar e a bola dar pulo. Acima de 2% já atrapalha."><div class="k">Perda</div><div class="v mono" id="mLoss">--<span class="u"> %</span></div><div class="n" id="nLoss">&nbsp;</div></div>
+      <div class="metric" data-dica="O atraso dos piores momentos: de cada 100 medidas, só 1 foi pior que este número. É o susto isolado que decide um gol."><div class="k">Pico (p99)</div><div class="v mono" id="mP99">--<span class="u"> ms</span></div><div class="n" id="nP99">&nbsp;</div></div>
+      <div class="metric" data-dica="A velocidade de download medida. Serve para baixar jogo rápido, mas quase não muda o ping da partida."><div class="k">Download</div><div class="v mono" id="mBanda">--<span class="u"> Mbps</span></div><div class="n" id="nBanda">&nbsp;</div></div>
+      <div class="metric" data-dica="Quanto o ping piora quando a internet está cheia. Este é o número que explica por que você trava quando alguém em casa começa a baixar algo."><div class="k">Sob carga</div><div class="v mono" id="mBufa">--<span class="u"> ms</span></div><div class="n" id="nBufa">&nbsp;</div></div>
     </div>
   </section>
 
@@ -473,13 +485,13 @@ footer{margin-top:26px;padding-top:18px;border-top:1px solid var(--line);font-si
   <section class="panel">
     <div class="phead">
       <span class="pnum">01</span>
-      <h2>Servidores reais</h2>
+      <h2 data-dica="Mede o tempo de resposta até computadores de verdade espalhados pelo mundo. Serve para você ver quanto sua internet demora para falar com São Paulo, com os Estados Unidos e com a Europa.">Servidores reais</h2>
       <p>Máquinas de verdade em data centers de nuvem. Escolha uma para usar nos testes abaixo.</p>
     </div>
     <div class="pbody">
       <div class="controls">
-        <button class="btn sec" id="btnMedirTodos" type="button">Medir todos os servidores</button>
-        <button class="btn sec" id="btnBR" type="button">Só os do Brasil</button>
+        <button class="btn sec" id="btnMedirTodos" type="button" data-dica="Testa todos os servidores da lista de uma vez, do mais perto ao mais distante. Leva alguns segundos e serve para ter o retrato geral da sua internet.">Medir todos os servidores</button>
+        <button class="btn sec" id="btnBR" type="button" data-dica="Testa só os servidores brasileiros. É o que interessa para jogar aqui: quase todo servidor de jogo do Brasil fica em São Paulo.">Só os do Brasil</button>
       </div>
       <div class="srv-grid" id="srvGrid" style="margin-top:14px"></div>
       <p class="note">
@@ -498,38 +510,39 @@ footer{margin-top:26px;padding-top:18px;border-top:1px solid var(--line);font-si
   <section class="panel">
     <div class="phead">
       <span class="pnum">02</span>
-      <h2>Simulação de partida</h2>
+      <h2 data-dica="Faz o seu navegador se comportar igual a um jogo online: manda pacotinhos sem parar, no mesmo ritmo de um FC ou UFL. No fim diz se a sua internet aguentaria a partida inteira sem travar.">Simulação de partida</h2>
       <p>Envia pacotes em ritmo constante, como um jogo online faz, durante o tempo que você escolher.</p>
     </div>
     <div class="pbody">
       <div class="controls">
         <div class="field">
-          <label for="selSrvPartida">Servidor</label>
-          <select id="selSrvPartida"></select>
+          <label for="selSrvPartida" data-dica="Para qual servidor a partida de mentira vai jogar. Escolha São Paulo: é onde ficam os servidores dos jogos brasileiros.">Servidor</label>
+          <select id="selSrvPartida" data-dica="Para qual servidor a partida de mentira vai jogar. Escolha São Paulo: é onde ficam os servidores dos jogos brasileiros."></select>
         </div>
         <div class="field">
-          <label for="inpMin">Duração (minutos)</label>
-          <input type="number" id="inpMin" value="3" min="0.5" max="120" step="0.5">
+          <label for="inpMin" data-dica="Quantos minutos o teste vai durar. Use 18 minutos para imitar uma partida inteira de futebol e pegar os problemas que só aparecem lá pelo segundo tempo.">Duração (minutos)</label>
+          <input type="number" id="inpMin" value="3" min="0.5" max="120" step="0.5"
+                 data-dica="Quantos minutos o teste vai durar. Use 18 minutos para imitar uma partida inteira de futebol e pegar os problemas que só aparecem lá pelo segundo tempo.">
         </div>
         <div class="field">
-          <label for="selTaxa">Ritmo</label>
-          <select id="selTaxa">
+          <label for="selTaxa" data-dica="Quantos pacotes por segundo mandar. Futebol e MOBA usam 5 por segundo; jogo de tiro usa 10. Quanto maior o ritmo, mais exigente é o teste.">Ritmo</label>
+          <select id="selTaxa" data-dica="Quantos pacotes por segundo mandar. Futebol e MOBA usam 5 por segundo; jogo de tiro usa 10. Quanto maior o ritmo, mais exigente é o teste.">
             <option value="100">10 pacotes/s — FPS</option>
             <option value="200" selected>5 pacotes/s — futebol / MOBA</option>
             <option value="500">2 pacotes/s — leve</option>
           </select>
         </div>
         <div class="field">
-          <label for="selCenario">Como está a internet</label>
-          <select id="selCenario">
+          <label for="selCenario" data-dica="Se o teste roda com a internet vazia, com download pesado ao mesmo tempo, ou alternando. “Alternando” é o mais revelador: mostra o antes e o depois lado a lado.">Como está a internet</label>
+          <select id="selCenario" data-dica="Se o teste roda com a internet vazia, com download pesado ao mesmo tempo, ou alternando. “Alternando” é o mais revelador: mostra o antes e o depois lado a lado.">
             <option value="livre">Livre, só o jogo</option>
             <option value="carga">Com download rodando o tempo todo</option>
             <option value="alterna" selected>Alternando livre e com download</option>
           </select>
         </div>
-        <button class="btn" id="btnPartida" type="button">Iniciar partida</button>
+        <button class="btn" id="btnPartida" type="button" data-dica="Começa a partida de mentira. Pode deixar rodando e ir fazer outra coisa: no fim ele dá a nota e conta tudo que aconteceu minuto a minuto.">Iniciar partida</button>
       </div>
-      <div class="presets">
+      <div class="presets" data-dica="Atalhos de tempo. 18 minutos é uma partida de futebol completa; 1 hora pega os problemas que só acontecem de vez em quando.">
         <button class="preset" type="button" data-min="1">1 min</button>
         <button class="preset" type="button" data-min="3">3 min</button>
         <button class="preset" type="button" data-min="10">10 min</button>
@@ -552,21 +565,27 @@ footer{margin-top:26px;padding-top:18px;border-top:1px solid var(--line);font-si
       <div class="status"><span class="dot" id="dotPartida"></span><span id="txtPartida">Pronto para começar.</span></div>
 
       <div class="rgrid">
-        <div><div class="k">Média</div><div class="v mono" id="pMedia">--<small> ms</small></div></div>
-        <div><div class="k">Mediana</div><div class="v mono" id="pMediana">--<small> ms</small></div></div>
-        <div><div class="k">Jitter</div><div class="v mono" id="pJitter">--<small> ms</small></div></div>
-        <div><div class="k">Melhor</div><div class="v mono" id="pMin">--<small> ms</small></div></div>
-        <div><div class="k">Pior pico</div><div class="v mono" id="pP95">--<small> ms</small></div></div>
-        <div><div class="k">p99</div><div class="v mono" id="pP99">--<small> ms</small></div></div>
-        <div><div class="k">Travadas</div><div class="v mono" id="pSpikes">--<small> /min</small></div></div>
-        <div><div class="k">Perda</div><div class="v mono" id="pPerda">--<small> %</small></div></div>
+        <div><div class="k" data-dica="A soma de todos os tempos dividida pela quantidade. Um pico enorme puxa este número para cima, por isso a mediana ao lado é mais honesta.">Média</div><div class="v mono" id="pMedia">--<small> ms</small></div></div>
+        <div><div class="k" data-dica="O valor do meio: metade das medidas ficou abaixo, metade acima. É o número que melhor representa o que você sente jogando.">Mediana</div><div class="v mono" id="pMediana">--<small> ms</small></div></div>
+        <div><div class="k" data-dica="O quanto o tempo de resposta ficou balançando entre um pacote e o outro. Abaixo de 5 ms é ótimo para futebol.">Jitter</div><div class="v mono" id="pJitter">--<small> ms</small></div></div>
+        <div><div class="k" data-dica="O melhor tempo que apareceu na partida inteira. Mostra do que sua internet é capaz quando está tudo tranquilo.">Melhor</div><div class="v mono" id="pMin">--<small> ms</small></div></div>
+        <div><div class="k" data-dica="O pacote mais atrasado da partida. É o susto isolado, aquele travadinho que decide um gol.">Pior pico</div><div class="v mono" id="pP95">--<small> ms</small></div></div>
+        <div><div class="k" data-dica="De cada 100 pacotes, 99 chegaram mais rápido que isso. Mostra o tamanho dos momentos ruins sem contar o caso mais extremo.">p99</div><div class="v mono" id="pP99">--<small> ms</small></div></div>
+        <div><div class="k" data-dica="Quantas vezes por minuto um pacote demorou mais que o dobro do normal. É o que você sente como “o jogador teleportou”. Menos de 2 por minuto é uma partida boa.">Travadas</div><div class="v mono" id="pSpikes">--<small> /min</small></div></div>
+        <div><div class="k" data-dica="Quantos por cento dos pacotes nunca chegaram. Cada um é um pedaço da jogada que o jogo teve que adivinhar.">Perda</div><div class="v mono" id="pPerda">--<small> %</small></div></div>
       </div>
       <div id="compara" hidden>
         <div class="cmp-titulo">Com a internet livre contra com download rodando</div>
         <div class="tscroll">
           <table class="cmp">
             <thead>
-              <tr><th>O que</th><th>Livre</th><th>Com download</th><th>Diferença</th><th>Efeito</th></tr>
+              <tr>
+                <th data-dica="Qual medida está sendo comparada nesta linha.">O que</th>
+                <th data-dica="Como ficou com a internet vazia, só a partida rodando. É o melhor cenário possível da sua conexão.">Livre</th>
+                <th data-dica="Como ficou com download pesado rodando ao mesmo tempo. Imita alguém baixando jogo ou assistindo vídeo enquanto você joga.">Com download</th>
+                <th data-dica="O quanto piorou entre um caso e o outro. É aqui que aparece se sua internet sufoca quando alguém usa junto.">Diferença</th>
+                <th data-dica="O que essa diferença significa na prática, dentro da partida.">Efeito</th>
+              </tr>
             </thead>
             <tbody id="cmpBody"></tbody>
           </table>
@@ -589,26 +608,27 @@ footer{margin-top:26px;padding-top:18px;border-top:1px solid var(--line);font-si
   <section class="panel">
     <div class="phead">
       <span class="pnum">03</span>
-      <h2>Download real</h2>
+      <h2 data-dica="Baixa arquivos de verdade e mostra se a velocidade se mantém firme do começo ao fim. Serve para saber quanto tempo um jogo de 80 GB vai levar e se a sua internet cai no meio do caminho.">Download real</h2>
       <p>Baixa a quantidade de dados que você pedir e mostra se a velocidade se mantém firme ou oscila.</p>
     </div>
     <div class="pbody">
       <div class="controls">
         <div class="field">
-          <label for="inpMB">Quantos MB baixar</label>
-          <input type="number" id="inpMB" value="200" min="10" max="20000" step="10">
+          <label for="inpMB" data-dica="Quantos megabytes baixar. Quanto mais, mais confiável o resultado — mas também gasta mais da sua franquia de internet.">Quantos MB baixar</label>
+          <input type="number" id="inpMB" value="200" min="10" max="20000" step="10"
+                 data-dica="Quantos megabytes baixar. Quanto mais, mais confiável o resultado — mas também gasta mais da sua franquia de internet.">
         </div>
         <div class="field">
-          <label for="selCon">Conexões ao mesmo tempo</label>
-          <select id="selCon">
+          <label for="selCon" data-dica="Quantos arquivos baixar ao mesmo tempo. A loja do Xbox e a Steam usam vários de uma vez, então 4 é o que mais parece com o download de um jogo de verdade.">Conexões ao mesmo tempo</label>
+          <select id="selCon" data-dica="Quantos arquivos baixar ao mesmo tempo. A loja do Xbox e a Steam usam vários de uma vez, então 4 é o que mais parece com o download de um jogo de verdade.">
             <option value="1">1 — como um arquivo só</option>
             <option value="4" selected>4 — como a Steam</option>
             <option value="8">8 — usar tudo</option>
           </select>
         </div>
-        <button class="btn" id="btnDown" type="button">Baixar</button>
+        <button class="btn" id="btnDown" type="button" data-dica="Começa o download. Ele baixa até o fim de verdade e só depois mostra o resultado, para o número não sair enganado.">Baixar</button>
       </div>
-      <div class="presets">
+      <div class="presets" data-dica="Atalhos de tamanho. 200 MB já dá boa noção; 5 GB mostra se a velocidade cai depois de alguns minutos, que é o que acontece ao baixar jogo grande.">
         <button class="preset" type="button" data-mb="50">50 MB</button>
         <button class="preset" type="button" data-mb="200">200 MB</button>
         <button class="preset" type="button" data-mb="500">500 MB</button>
@@ -628,22 +648,22 @@ footer{margin-top:26px;padding-top:18px;border-top:1px solid var(--line);font-si
 
       <div class="sub-rotulo">Durante o download</div>
       <div class="rgrid">
-        <div><div class="k">Agora</div><div class="v mono" id="dAgora">--<small> Mbps</small></div></div>
-        <div><div class="k">Baixado</div><div class="v mono" id="dTotal">--<small> MB</small></div></div>
-        <div><div class="k">Tempo</div><div class="v mono" id="dTempo">--<small> s</small></div></div>
-        <div><div class="k">Falta</div><div class="v mono" id="dFalta">--<small> s</small></div></div>
+        <div><div class="k" data-dica="A velocidade neste exato segundo. Fica pulando o tempo todo, é normal — o que importa é a média no fim.">Agora</div><div class="v mono" id="dAgora">--<small> Mbps</small></div></div>
+        <div><div class="k" data-dica="Quanto já foi baixado até agora, em megabytes.">Baixado</div><div class="v mono" id="dTotal">--<small> MB</small></div></div>
+        <div><div class="k" data-dica="Há quantos segundos o download começou.">Tempo</div><div class="v mono" id="dTempo">--<small> s</small></div></div>
+        <div><div class="k" data-dica="Quanto tempo falta para terminar, na velocidade atual.">Falta</div><div class="v mono" id="dFalta">--<small> s</small></div></div>
       </div>
 
       <div class="sub-rotulo">Resultado, contado só no fim <span id="dSelo" class="selo-espera">aparece quando o teste terminar</span></div>
       <div class="rgrid" id="gradeFinal">
-        <div><div class="k">Velocidade firme</div><div class="v mono" id="dMed">--<small> Mbps</small></div></div>
-        <div><div class="k">Pico</div><div class="v mono" id="dPico">--<small> Mbps</small></div></div>
-        <div><div class="k">Vale</div><div class="v mono" id="dVale">--<small> Mbps</small></div></div>
-        <div><div class="k">Estabilidade</div><div class="v mono" id="dEst">--<small> %</small></div></div>
-        <div><div class="k">Quedas</div><div class="v mono" id="dQuedas">--</div></div>
-        <div><div class="k">Maior queda</div><div class="v mono" id="dMaiorQueda">--<small> %</small></div></div>
-        <div><div class="k">Tempo oscilando</div><div class="v mono" id="dTempoOsc">--<small> %</small></div></div>
-        <div><div class="k">1 GB levaria</div><div class="v mono" id="dGB">--</div></div>
+        <div><div class="k" data-dica="A velocidade que sua internet sustentou de verdade, sem contar a arrancada do começo nem o finalzinho. É este o número que vale como “sua velocidade”.">Velocidade firme</div><div class="v mono" id="dMed">--<small> Mbps</small></div></div>
+        <div><div class="k" data-dica="O momento mais rápido do download. Bom para saber o teto da sua linha.">Pico</div><div class="v mono" id="dPico">--<small> Mbps</small></div></div>
+        <div><div class="k" data-dica="O momento mais lento. Se estiver muito longe do pico, sua internet oscila bastante.">Vale</div><div class="v mono" id="dVale">--<small> Mbps</small></div></div>
+        <div><div class="k" data-dica="De 0 a 100, o quanto a velocidade se manteve parada no mesmo lugar. Acima de 90 é uma internet bem firme.">Estabilidade</div><div class="v mono" id="dEst">--<small> %</small></div></div>
+        <div><div class="k" data-dica="Quantas vezes a velocidade despencou durante o download. Cada queda é um engasgo da sua conexão.">Quedas</div><div class="v mono" id="dQuedas">--</div></div>
+        <div><div class="k" data-dica="O tamanho do pior engasgo, em porcentagem. Uma queda de 80% quer dizer que a velocidade caiu para um quinto.">Maior queda</div><div class="v mono" id="dMaiorQueda">--<small> %</small></div></div>
+        <div><div class="k" data-dica="Quanto por cento do tempo a velocidade ficou balançando em vez de firme.">Tempo oscilando</div><div class="v mono" id="dTempoOsc">--<small> %</small></div></div>
+        <div><div class="k" data-dica="Quanto tempo levaria para baixar 1 GB nessa velocidade. Multiplique por 80 para ter ideia de um jogo grande como o FC.">1 GB levaria</div><div class="v mono" id="dGB">--</div></div>
       </div>
       <div class="osc-veredito" id="oscVeredito" hidden></div>
       <p class="note">
@@ -660,30 +680,30 @@ footer{margin-top:26px;padding-top:18px;border-top:1px solid var(--line);font-si
   <section class="panel">
     <div class="phead">
       <span class="pnum">04</span>
-      <h2>Latência com a internet ocupada</h2>
+      <h2 data-dica="O teste mais importante para quem joga: enche sua internet de propósito e vê se o ping dispara. É o que explica por que você trava quando alguém em casa começa a baixar alguma coisa.">Latência com a internet ocupada</h2>
       <p>Mede o ping sozinho, depois com a descida <b>e</b> a subida cheias ao mesmo tempo. É o teste que revela se você trava quando alguém baixa ou envia algo em casa.</p>
     </div>
     <div class="pbody">
       <div class="controls">
         <div class="field">
-          <label for="selSrvCarga">Servidor de referência</label>
-          <select id="selSrvCarga"></select>
+          <label for="selSrvCarga" data-dica="Contra qual servidor medir o ping enquanto a internet está cheia. São Paulo é a melhor escolha para jogos brasileiros.">Servidor de referência</label>
+          <select id="selSrvCarga" data-dica="Contra qual servidor medir o ping enquanto a internet está cheia. São Paulo é a melhor escolha para jogos brasileiros."></select>
         </div>
-        <button class="btn" id="btnCarga" type="button">Rodar teste de carga</button>
+        <button class="btn" id="btnCarga" type="button" data-dica="Roda o teste, que leva uns 40 segundos. Atenção: ele enche sua internet de propósito e consome uns 250 MB, então evite no 4G.">Rodar teste de carga</button>
       </div>
 
       <div class="bar"><i id="barCarga"></i></div>
       <div class="status"><span class="dot" id="dotCarga"></span><span id="txtCarga">O teste leva cerca de 40 segundos.</span></div>
 
       <div class="rgrid">
-        <div><div class="k">Sem carga</div><div class="v mono" id="cLivre">--<small> ms</small></div></div>
-        <div><div class="k">Linha cheia</div><div class="v mono" id="cCarga">--<small> ms</small></div></div>
-        <div><div class="k">Aumento</div><div class="v mono" id="cDelta">--<small> ms</small></div></div>
-        <div><div class="k">Jitter na carga</div><div class="v mono" id="cJit">--<small> ms</small></div></div>
-        <div><div class="k">Perda na carga</div><div class="v mono" id="cPerda">--<small> %</small></div></div>
-        <div><div class="k">Recuperação</div><div class="v mono" id="cRec">--<small> ms</small></div></div>
-        <div><div class="k">Banda (desce / sobe)</div><div class="v mono" id="cBanda">--<small> Mbps</small></div></div>
-        <div><div class="k">Nota</div><div class="v mono" id="cNota">--</div></div>
+        <div><div class="k" data-dica="O ping com a internet vazia. É o melhor que a sua conexão consegue fazer.">Sem carga</div><div class="v mono" id="cLivre">--<small> ms</small></div></div>
+        <div><div class="k" data-dica="O ping com a internet totalmente ocupada, baixando e enviando ao mesmo tempo. Imita a hora em que a casa inteira está usando.">Linha cheia</div><div class="v mono" id="cCarga">--<small> ms</small></div></div>
+        <div><div class="k" data-dica="O quanto o ping piorou quando a internet encheu. Este é o número que mais importa: acima de 100 ms a partida fica injogável.">Aumento</div><div class="v mono" id="cDelta">--<small> ms</small></div></div>
+        <div><div class="k" data-dica="O quanto o ping ficou balançando com a linha cheia. Aviso honesto: no navegador este número sai maior que o real — confie mais no “Aumento”.">Jitter na carga</div><div class="v mono" id="cJit">--<small> ms</small></div></div>
+        <div><div class="k" data-dica="Quantos pacotes sumiram enquanto a internet estava cheia. É o que faz o jogador teleportar no meio da jogada.">Perda na carga</div><div class="v mono" id="cPerda">--<small> %</small></div></div>
+        <div><div class="k" data-dica="Quanto tempo o ping leva para voltar ao normal depois que o download termina. Recuperação lenta significa que a fila do roteador demora a esvaziar.">Recuperação</div><div class="v mono" id="cRec">--<small> ms</small></div></div>
+        <div><div class="k" data-dica="A velocidade que a linha atingiu nos dois sentidos durante o teste. Serve para conferir se o que você paga está chegando.">Banda (desce / sobe)</div><div class="v mono" id="cBanda">--<small> Mbps</small></div></div>
+        <div><div class="k" data-dica="Nota de 0 a 100 juntando tudo. Acima de 80 sua internet aguenta jogo e download ao mesmo tempo sem você sentir.">Nota</div><div class="v mono" id="cNota">--</div></div>
       </div>
       <p class="note">
         O teste enche a descida <b>e</b> a subida de propósito por cerca de 20 segundos, então <b>ele consome dados
@@ -707,12 +727,12 @@ footer{margin-top:26px;padding-top:18px;border-top:1px solid var(--line);font-si
   <section class="panel" id="painelLojas">
     <div class="phead">
       <span class="pnum">05</span>
-      <h2>Servidores das lojas de jogos</h2>
+      <h2 data-dica="Mede a distância até as lojas de onde você baixa jogos: Xbox, PlayStation, Steam, Epic. Quanto menor o número, mais rápido o download engrena.">Servidores das lojas de jogos</h2>
       <p>Distância até os servidores de onde você realmente baixa jogos. Quanto menor o número, mais rápido o download começa a engrenar.</p>
     </div>
     <div class="pbody">
       <div class="controls">
-        <button class="btn sec" id="btnLojas" type="button">Medir as lojas</button>
+        <button class="btn sec" id="btnLojas" type="button" data-dica="Testa todas as lojas de jogos de uma vez e mostra quais estão perto de você. Aqui é onde aparece o servidor de download do Xbox.">Medir as lojas</button>
       </div>
       <div class="srv-grid" id="lojasGrid" style="margin-top:14px"></div>
       <p class="note">
@@ -728,7 +748,7 @@ footer{margin-top:26px;padding-top:18px;border-top:1px solid var(--line);font-si
   <section class="panel">
     <div class="phead">
       <span class="pnum">06</span>
-      <h2>Para o que sua internet serve</h2>
+      <h2 data-dica="Pega todos os números que você mediu e responde em português: dá para jogar online? dá para assistir em 4K? dá para fazer chamada de vídeo? Cada atividade tem sua exigência.">Para o que sua internet serve</h2>
       <p>Cada atividade tem exigência própria. Os selos usam os números medidos até agora.</p>
     </div>
     <div class="pbody">
@@ -745,14 +765,14 @@ footer{margin-top:26px;padding-top:18px;border-top:1px solid var(--line);font-si
   <section class="panel" id="painelMelhorar">
     <div class="phead">
       <span class="pnum">07</span>
-      <h2>Como deixar melhor</h2>
+      <h2 data-dica="A lista do que fazer para melhorar, já em ordem: a primeira ação é a que mais rende. Ela é montada com os seus números, não é conselho genérico de internet.">Como deixar melhor</h2>
       <p>Lista de ações em ordem de impacto, montada a partir dos seus números. A primeira é a que mais rende.</p>
     </div>
     <div class="pbody">
       <div class="controls">
         <div class="field">
-          <label for="selLigacao">Como este aparelho está ligado</label>
-          <select id="selLigacao">
+          <label for="selLigacao" data-dica="Diga como este aparelho está ligado agora. Isso muda os conselhos: no Wi-Fi a primeira dica quase sempre é passar para o cabo.">Como este aparelho está ligado</label>
+          <select id="selLigacao" data-dica="Diga como este aparelho está ligado agora. Isso muda os conselhos: no Wi-Fi a primeira dica quase sempre é passar para o cabo.">
             <option value="wifi24">Wi-Fi 2,4 GHz</option>
             <option value="wifi5" selected>Wi-Fi 5 GHz</option>
             <option value="cabo">Cabo de rede</option>
@@ -760,8 +780,9 @@ footer{margin-top:26px;padding-top:18px;border-top:1px solid var(--line);font-si
           </select>
         </div>
         <div class="field">
-          <label for="inpPlano">Velocidade do seu plano (Mega)</label>
-          <input type="number" id="inpPlano" value="0" min="0" max="10000" step="10" placeholder="opcional">
+          <label for="inpPlano" data-dica="Quanto você contratou com a operadora, em Mega. Serve para o site comparar o que você paga com o que chega de verdade.">Velocidade do seu plano (Mega)</label>
+          <input type="number" id="inpPlano" value="0" min="0" max="10000" step="10" placeholder="opcional"
+                 data-dica="Quanto você contratou com a operadora, em Mega. Serve para o site comparar o que você paga com o que chega de verdade.">
         </div>
       </div>
       <div class="acoes" id="acoes"></div>
@@ -775,22 +796,22 @@ footer{margin-top:26px;padding-top:18px;border-top:1px solid var(--line);font-si
   <section class="panel" id="painelRota">
     <div class="phead">
       <span class="pnum">08</span>
-      <h2>Vigia de rota</h2>
+      <h2 data-dica="Fica de olho no caminho da sua internet e avisa na hora se alguma coisa mudar: VPN que ligou, roteador que reiniciou, operadora que trocou a rota. Deixe ligado enquanto mexe nas configurações.">Vigia de rota</h2>
       <p>Mostra por onde sua conexão sai para a internet e avisa na hora se você mudar alguma coisa no roteador.</p>
     </div>
     <div class="pbody">
       <div class="rota-grid" id="rotaGrid">
-        <div class="rota-item"><div class="k">Operadora</div><div class="v" id="rOperadora">lendo…</div></div>
-        <div class="rota-item"><div class="k">Seu endereço na internet</div><div class="v mono" id="rIP">lendo…</div></div>
-        <div class="rota-item"><div class="k">Onde a rede acha que você está</div><div class="v" id="rCidade">lendo…</div></div>
-        <div class="rota-item"><div class="k">Porta de entrada da sua conexão</div><div class="v" id="rEntrada">lendo…</div></div>
-        <div class="rota-item"><div class="k">Assinatura de latência</div><div class="v mono" id="rAssinatura">--</div></div>
-        <div class="rota-item"><div class="k">Ligação deste aparelho</div><div class="v" id="rLigacao">--</div></div>
+        <div class="rota-item"><div class="k" data-dica="A empresa que está levando seus dados para a internet neste momento. Se aparecer um nome estranho, tem VPN ligada.">Operadora</div><div class="v" id="rOperadora">lendo…</div></div>
+        <div class="rota-item"><div class="k" data-dica="O número que identifica sua casa na internet. Muda quando o roteador reinicia ou quando você liga uma VPN.">Seu endereço na internet</div><div class="v mono" id="rIP">lendo…</div></div>
+        <div class="rota-item"><div class="k" data-dica="A cidade que a internet acha que é a sua. Nem sempre bate com onde você mora de verdade — depende de por onde a operadora te conecta.">Onde a rede acha que você está</div><div class="v" id="rCidade">lendo…</div></div>
+        <div class="rota-item"><div class="k" data-dica="A cidade por onde seus dados entram na rede mundial. Quanto mais perto de São Paulo, menor o ping nos jogos brasileiros.">Porta de entrada da sua conexão</div><div class="v" id="rEntrada">lendo…</div></div>
+        <div class="rota-item"><div class="k" data-dica="Uma espécie de impressão digital da sua conexão, feita de tempos de resposta. Quando ela muda, é sinal de que o caminho mudou.">Assinatura de latência</div><div class="v mono" id="rAssinatura">--</div></div>
+        <div class="rota-item"><div class="k" data-dica="Se este aparelho está no cabo, no Wi-Fi ou nos dados do celular agora.">Ligação deste aparelho</div><div class="v" id="rLigacao">--</div></div>
       </div>
 
       <div class="controls" style="margin-top:16px">
-        <button class="btn" id="btnVigia" type="button">Ligar o vigia</button>
-        <button class="btn sec" id="btnMarcoZero" type="button">Marcar como está agora</button>
+        <button class="btn" id="btnVigia" type="button" data-dica="Liga a vigia do caminho. A partir daí, qualquer mudança que você fizer no roteador aparece aqui embaixo em poucos segundos.">Ligar o vigia</button>
+        <button class="btn sec" id="btnMarcoZero" type="button" data-dica="Guarda como está tudo neste momento, para servir de ponto de partida. Use antes de mexer em algo, para depois comparar o antes e o depois.">Marcar como está agora</button>
       </div>
       <div class="status"><span class="dot" id="dotRota"></span><span id="txtRota">Toque em “Ligar o vigia”, vá mexer no roteador e volte. As mudanças aparecem aqui embaixo.</span></div>
 
@@ -807,22 +828,31 @@ footer{margin-top:26px;padding-top:18px;border-top:1px solid var(--line);font-si
   <section class="panel">
     <div class="phead">
       <span class="pnum">09</span>
-      <h2>Histórico por horário</h2>
+      <h2 data-dica="Guarda todo teste que você faz, com data e hora. Serve para provar que sua internet piora no horário de pico: teste de madrugada, teste às 21h e compare as duas linhas.">Histórico por horário</h2>
       <p>Compare madrugada com horário de pico. Guardado só neste aparelho.</p>
     </div>
     <div class="pbody">
       <div class="tscroll">
         <table>
           <thead>
-            <tr><th>Quando</th><th>Teste</th><th>Servidor</th><th>Latência</th><th>Jitter</th><th>Perda</th><th>Banda</th><th>Nota</th></tr>
+            <tr>
+              <th data-dica="Dia e hora em que o teste foi feito. É a coluna que revela o problema de horário de pico.">Quando</th>
+              <th data-dica="Qual dos testes do site gerou esta linha.">Teste</th>
+              <th data-dica="Contra qual servidor o teste foi feito.">Servidor</th>
+              <th data-dica="O tempo de resposta medido. Quanto menor, mais rápido o jogo responde ao seu comando.">Latência</th>
+              <th data-dica="O quanto o tempo de resposta ficou balançando. É o vilão dos jogos de futebol.">Jitter</th>
+              <th data-dica="Quantos por cento dos pacotes sumiram no caminho.">Perda</th>
+              <th data-dica="A velocidade medida, quando o teste mediu velocidade.">Banda</th>
+              <th data-dica="A nota geral daquele teste, de 0 a 100.">Nota</th>
+            </tr>
           </thead>
           <tbody id="histBody"></tbody>
         </table>
       </div>
       <div class="empty" id="histVazio">Nenhum teste guardado ainda. Rode qualquer teste acima e ele aparece aqui.</div>
       <div class="controls" style="margin-top:14px">
-        <button class="btn sec" id="btnCopiar" type="button">Copiar relatório</button>
-        <button class="btn sec" id="btnLimpar" type="button">Apagar histórico</button>
+        <button class="btn sec" id="btnCopiar" type="button" data-dica="Copia todos os testes em texto, pronto para colar. Serve para mandar para o suporte da operadora quando você for reclamar.">Copiar relatório</button>
+        <button class="btn sec" id="btnLimpar" type="button" data-dica="Apaga todos os testes guardados neste aparelho. Não dá para desfazer.">Apagar histórico</button>
       </div>
     </div>
   </section>
@@ -1053,6 +1083,12 @@ function montarServidores(){
     b.className = 'chip';
     b.dataset.id = s.id;
     b.setAttribute('aria-pressed', s.id === APP.srvAtual ? 'true' : 'false');
+    const onde = /borda/i.test(s.cidade)
+      ? 'O ponto da ' + s.prov.split(' · ')[0] + ' mais perto da sua casa'
+      : 'Servidor de verdade em ' + s.cidade + ', da ' + s.prov.split(' · ')[0];
+    b.setAttribute('data-dica', onde +
+      '. O número é quanto tempo sua internet leva para ir até lá e voltar. Clique para usar este servidor nos testes de baixo' +
+      (s.flag === 'BR' ? ' — os de São Paulo são os que mais parecem com jogar no Brasil.' : '.'));
     b.innerHTML =
       '<div class="cidade"><span class="flag">'+s.flag+'</span>'+s.cidade+'</div>' +
       '<div class="prov">'+s.prov+'</div>' +
@@ -2420,6 +2456,8 @@ function montarAtividades(m){
     const d = document.createElement('div');
     d.className = 'act';
     d.style.borderLeftColor = r.cor;
+    d.setAttribute('data-dica', 'Diz se a sua internet aguenta ' + a.nome.toLowerCase() + ' (' + a.ex + '), usando os números que você já mediu. ' +
+      'A etiqueta colorida é o veredito; a frase de baixo explica o motivo.');
     d.innerHTML =
       '<span class="sel" style="background:'+r.cor+';color:var(--panel)">'+r.sel+'</span>' +
       '<div><div class="nome">'+a.nome+'</div><div class="ex">'+a.ex+'</div><div class="por">'+r.por+'</div></div>';
@@ -2637,7 +2675,7 @@ function montarAcoes(){
 
   const temAlgo = m.ping !== null || m.jitter !== null || m.banda !== null || m.bufa !== null;
   if(!temAlgo){
-    caixa.innerHTML = '<div class="acao"><div class="acao-topo"><h3>Rode um teste primeiro</h3></div>' +
+    caixa.innerHTML = '<div class="acao" data-dica="A lista de melhorias só aparece depois de medir, porque ela é montada com os seus números e não com conselho genérico."><div class="acao-topo"><h3>Rode um teste primeiro</h3></div>' +
       '<div class="tudo-certo">Assim que a medição do painel 01 ou 02 terminar, a lista de ações aparece aqui, ' +
       'em ordem de quanto cada uma rende no seu caso.</div></div>';
     return;
@@ -2651,7 +2689,7 @@ function montarAcoes(){
   if(!achadas.length){
     const nota = notaGeral(m);
     caixa.innerHTML =
-      '<div class="acao" style="border-left-color:var(--n5)">' +
+      '<div class="acao" style="border-left-color:var(--n5)" data-dica="Pelos números medidos, não há ajuste que faça diferença real agora. Rode os testes de novo no horário de pico para confirmar.">' +
       '<div class="acao-topo"><span class="prio" style="background:var(--n5);color:var(--panel)">Nada a fazer</span>' +
       '<h3>Sua internet já está no ponto</h3></div>' +
       '<div class="tudo-certo">Os números que você mediu não deixam margem para melhora prática' +
@@ -2675,6 +2713,8 @@ function montarAcoes(){
     const el = document.createElement('div');
     el.className = 'acao';
     el.style.borderLeftColor = selo.cor;
+    el.setAttribute('data-dica', 'Uma coisa que você pode fazer para melhorar, montada com os seus números. ' +
+      '“Faça primeiro” é a que mais ajuda no seu caso; “Se sobrar tempo” ajuda pouco. Siga os passos numerados.');
     el.innerHTML =
       '<div class="acao-topo">' +
         '<span class="prio" style="background:' + selo.cor + ';color:var(--panel)">' + selo.nome + '</span>' +
@@ -3144,8 +3184,9 @@ function montarLojas(){
   LOJAS.forEach(function(l){
     const d = document.createElement('div');
     d.className = 'chip';
-    d.style.cursor = 'default';
     d.dataset.loja = l.id;
+    d.setAttribute('data-dica', 'Distância até o servidor de download da ' + l.nome + ' (' + l.jogos + '). ' +
+      'Quanto menor o número, mais perto de você e mais rápido o download começa a engrenar.');
     d.innerHTML =
       '<div class="cidade">' + l.nome + '</div>' +
       '<div class="prov">' + l.jogos + '</div>' +
@@ -3269,6 +3310,55 @@ document.querySelectorAll('.preset[data-min]').forEach(function(b){
   APP.assinatura = { edge: APP.pingAtual['edge'], 'gru-aws': APP.pingAtual['gru-aws'] };
   pintarRota(APP.rota, APP.assinatura, {});
   montarAcoes();
+})();
+
+/* =========================================================
+   Dica ao passar o mouse (e ao tocar, no celular)
+   ========================================================= */
+(function(){
+  const balao = document.createElement('div');
+  balao.id = 'dica'; balao.setAttribute('role','tooltip'); balao.hidden = true;
+  document.body.appendChild(balao);
+  let alvo = null, sumir;
+  const limite = (v,a,b) => Math.max(a, Math.min(b, v));
+  const escapar = s => { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; };
+
+  function posicionar(el){
+    const r = el.getBoundingClientRect(), b = balao.getBoundingClientRect();
+    let x = limite(r.left + r.width/2 - b.width/2, 10, Math.max(10, window.innerWidth - b.width - 10));
+    let y = r.bottom + 9;
+    if(y + b.height > window.innerHeight - 10) y = Math.max(10, r.top - b.height - 9);
+    balao.style.left = Math.round(x) + 'px';
+    balao.style.top = Math.round(y) + 'px';
+  }
+  function abrir(el){
+    const texto = el.getAttribute('data-dica');
+    if(!texto) return;
+    clearTimeout(sumir);
+    alvo = el;
+    balao.innerHTML = '<b>Para que serve</b>' + escapar(texto);
+    balao.hidden = false;
+    posicionar(el);
+    requestAnimationFrame(() => balao.classList.add('on'));
+  }
+  function fechar(){
+    alvo = null;
+    balao.classList.remove('on');
+    sumir = setTimeout(() => { balao.hidden = true; }, 160);
+  }
+  const achar = e => e.target.closest && e.target.closest('[data-dica]');
+  document.addEventListener('pointerover', e => { const el = achar(e); if(el && el !== alvo) abrir(el); });
+  document.addEventListener('pointerout', e => { const el = achar(e); if(el && el === alvo && !el.contains(e.relatedTarget)) fechar(); });
+  document.addEventListener('focusin', e => { const el = achar(e); if(el) abrir(el); else if(alvo) fechar(); });
+  document.addEventListener('focusout', () => { if(alvo) fechar(); });
+  // No celular não existe "passar o mouse": um toque mostra a dica, o de fora fecha.
+  document.addEventListener('click', e => {
+    const el = achar(e);
+    if(el){ if(el === alvo) return; abrir(el); clearTimeout(sumir); sumir = setTimeout(fechar, 6000); }
+    else if(alvo) fechar();
+  }, true);
+  document.addEventListener('keydown', e => { if(e.key === 'Escape' && alvo) fechar(); });
+  window.addEventListener('scroll', () => { if(alvo) posicionar(alvo); }, { passive:true });
 })();
 </script>
 </body>

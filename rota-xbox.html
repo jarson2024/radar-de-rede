@@ -224,6 +224,76 @@ tr.melhor td{background:var(--accent-soft)}
 .end-quando{font-weight:600;font-size:15px}
 .end-link{font-family:"IBM Plex Mono",monospace;font-size:13.5px;color:var(--accent)}
 .end-obs{font-size:12.5px;color:var(--ink3)}
+
+/* ---------- partida ao vivo ---------- */
+.partida{border-left:5px solid var(--s-xbox)}
+.entrada{display:grid;gap:14px;max-width:none}
+.entrada .aviso{font-size:13.5px;color:var(--ink2);background:var(--panel2);border:1px solid var(--line-soft);
+  border-left:3px solid var(--n5);border-radius:10px;padding:12px 14px;line-height:1.6;max-width:78ch}
+.entrada .aviso b{color:var(--ink)}
+input[type=password]{background:var(--sunk);border:1px solid var(--line);border-radius:10px;padding:10px 12px;
+  min-height:44px;font-size:14.5px;color:var(--ink);max-width:100%;min-width:200px}
+.erro-cx{font-size:13.5px;color:var(--n1);background:var(--panel2);border:1px solid var(--n1);border-radius:10px;
+  padding:10px 13px;line-height:1.5}
+
+.adv{display:grid;gap:14px;padding:16px 18px;background:var(--panel2);border-bottom:1px solid var(--line-soft)}
+@media(min-width:820px){.adv{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);align-items:start}}
+.adv-quem{display:flex;flex-direction:column;gap:5px;min-width:0}
+.adv-tipo{display:inline-flex;align-items:center;gap:7px;font-family:"IBM Plex Sans Condensed",sans-serif;
+  font-weight:700;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)}
+.adv-ip{font-family:"IBM Plex Mono",monospace;font-size:27px;font-weight:500;line-height:1.1;overflow-wrap:anywhere}
+@media(max-width:600px){.adv-ip{font-size:22px}}
+.adv-dono{font-size:15px;font-weight:600}
+.adv-obs{font-size:13px;color:var(--ink3);line-height:1.5;max-width:60ch}
+.adv-rota{font-size:13px;color:var(--ink2);display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+
+.placar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line-soft);
+  border:1px solid var(--line-soft);border-radius:11px;overflow:hidden}
+@media(min-width:560px){.placar{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.placar>div{background:var(--panel);padding:10px 12px;min-width:0}
+.placar .k{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);font-weight:600}
+.placar .v{font-family:"IBM Plex Mono",monospace;font-size:22px;font-variant-numeric:tabular-nums;line-height:1.2;margin-top:2px}
+.placar .v small{font-size:11.5px;color:var(--ink3);font-weight:400}
+.placar .s{font-size:11.5px;color:var(--ink3)}
+.placar .v.q1{color:var(--n1)} .placar .v.q2{color:var(--n2)} .placar .v.q4{color:var(--n4)} .placar .v.q5{color:var(--n5)}
+
+.lados{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:14px}
+.lado{background:var(--panel2);border:1px solid var(--line-soft);border-radius:11px;padding:11px 12px;
+  border-top:3px solid var(--line);min-width:0}
+.lado .k{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink3);font-weight:600}
+.lado .v{font-family:"IBM Plex Mono",monospace;font-size:19px;margin-top:3px;font-variant-numeric:tabular-nums}
+.lado .s{font-size:11.5px;color:var(--ink3);margin-top:1px}
+.lado.culpado{border-top-color:var(--n1);box-shadow:0 0 0 1px var(--n1) inset}
+.lado.culpado .k{color:var(--n1)}
+@media(max-width:520px){
+  .lados{gap:6px}
+  .lado{padding:9px 8px}
+  .lado .k{font-size:10px;letter-spacing:.03em}
+  .lado .v{font-size:15px}
+  .lado .s{font-size:10.5px;line-height:1.35}
+}
+
+#cvPartida{height:210px}
+.ev .lado-selo{font-family:"IBM Plex Sans Condensed",sans-serif;font-weight:700;font-size:10px;letter-spacing:.07em;
+  text-transform:uppercase;padding:2px 6px;border-radius:5px;margin-right:6px;white-space:nowrap;
+  background:var(--line);color:var(--panel)}
+.lado-voce{background:var(--n2)!important;color:#1a1205!important}
+.lado-adversario{background:var(--n1)!important;color:#fff!important}
+.lado-meio{background:var(--s-operadora)!important;color:#fff!important}
+.conexoes{font-size:12.5px;color:var(--ink3);margin-top:12px}
+.conexoes summary{cursor:pointer;font-weight:600;color:var(--ink2);padding:4px 0}
+
+/* ---------- dica ao passar o mouse ---------- */
+[data-dica]{cursor:help}
+button[data-dica],a[data-dica],select[data-dica],input[data-dica]{cursor:pointer}
+#dica{position:fixed;z-index:200;max-width:330px;background:var(--panel);color:var(--ink);border:1px solid var(--line);
+  border-left:3px solid var(--accent);border-radius:11px;padding:11px 13px;font-size:13.5px;line-height:1.5;
+  box-shadow:0 6px 28px -8px rgba(0,0,0,.45);pointer-events:none;opacity:0;transform:translateY(4px);
+  transition:opacity .12s ease,transform .12s ease}
+#dica.on{opacity:1;transform:translateY(0)}
+#dica b{color:var(--accent);display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
+@media (prefers-reduced-motion: reduce){#dica{transition:none}}
+@media(max-width:600px){#dica{max-width:calc(100vw - 24px)}}
 </style>
 </head>
 <body>
@@ -236,8 +306,8 @@ tr.melhor td{background:var(--accent-soft)}
       <div class="sub">Monitor no notebook · mesmo roteador do console</div>
     </div>
     <div class="esp"></div>
-    <a class="ghost" href="radar-de-rede.html">Teste completo</a>
-    <button class="ghost" id="btnTema" type="button">Tema</button>
+    <a class="ghost" href="radar-de-rede.html" data-dica="Vai para a outra página, a de testes: lá você mede velocidade, faz download de verdade e simula uma partida para ver como sua internet se comporta.">Teste completo</a>
+    <button class="ghost" id="btnTema" type="button" data-dica="Troca entre tela clara e tela escura. Só muda a aparência, não mexe em nenhuma medição.">Tema</button>
   </div>
 </div>
 
@@ -277,6 +347,139 @@ tr.melhor td{background:var(--accent-soft)}
   <div id="app" hidden>
     <div class="faixa" id="faixa"></div>
 
+    <!-- PARTIDA AO VIVO -->
+    <section class="panel partida" style="margin-top:18px">
+      <div class="phead">
+        <h2 data-dica="Descobre o endereço de quem está do outro lado da sua partida e mede a conexão com ele, segundo a segundo, enquanto você joga.">Partida ao vivo · quem está do outro lado</h2>
+        <p>Lê no roteador com quem o Xbox está trocando dados agora. Quando uma partida começa, mostra o endereço do
+          outro lado e vigia a conexão até o apito final.</p>
+        <div class="esp"></div>
+        <button class="btn" id="btnPartida" type="button" hidden
+                data-dica="Começa a vigiar o Xbox. Ele fica esperando você entrar numa partida e, assim que entrar, mostra tudo sozinho.">Vigiar partidas</button>
+      </div>
+
+      <!-- passo 1: entrar no roteador -->
+      <div class="pbody" id="pEntrar" hidden>
+        <div class="entrada">
+          <div class="aviso">
+            <b>Por que preciso da senha do roteador?</b> O notebook não enxerga o que o Xbox está fazendo: dentro do
+            roteador, cada aparelho tem seu próprio caminho e um não vê o do outro. Quem enxerga tudo é o roteador.
+            Com essa permissão eu leio nele a lista de conversas abertas do Xbox — é a única forma de descobrir o
+            endereço do adversário.<br><br>
+            <b>A senha não sai daqui.</b> Ela fica só na memória do programa enquanto ele estiver aberto: não é gravada
+            em arquivo nenhum, não vai para a internet e some quando você fecha o monitor.
+          </div>
+          <div class="controls">
+            <div class="field">
+              <label for="inpUsuario">Usuário do roteador</label>
+              <input type="text" id="inpUsuario" autocomplete="username" spellcheck="false" placeholder="admin"
+                     data-dica="O mesmo nome que você usa para abrir a tela do roteador no navegador. Na maioria dos ASUS é admin.">
+            </div>
+            <div class="field">
+              <label for="inpSenha">Senha do roteador</label>
+              <input type="password" id="inpSenha" autocomplete="current-password"
+                     data-dica="A mesma senha da tela de configuração do roteador. Não é a senha do Wi-Fi.">
+            </div>
+            <button class="btn" id="btnEntrar" type="button" data-dica="Conecta o monitor ao seu roteador com essa senha, só para ler a lista de conversas do Xbox. Nada é mudado no roteador e a senha não é guardada em arquivo.">Entrar no roteador</button>
+            <button class="btn sec mini" id="btnAbrirRoteador" type="button"
+                    data-dica="Abre a tela do seu roteador no navegador, caso você precise conferir ou trocar a senha.">Abrir a tela do roteador</button>
+          </div>
+          <div class="erro-cx" id="erroEntrar" hidden></div>
+          <p class="nota" id="dicaSsh" hidden>Se der erro de conexão, ligue o acesso avançado no roteador:
+            <b>Administração → Sistema → Serviço SSH → LAN only</b>, e salve.</p>
+        </div>
+      </div>
+
+      <!-- aviso: o roteador não conta os dados de cada conversa -->
+      <div class="pbody" id="pContagem" hidden style="padding-bottom:0">
+        <div class="entrada">
+          <div class="aviso" style="border-left-color:var(--n3)">
+            <b>Seu roteador não está contando os dados de cada conversa.</b> De fábrica ele vem assim, para poupar
+            processamento. Sem essa contagem eu consigo achar a partida e o endereço do adversário, mas <b>não consigo
+            medir quanto dado ela troca</b> — e é isso que me deixa dizer, num travamento, se parou de chegar coisa
+            dele ou de sair coisa sua.<br><br>
+            Dá para ligar essa contagem num clique. É um <b>ajuste de memória</b>: não grava nada no roteador, não
+            reinicia nada, sua internet não cai, e ele volta sozinho ao normal se o roteador for desligado da tomada.
+          </div>
+          <div class="controls">
+            <button class="btn" id="btnContagem" type="button"
+                    data-dica="Pede ao roteador para contar quantos dados cada conversa troca. Sem isso, o site acha a partida mas não sabe medir o volume nem dizer de que lado o dado parou.">Ligar a contagem de dados</button>
+            <button class="btn sec mini" id="btnPular" type="button"
+                    data-dica="Segue sem a contagem. Você ainda vê o endereço do adversário, o ping e os travamentos — só perde o detalhe de quanto dado cada lado estava mandando.">Seguir sem isso</button>
+          </div>
+          <div class="erro-cx" id="erroContagem" hidden></div>
+        </div>
+      </div>
+
+      <!-- passo 2: procurando partida -->
+      <div class="pbody" id="pProcurando" hidden>
+        <div class="status"><span class="dot vivo" id="dotProcura"></span><span id="txtProcura">Esperando você entrar numa partida…</span></div>
+        <p class="nota">Entre numa partida online no Xbox (UFL, FC 26, o que for). Assim que o jogo achar adversário e a
+          bola rolar, esta tela se preenche sozinha. Pode deixar aberta e ir jogar.</p>
+        <p class="nota" data-aviso-contagem hidden><b>Sobre o seu roteador:</b> ele não conta quantos dados passam em cada
+          conversa, e esse ajuste não existe nele para ligar. Por isso a partida é achada pelo “sinal de vida” da
+          conversa (o roteador renova um relógio a cada pacote), e o lado culpado é descoberto comparando o ping até o
+          adversário com o ping até o seu roteador e até um servidor de referência. Funciona — só não mostra o volume de dados.</p>
+        <details class="conexoes" id="detConexoes">
+          <summary data-dica="Lista tudo com que o Xbox está falando agora: servidores da Microsoft, do jogo, e a partida. Serve para conferir que a leitura está funcionando.">Ver tudo com que o Xbox está falando agora</summary>
+          <div class="tscroll" style="margin-top:8px"><table><thead><tr>
+            <th data-dica="O endereço do outro lado, na internet.">Endereço</th>
+            <th data-dica="O jeito da conversa. Jogo online usa UDP, que é rápido e não espera confirmação; sites e downloads usam TCP.">Tipo</th>
+            <th data-dica="Se ainda está passando dado por essa conversa agora, ou há quanto tempo ela está parada.">Movimento</th>
+            <th data-dica="Nota de 0 a 100 de quanto essa conversa parece uma partida em andamento.">Cara de jogo</th>
+          </tr></thead><tbody id="tbConexoes"></tbody></table></div>
+        </details>
+      </div>
+
+      <!-- passo 3: em partida -->
+      <div id="pPartida" hidden>
+        <div class="adv">
+          <div class="adv-quem">
+            <span class="adv-tipo"><span class="bolinha" id="advBolinha"></span><span id="advTipo">adversário</span></span>
+            <div class="adv-ip mono" id="advIp">--</div>
+            <div class="adv-dono" id="advDono">--</div>
+            <div class="adv-obs" id="advObs"></div>
+            <div class="adv-rota" id="advRota"></div>
+          </div>
+          <div>
+            <div class="placar">
+              <div><div class="k" data-dica="O tempo que um dado leva para ir até o outro lado e voltar. Quanto menor, mais rápido o jogo responde ao seu comando.">Ping agora</div><div class="v mono" id="pgPing">--<small> ms</small></div><div class="s" id="pgPingBase"></div></div>
+              <div><div class="k" data-dica="O quanto o ping fica variando. É o vilão dos jogos de futebol: ping alto mas parado incomoda menos que ping baixo que pula o tempo todo.">Variação</div><div class="v mono" id="pgJitter">--<small> ms</small></div><div class="s">quanto menor, melhor</div></div>
+              <div><div class="k" data-dica="Pedaços de dado que sumiram no caminho. É o que faz o jogador teleportar e a bola dar pulo.">Pacotes perdidos</div><div class="v mono" id="pgPerda">--<small> %</small></div><div class="s" id="pgPerdaObs"></div></div>
+              <div><div class="k" data-dica="O maior atraso que apareceu desde o começo da partida. Um pico alto costuma ser aquele travadinho que você sentiu.">Pior pico</div><div class="v mono" id="pgPico">--<small> ms</small></div><div class="s" id="pgTempo"></div></div>
+            </div>
+            <div class="lados" id="lados">
+              <div class="lado" id="ladoVoce"><div class="k" data-dica="Mede o seu roteador aqui de casa. Se este número sobe, o problema é seu: Wi-Fi, cabo, ou alguém baixando algo pesado.">Seu lado</div><div class="v mono" id="ladoVoceV">--</div><div class="s" id="ladoVoceS">roteador de casa</div></div>
+              <div class="lado" id="ladoMeio"><div class="k" data-dica="Mede um servidor conhecido e estável em São Paulo. Se ele piora junto com a partida, o problema é da internet no meio do caminho, não do adversário.">Caminho</div><div class="v mono" id="ladoMeioV">--</div><div class="s" id="ladoMeioS">servidor de referência</div></div>
+              <div class="lado" id="ladoAdv"><div class="k" data-dica="Mede o caminho até o adversário. Se só este piora e os outros dois continuam bons, o problema está do lado dele.">Lado dele</div><div class="v mono" id="ladoAdvV">--</div><div class="s" id="ladoAdvS">até o adversário</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pbody">
+          <div class="diag" id="diagPartida" style="padding:14px 16px;border-radius:11px;background:var(--panel2);border:1px solid var(--line-soft)">
+            <div class="linha1"><span class="pilula" id="ppPilula">tudo certo</span><span class="desde" id="ppDesde"></span></div>
+            <div class="texto" id="ppTexto" style="font-size:16px">Conexão limpa com o adversário até agora.</div>
+          </div>
+
+          <div class="grafico">
+            <canvas id="cvPartida"></canvas>
+            <div class="legenda" id="legPartida"></div>
+          </div>
+
+          <h3 style="font-size:15.5px;margin:18px 0 8px" data-dica="Tudo que deu errado na partida, na ordem, com o minuto em que aconteceu e de quem foi a culpa.">O que aconteceu na partida</h3>
+          <div class="eventos" id="evPartida"><div class="vazio">Nada de errado até agora.</div></div>
+        </div>
+      </div>
+
+      <!-- passo 4: resumo da última partida -->
+      <div class="pbody" id="pResumo" hidden>
+        <div class="recom" id="resumoTexto"></div>
+        <div class="placar" style="margin-top:14px" id="resumoPlacar"></div>
+        <div class="eventos" id="evResumo" style="margin-top:14px"></div>
+      </div>
+    </section>
+
     <div class="grade">
       <div class="coluna">
 
@@ -294,51 +497,53 @@ tr.melhor td{background:var(--accent-soft)}
         <!-- CAMINHO -->
         <section class="panel">
           <div class="phead">
-            <h2>Caminho do Xbox até o servidor</h2>
+            <h2 data-dica="Mostra o caminho que seus dados fazem, ponto por ponto: do Xbox até o roteador, do roteador até a operadora, e da operadora até o servidor. Assim você vê em qual pedaço o atraso aparece.">Caminho do Xbox até o servidor</h2>
             <p>Cada caixa é um ponto da rota, medido agora. Embaixo, o nível dele com a rede calma.</p>
           </div>
           <div class="caminho" id="caminho">
-            <div class="no" id="noXbox"><div class="rot">Xbox</div><div class="nome" id="noXboxNome">procurando…</div><div class="ms mono" id="noXboxMs">--<small> ms</small></div><div class="base" id="noXboxBase">ligação com o roteador</div><div class="ip" id="noXboxIp"></div></div>
+            <div class="no" id="noXbox" data-dica="O tempo entre o seu Xbox e o roteador, dentro de casa. Se este número passar de uns poucos milissegundos, o problema é o cabo ou o Wi-Fi do console."><div class="rot">Xbox</div><div class="nome" id="noXboxNome">procurando…</div><div class="ms mono" id="noXboxMs">--<small> ms</small></div><div class="base" id="noXboxBase">ligação com o roteador</div><div class="ip" id="noXboxIp"></div></div>
             <div class="elo" id="elo1"><i></i><span></span></div>
-            <div class="no" id="noRoteador"><div class="rot">Roteador</div><div class="nome" id="noRoteadorNome">--</div><div class="ms mono" id="noRoteadorMs">--<small> ms</small></div><div class="base" id="noRoteadorBase">&nbsp;</div><div class="ip" id="noRoteadorIp"></div></div>
+            <div class="no" id="noRoteador" data-dica="O tempo até o seu próprio roteador. Quando sobe, é sinal de que a fila dentro de casa encheu — alguém baixando algo pesado, por exemplo."><div class="rot">Roteador</div><div class="nome" id="noRoteadorNome">--</div><div class="ms mono" id="noRoteadorMs">--<small> ms</small></div><div class="base" id="noRoteadorBase">&nbsp;</div><div class="ip" id="noRoteadorIp"></div></div>
             <div class="elo" id="elo2"><i></i><span></span></div>
-            <div class="no" id="noOperadora"><div class="rot">Saída da operadora</div><div class="nome" id="noOperadoraNome">--</div><div class="ms mono" id="noOperadoraMs">--<small> ms</small></div><div class="base" id="noOperadoraBase">&nbsp;</div><div class="ip" id="noOperadoraIp"></div></div>
+            <div class="no" id="noOperadora" data-dica="O primeiro ponto já dentro da sua operadora, logo depois de sair de casa. Se o atraso começa aqui, a culpa é da operadora, não sua."><div class="rot">Saída da operadora</div><div class="nome" id="noOperadoraNome">--</div><div class="ms mono" id="noOperadoraMs">--<small> ms</small></div><div class="base" id="noOperadoraBase">&nbsp;</div><div class="ip" id="noOperadoraIp"></div></div>
             <div class="elo" id="elo3"><i></i><span></span></div>
-            <div class="no" id="noDestino"><div class="rot">Servidor</div><div class="nome" id="noDestinoNome">--</div><div class="ms mono" id="noDestinoMs">--<small> ms</small></div><div class="base" id="noDestinoBase">&nbsp;</div><div class="ip" id="noDestinoIp"></div></div>
+            <div class="no" id="noDestino" data-dica="O destino final, lá em São Paulo ou onde você escolheu. É o número que mais se parece com o ping que você sente no jogo."><div class="rot">Servidor</div><div class="nome" id="noDestinoNome">--</div><div class="ms mono" id="noDestinoMs">--<small> ms</small></div><div class="base" id="noDestinoBase">&nbsp;</div><div class="ip" id="noDestinoIp"></div></div>
           </div>
         </section>
 
         <!-- MONITOR -->
         <section class="panel">
           <div class="phead">
-            <h2>Monitor ao vivo</h2>
+            <h2 data-dica="Fica medindo sua internet sem parar e avisa na hora em que algo piora, dizendo em qual trecho foi. É o vigia geral da sua conexão, não só da partida.">Monitor ao vivo</h2>
             <p>Deixe ligado enquanto joga. A medição acontece no notebook, então pode minimizar esta janela.</p>
           </div>
           <div class="pbody">
             <div class="controls">
               <div class="field">
                 <label for="selDestino">Medir até</label>
-                <select id="selDestino"></select>
+                <select id="selDestino" data-dica="Escolhe até onde medir. São Paulo é onde ficam os servidores da maioria dos jogos, então é a escolha que mais parece com jogar de verdade."></select>
               </div>
               <div class="field" id="campoOutro" hidden>
                 <label for="inpOutro">Endereço do servidor</label>
-                <input type="text" id="inpOutro" placeholder="ex.: 35.71.106.103" autocomplete="off" spellcheck="false">
+                <input type="text" id="inpOutro" placeholder="ex.: 35.71.106.103" autocomplete="off" spellcheck="false"
+                       data-dica="Se você souber o endereço de um servidor específico, digite aqui para medir até ele.">
               </div>
               <div class="field">
                 <label for="selIntervalo">Ritmo</label>
-                <select id="selIntervalo" style="min-width:150px">
+                <select id="selIntervalo" style="min-width:150px"
+                        data-dica="De quanto em quanto tempo medir. Uma vez por segundo pega mais detalhe; a cada 2 segundos gasta menos e serve para deixar ligado horas.">
                   <option value="1">1 medida por segundo</option>
                   <option value="2">1 a cada 2 segundos</option>
                 </select>
               </div>
-              <button class="btn" id="btnMonitor" type="button">Ligar monitor</button>
+              <button class="btn" id="btnMonitor" type="button" data-dica="Liga ou desliga a vigia contínua da internet. Ligado, ele desenha o gráfico e avisa quando alguma coisa piora.">Ligar monitor</button>
             </div>
             <div class="status" id="avisoMonitor" hidden><span class="dot erro"></span><span id="avisoMonitorTxt"></span></div>
 
             <div class="grafico"><canvas id="cvLat"></canvas></div>
             <div class="controls" style="justify-content:space-between;margin-top:10px">
               <div class="legenda" id="legenda"></div>
-              <div class="janelas" id="janelas">
+              <div class="janelas" id="janelas" data-dica="Escolhe quanto tempo o gráfico mostra de uma vez. 2 minutos para ver o detalhe do agora; 30 minutos para ver a partida inteira.">
                 <button type="button" data-s="120" aria-pressed="true">2 min</button>
                 <button type="button" data-s="600" aria-pressed="false">10 min</button>
                 <button type="button" data-s="1800" aria-pressed="false">30 min</button>
@@ -346,7 +551,7 @@ tr.melhor td{background:var(--accent-soft)}
             </div>
 
             <div class="casa-linha">
-              <div><div class="k">A casa inteira agora</div>
+              <div><div class="k" data-dica="Quanto TODA a casa está usando de internet agora, somando todos os aparelhos. Se este número estiver alto durante a partida, a culpa do travamento provavelmente é de casa.">A casa inteira agora</div>
                 <div class="v mono"><span id="casaDesce">--</span><small> Mbps baixando</small> · <span id="casaSobe">--</span><small> Mbps enviando</small></div></div>
             </div>
             <div class="grafico"><canvas id="cvCasa"></canvas></div>
@@ -357,7 +562,7 @@ tr.melhor td{background:var(--accent-soft)}
 
         <!-- EVENTOS -->
         <section class="panel">
-          <div class="phead"><h2>O que aconteceu</h2><p>Mudanças de rota, congestionamentos e o Xbox ligando ou desligando.</p></div>
+          <div class="phead"><h2 data-dica="Um diário da sua internet: cada vez que ela piorou, voltou ao normal, mudou de caminho, ou o Xbox ligou e desligou, fica registrado aqui com a hora.">O que aconteceu</h2><p>Mudanças de rota, congestionamentos e o Xbox ligando ou desligando.</p></div>
           <div class="pbody"><div class="eventos" id="eventos"><div class="vazio">Nada ainda.</div></div></div>
         </section>
       </div>
@@ -367,33 +572,35 @@ tr.melhor td{background:var(--accent-soft)}
         <!-- ROTA ATUAL -->
         <section class="panel">
           <div class="phead">
-            <h2>Rota em uso agora</h2>
+            <h2 data-dica="Mostra por qual caminho sua internet está saindo neste momento: qual operadora, qual endereço público e por qual cidade você entra na internet.">Rota em uso agora</h2>
             <p>Por onde a conexão deste notebook sai para a internet. O Xbox usa a mesma, desde que os dois estejam no mesmo perfil do roteador.</p>
           </div>
           <div class="pbody">
             <div class="id-grid">
-              <div><div class="k">Operadora</div><div class="v" id="idOperadora">--</div><div class="s" id="idAsn"></div></div>
-              <div><div class="k">Endereço público</div><div class="v mono" id="idIp">--</div></div>
-              <div><div class="k">Entra na internet por</div><div class="v" id="idEntrada">--</div><div class="s" id="idSigla"></div></div>
-              <div><div class="k">Notebook ligado</div><div class="v" id="idNotebook">--</div><div class="s" id="idNotebookS"></div></div>
+              <div><div class="k" data-dica="A empresa que vende sua internet e por onde seus dados saem de casa.">Operadora</div><div class="v" id="idOperadora">--</div><div class="s" id="idAsn"></div></div>
+              <div><div class="k" data-dica="O número que identifica sua casa na internet. É por ele que o adversário encontra você numa partida.">Endereço público</div><div class="v mono" id="idIp">--</div></div>
+              <div><div class="k" data-dica="A cidade onde sua operadora te conecta ao resto da internet. Quanto mais perto de São Paulo, menor o ping nos jogos.">Entra na internet por</div><div class="v" id="idEntrada">--</div><div class="s" id="idSigla"></div></div>
+              <div><div class="k" data-dica="Se o notebook está no cabo ou no Wi-Fi. No cabo a medição é mais confiável, porque o Wi-Fi tem oscilação própria.">Notebook ligado</div><div class="v" id="idNotebook">--</div><div class="s" id="idNotebookS"></div></div>
             </div>
             <div class="cadeia" id="cadeia"></div>
 
             <div class="controls" style="margin-top:14px">
               <div class="field" style="flex:1">
                 <label for="inpNomeRota">Nome desta rota (opcional)</label>
-                <input type="text" id="inpNomeRota" placeholder="ex.: Age direto, VPN São Paulo…" maxlength="60" autocomplete="off">
+                <input type="text" id="inpNomeRota" placeholder="ex.: Age direto, VPN São Paulo…" maxlength="60" autocomplete="off"
+                       data-dica="Dê um nome para lembrar depois qual caminho você estava usando neste teste. Assim dá para comparar “sem VPN” contra “com VPN”, por exemplo.">
               </div>
               <div class="field">
                 <label for="selDuracao">Tempo</label>
-                <select id="selDuracao" style="min-width:120px">
+                <select id="selDuracao" style="min-width:120px"
+                        data-dica="Quanto tempo o teste vai durar. 1 minuto já dá boa ideia; 5 minutos pega também os problemas que só aparecem de vez em quando.">
                   <option value="30">30 s</option>
                   <option value="60" selected>1 min</option>
                   <option value="120">2 min</option>
                   <option value="300">5 min</option>
                 </select>
               </div>
-              <button class="btn" id="btnMedir" type="button">Medir esta rota</button>
+              <button class="btn" id="btnMedir" type="button" data-dica="Dá uma nota ao caminho que você está usando agora. Faça um teste, depois troque de caminho (VPN, outro DNS) e teste de novo: a nota maior é a melhor rota para jogar.">Medir esta rota</button>
             </div>
             <div class="barra"><i id="barMedir"></i></div>
             <div class="status"><span class="dot" id="dotMedir"></span><span id="txtMedir">A medição manda 2 pings por segundo até o servidor escolhido no monitor e guarda o resultado para comparar. Mais rápido que isso o caminho descarta pings e a perda sai falsa.</span></div>
@@ -403,13 +610,20 @@ tr.melhor td{background:var(--accent-soft)}
         <!-- ROTAS -->
         <section class="panel">
           <div class="phead">
-            <h2>Rotas medidas</h2>
+            <h2 data-dica="Guarda todos os testes de caminho que você já fez, lado a lado, para você escolher o melhor. É aqui que você descobre se aquela VPN vale a pena ou não.">Rotas medidas</h2>
             <p>A de nota maior tem menos congestionamento. É essa que você coloca no Xbox.</p>
           </div>
           <div class="pbody">
             <div class="tscroll">
               <table class="tabela-rotas">
-                <thead><tr><th>Rota</th><th>Nota</th><th>Ping</th><th>Jitter</th><th>Pior</th><th>Perda</th></tr></thead>
+                <thead><tr>
+                  <th data-dica="O nome que você deu ao caminho, e por quais empresas ele passa.">Rota</th>
+                  <th data-dica="Nota de 0 a 100 juntando ping, variação e pacotes perdidos. Quanto maior, melhor para jogar.">Nota</th>
+                  <th data-dica="O tempo que o dado leva para ir e voltar. Abaixo de 40 ms é ótimo para futebol.">Ping</th>
+                  <th data-dica="O quanto o ping fica balançando. É o que mais estraga jogo de futebol: abaixo de 5 ms é ótimo.">Jitter</th>
+                  <th data-dica="O pior atraso que apareceu no teste. Mostra o tamanho do travamento no momento ruim.">Pior</th>
+                  <th data-dica="Quantos por cento dos dados sumiram no caminho. Acima de 2% o jogador começa a teleportar.">Perda</th>
+                </tr></thead>
                 <tbody id="tbRotas"></tbody>
               </table>
             </div>
@@ -421,14 +635,19 @@ tr.melhor td{background:var(--accent-soft)}
         <!-- SALTOS -->
         <section class="panel">
           <div class="phead">
-            <h2>Saltos da rota</h2>
+            <h2 data-dica="Mostra cada “parada” que seus dados fazem até chegar ao servidor, como as paradas de um ônibus. Serve para ver exatamente em qual empresa o atraso começa.">Saltos da rota</h2>
             <p>Cada roteador por onde o pacote passa até o servidor, e de qual empresa ele é.</p>
           </div>
           <div class="pbody">
-            <button class="btn sec" id="btnTracar" type="button">Traçar a rota agora</button>
+            <button class="btn sec" id="btnTracar" type="button" data-dica="Refaz o caminho agora e lista as paradas atualizadas. Use quando desconfiar que sua operadora mudou a rota.">Traçar a rota agora</button>
             <div class="tscroll" style="margin-top:12px">
               <table>
-                <thead><tr><th>#</th><th>Onde</th><th>Tempo</th><th>Respostas</th></tr></thead>
+                <thead><tr>
+                  <th data-dica="O número da parada, em ordem: 1 é o seu roteador, o último é o servidor.">#</th>
+                  <th data-dica="De qual empresa é aquela parada e o endereço dela.">Onde</th>
+                  <th data-dica="Quanto tempo leva para chegar até aquela parada e voltar.">Tempo</th>
+                  <th data-dica="Quantas das 6 perguntas aquela parada respondeu. Parada que responde pouco é normal: muitos roteadores se protegem assim.">Respostas</th>
+                </tr></thead>
                 <tbody id="tbSaltos"></tbody>
               </table>
             </div>
@@ -440,11 +659,11 @@ tr.melhor td{background:var(--accent-soft)}
         <!-- APARELHOS -->
         <section class="panel">
           <div class="phead">
-            <h2>Aparelhos na rede</h2>
+            <h2 data-dica="Lista tudo que está ligado no seu roteador: celulares, TV, notebook e o Xbox. É aqui que você diz qual deles é o console, para o resto do site saber quem vigiar.">Aparelhos na rede</h2>
             <p>Confirme qual deles é o Xbox. O monitor passa a vigiar a ligação dele com o roteador.</p>
           </div>
           <div class="pbody">
-            <button class="btn sec" id="btnVarrer" type="button">Procurar aparelhos</button>
+            <button class="btn sec" id="btnVarrer" type="button" data-dica="Procura de novo todos os aparelhos ligados. Use se você ligou o Xbox agora e ele ainda não apareceu na lista.">Procurar aparelhos</button>
             <div class="aparelhos" id="aparelhos" style="margin-top:12px"></div>
           </div>
         </section>
@@ -454,17 +673,17 @@ tr.melhor td{background:var(--accent-soft)}
     <!-- GUIA DO ROTEADOR -->
     <section class="panel" style="margin-top:18px">
       <div class="phead">
-        <h2>Como trocar a rota no seu RT-AX82U</h2>
+        <h2 data-dica="O passo a passo, na tela do seu roteador, para colocar o Xbox num caminho diferente ou tirar o congestionamento de dentro de casa.">Como trocar a rota no seu RT-AX82U</h2>
         <p>Você faz as mudanças no roteador. Esta página mede antes e depois e mostra qual rota ganhou.</p>
       </div>
       <div class="pbody">
         <div class="controls" style="margin-bottom:14px">
-          <button class="btn" id="btnRoteador" type="button">Abrir o roteador</button>
+          <button class="btn" id="btnRoteador" type="button" data-dica="Abre a tela de configuração do seu roteador numa aba nova, para você mesmo mexer nos ajustes. A senha você digita lá, não aqui.">Abrir o roteador</button>
           <span class="nota" style="margin:0">Abre a tela de entrada do roteador numa aba nova. <b>Você digita a senha lá.</b> Esta página nunca vê nem guarda sua senha.</span>
         </div>
         <div class="guia">
           <div class="passo">
-            <h3>Colocar o Xbox numa rota diferente</h3>
+            <h3 data-dica="Usar uma VPN é o único jeito de forçar a internet a ir por outro caminho. Vale a pena só se a nota medida ficar maior que a do caminho normal.">Colocar o Xbox numa rota diferente</h3>
             <div class="quando">Muda o caminho de verdade, usando um túnel</div>
             <ol>
               <li>Tenha um serviço de VPN com servidor em <b>São Paulo</b> que entregue arquivo <b>WireGuard</b> ou <b>OpenVPN</b>.</li>
@@ -475,7 +694,7 @@ tr.melhor td{background:var(--accent-soft)}
             </ol>
           </div>
           <div class="passo">
-            <h3>Tirar congestionamento de dentro de casa</h3>
+            <h3 data-dica="Ajustes dentro da sua casa que quase sempre ajudam: cabo em vez de Wi-Fi, e dar prioridade ao Xbox quando alguém está baixando algo.">Tirar congestionamento de dentro de casa</h3>
             <div class="quando">Vale para qualquer rota</div>
             <ol>
               <li>Ligue o Xbox na porta de rede do roteador com o desenho de <b>controle de videogame</b>, a porta de jogos.</li>
@@ -484,7 +703,7 @@ tr.melhor td{background:var(--accent-soft)}
             </ol>
           </div>
           <div class="passo">
-            <h3>Trocar o DNS</h3>
+            <h3 data-dica="O DNS é a lista telefônica da internet. Trocar pode acelerar download na loja, mas não muda o ping da partida — é o engano mais comum.">Trocar o DNS</h3>
             <div class="quando">Só muda o servidor de download, não a rota do jogo</div>
             <ol>
               <li>No roteador, em <b>WAN</b>, troque o DNS para <b>1.1.1.1</b> e <b>8.8.8.8</b>.</li>
@@ -606,6 +825,8 @@ async function conectar(){
   if(m){ aplicarMonitor(m, true); }
   if(!E.intervaloLeitura) E.intervaloLeitura = setInterval(lerMonitor, 1000);
   verificarMedicao();
+  lerPartida();
+  if(!P.timer) P.timer = setInterval(lerPartida, 1000);
 }
 
 /* =========================================================
@@ -621,23 +842,30 @@ async function carregarRede(){
   const nb = r.notebook || {}, rot = r.roteador || {}, net = r.internet || {}, xb = r.xbox || {};
   const faixa = $('faixa');
   faixa.innerHTML = '';
-  const chip = (cor, html) => {
+  const chip = (cor, html, dica) => {
     const c = document.createElement('span');
     c.className = 'chip';
+    if(dica) c.setAttribute('data-dica', dica);
     c.innerHTML = '<span class="bolinha" style="background:' + cor + '"></span>' + html;
     faixa.appendChild(c);
   };
   chip(nb.tipo === 'cabo' ? 'var(--n5)' : 'var(--n2)',
        'Notebook <b>' + (nb.tipo === 'cabo' ? 'no cabo' : nb.tipo === 'wifi' ? 'no Wi-Fi' : 'conectado') + '</b>' +
-       (nb.velocidade_mbps ? ' · ' + (nb.velocidade_mbps >= 1000 ? num(nb.velocidade_mbps/1000, 0) + ' Gbps' : nb.velocidade_mbps + ' Mbps') : ''));
-  chip(rot.upnp ? 'var(--n5)' : 'var(--n3)', 'Roteador <b>' + (rot.nome ? rot.nome.replace(/-[0-9A-F]{4}$/i,'') : (rot.ip || '--')) + '</b>' + (rot.ms != null ? ' · ' + num(rot.ms,1) + ' ms' : ''));
+       (nb.velocidade_mbps ? ' · ' + (nb.velocidade_mbps >= 1000 ? num(nb.velocidade_mbps/1000, 0) + ' Gbps' : nb.velocidade_mbps + ' Mbps') : ''),
+       'Como este notebook está ligado no roteador. No cabo a medição é confiável; no Wi-Fi o próprio Wi-Fi já bagunça o resultado.');
+  chip(rot.upnp ? 'var(--n5)' : 'var(--n3)', 'Roteador <b>' + (rot.nome ? rot.nome.replace(/-[0-9A-F]{4}$/i,'') : (rot.ip || '--')) + '</b>' + (rot.ms != null ? ' · ' + num(rot.ms,1) + ' ms' : ''),
+       'Qual roteador foi encontrado e quanto tempo ele leva para responder aqui de dentro de casa.');
   chip(xb.ip ? (xb.ms != null ? 'var(--n5)' : 'var(--n3)') : 'var(--ink3)',
-       xb.ip ? 'Xbox <b>' + xb.ip + '</b>' + (xb.ms != null ? ' · ' + num(xb.ms,1) + ' ms' : ' · sem resposta') : 'Xbox <b>não escolhido</b>');
-  if(rot.ligado_s) chip('var(--ink3)', 'Internet ligada há <b>' + duracao(rot.ligado_s) + '</b>');
-  if(rot.dupla_nat) chip('var(--n1)', '<b>Dois roteadores em sequência</b>: isso atrapalha o Xbox');
+       xb.ip ? 'Xbox <b>' + xb.ip + '</b>' + (xb.ms != null ? ' · ' + num(xb.ms,1) + ' ms' : ' · sem resposta') : 'Xbox <b>não escolhido</b>',
+       'O endereço do seu Xbox dentro de casa e quanto ele demora para responder. “Sem resposta” quer dizer que está desligado ou dormindo.');
+  if(rot.ligado_s) chip('var(--ink3)', 'Internet ligada há <b>' + duracao(rot.ligado_s) + '</b>',
+       'Há quanto tempo sua internet está no ar sem cair. Se este número zera sozinho, sua conexão está caindo.');
+  if(rot.dupla_nat) chip('var(--n1)', '<b>Dois roteadores em sequência</b>: isso atrapalha o Xbox',
+       'Você tem dois roteadores um atrás do outro. Isso deixa o Xbox em NAT fechado e atrapalha achar partida. O ideal é colocar o primeiro em modo ponte.');
 
   if(nb.tipo === 'wifi'){
-    chip('var(--n1)', '<b>Ligue o notebook no cabo</b> para a medida valer');
+    chip('var(--n1)', '<b>Ligue o notebook no cabo</b> para a medida valer',
+         'No Wi-Fi, a própria conexão sem fio cria oscilação. Como o objetivo é medir a internet, o cabo evita culpar a internet por um problema do Wi-Fi.');
   }
 
   $('idOperadora').textContent = net.operadora || '--';
@@ -1127,7 +1355,7 @@ async function carregarRotas(){
     const caminho = (r.caminho || []).map(c => c.nome).join(' › ');
     tr.innerHTML =
       '<td><div class="rnome"></div><div class="selos"></div><div class="rcam"></div>' +
-      '<button class="apagar" type="button">apagar</button></td>' +
+      '<button class="apagar" type="button" data-dica="Tira este teste da lista. Use para limpar medições antigas ou que deram errado.">apagar</button></td>' +
       '<td class="n" style="color:' + f.cor + ';font-weight:600">' + num(e.nota,0) + '</td>' +
       '<td class="n">' + num(e.mediana,1) + '</td>' +
       '<td class="n">' + num(e.jitter,1) + '</td>' +
@@ -1200,6 +1428,9 @@ async function carregarAparelhos(varrer){
     d.querySelector('.mono').textContent = a.ip + (a.ms != null ? ' · ' + num(a.ms,1) + ' ms' : '');
     const bt = d.querySelector('button');
     bt.textContent = ehXbox ? 'É o Xbox' : 'Este é o Xbox';
+    bt.setAttribute('data-dica', ehXbox
+      ? 'Este já está marcado como o seu Xbox. É dele que o site lê as partidas e a conexão.'
+      : 'Marca este aparelho como sendo o seu Xbox. A partir daí o site vigia as partidas dele e mede a ligação dele com o roteador.');
     if(ehXbox){ bt.disabled = true; }
     bt.addEventListener('click', async () => {
       await api('/api/xbox?ip=' + encodeURIComponent(a.ip)).catch(() => {});
@@ -1229,8 +1460,437 @@ $('btnTema').addEventListener('click', () => {
 });
 try{ const t = localStorage.getItem('radar-tema'); if(t) document.documentElement.setAttribute('data-theme', t); }catch(e){}
 
+/* =========================================================
+   Partida ao vivo: quem é o adversário e de quem é a culpa
+   ========================================================= */
+const P = { amostras: [], seq: 0, idPartida: null, ligado: false, ocupado: false, timer: null, pulouContagem: false };
+
+async function apiPost(caminho, corpo, prazoMs = 15000){
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), prazoMs);
+  try{
+    const r = await fetch(caminho, { method:'POST', headers:{ 'X-Radar':'1', 'Content-Type':'application/json' },
+                                     cache:'no-store', body: JSON.stringify(corpo), signal: ctl.signal });
+    const j = await r.json().catch(() => ({}));
+    if(!r.ok) throw new Error(j.erro || ('erro ' + r.status));
+    return j;
+  } finally { clearTimeout(t); }
+}
+
+async function lerPartida(){
+  if(P.ocupado) return;
+  P.ocupado = true;
+  let r;
+  try{ r = await api('/api/partida?desde=' + P.seq, 9000); }
+  catch(e){ P.ocupado = false; return; }
+  P.ocupado = false;
+  mostrarPartida(r);
+}
+
+function mostrarPartida(r){
+  const rot = r.roteador || {};
+  P.ligado = r.ligado;
+  $('btnPartida').hidden = !rot.ligado;
+  $('btnPartida').textContent = r.ligado ? 'Parar de vigiar' : 'Vigiar partidas';
+  $('btnPartida').classList.toggle('parar', !!r.ligado);
+
+  const semRoteador = !rot.ligado;
+  $('pEntrar').hidden = !semRoteador;
+  if(semRoteador){
+    $('pContagem').hidden = true; $('pProcurando').hidden = true; $('pPartida').hidden = true; $('pResumo').hidden = true;
+    if(rot.disponivel === false){
+      $('erroEntrar').hidden = false;
+      $('erroEntrar').textContent = 'Falta uma peça no Python para conversar com o roteador. Feche e abra o monitor de novo.';
+    }
+    return;
+  }
+
+  // Sem a contagem de dados, dá para achar a partida mas não para medir o volume.
+  $('pContagem').hidden = !(rot.contadores === false && rot.pode_ligar_contagem && !P.pulouContagem);
+  document.querySelectorAll('[data-aviso-contagem]').forEach(el => {
+    el.hidden = !(rot.contadores === false && !rot.pode_ligar_contagem);
+  });
+
+  const p = r.partida;
+  $('pPartida').hidden = !p;
+  $('pProcurando').hidden = !!p || !r.ligado;
+  $('pResumo').hidden = !!p || !(r.historico && r.historico.length);
+
+  if(!p){
+    P.amostras = []; P.seq = 0; P.idPartida = null;
+    $('dotProcura').className = 'dot ' + (r.ligado ? 'vivo' : '');
+    $('txtProcura').textContent = r.erro
+      ? ('Problema ao ler o roteador: ' + r.erro)
+      : (r.ligado ? 'Vigiando o Xbox. Esperando você entrar numa partida…' : 'Vigia parado. Clique em “Vigiar partidas”.');
+    mostrarConexoes(r.conexoes || [], rot.contadores);
+    if(r.historico && r.historico.length) mostrarResumo(r.historico[0]);
+    return;
+  }
+
+  if(P.idPartida !== p.id || p.recomecou){ P.amostras = []; P.seq = 0; P.idPartida = p.id; }
+  if(p.amostras && p.amostras.length){
+    P.amostras = P.amostras.concat(p.amostras).slice(-2400);
+    P.seq = P.amostras[P.amostras.length-1].n;
+  }
+  mostrarAdversario(p);
+  mostrarNumeros(p);
+  mostrarProblemaAtual(p);
+  mostrarEventosPartida(p.eventos || []);
+  desenharPartida();
+}
+
+const ICONE_TIPO = { servidor:'Servidor do jogo', jogador:'Casa de outro jogador',
+                     indefinido:'Provavelmente um jogador', desconhecido:'Não identificado' };
+const COR_TIPO = { servidor:'var(--s-operadora)', jogador:'var(--n2)', indefinido:'var(--n3)', desconhecido:'var(--ink3)' };
+
+function mostrarAdversario(p){
+  const quem = p.quem || {}, dono = p.dono || {};
+  $('advTipo').textContent = ICONE_TIPO[quem.tipo] || 'adversário';
+  $('advBolinha').style.background = COR_TIPO[quem.tipo] || 'var(--ink3)';
+  $('advIp').textContent = p.ip;
+  $('advDono').textContent = dono.nome ? (dono.nome + (dono.pais ? ' · ' + dono.pais : '')) : 'dono não identificado';
+
+  const obs = [];
+  if(quem.rotulo) obs.push(quem.rotulo + '.');
+  if(p.nome_reverso) obs.push('Nome na internet: ' + p.nome_reverso + '.');
+  if(p.alvo && !p.alvo.direto) obs.push('Aviso honesto: ' + p.alvo.texto);
+  obs.push('Porta ' + p.porta + ' · ' + (p.protocolo || '').toUpperCase() + '.');
+  $('advObs').textContent = obs.join(' ');
+
+  const cx = $('advRota'); cx.textContent = '';
+  const cam = (p.rota && p.rota.caminho) || [];
+  if(cam.length){
+    const s = document.createElement('span');
+    s.innerHTML = 'Caminho até ele: <b>' + cam.map(c => c.nome).join('</b> → <b>') + '</b>';
+    cx.appendChild(s);
+  }
+  if(p.rota && p.rota.saltos){
+    const n = p.rota.saltos.length;
+    const t = document.createElement('span');
+    t.style.color = 'var(--ink3)';
+    t.textContent = '· ' + n + ' saltos';
+    cx.appendChild(t);
+  }
+}
+
+function serieDe(chave, n){
+  const out = [];
+  for(let i = Math.max(0, P.amostras.length - n); i < P.amostras.length; i++){
+    const v = P.amostras[i].ms[chave];
+    if(v !== undefined) out.push(v);
+  }
+  return out;
+}
+
+function mostrarNumeros(p){
+  const adv = serieDe('adversario', 16).filter(v => v !== null);
+  const todos = P.amostras.map(a => a.ms.adversario).filter(v => v !== undefined);
+  const bons = todos.filter(v => v !== null);
+  const agora = adv.length ? mediana(adv) : null;
+  const base = (p.bases || {}).adversario;
+
+  const pico = bons.length ? Math.max.apply(null, bons.slice(-2000)) : null;
+  const perda = todos.length ? (todos.length - bons.length) / todos.length * 100 : null;
+  let jit = null;
+  if(bons.length > 3){
+    let soma = 0, n = 0;
+    for(let i = 1; i < bons.length; i++){ soma += Math.abs(bons[i] - bons[i-1]); n++; }
+    jit = soma / n;
+  }
+  const por = (el, v, d, faixas) => {
+    const e = $(el);
+    e.innerHTML = num(v, d) + '<small> ' + (el === 'pgPerda' ? '%' : 'ms') + '</small>';
+    e.className = 'v mono' + (v === null ? '' : ' q' + faixas(v));
+  };
+  por('pgPing', agora, 0, v => v < 40 ? 5 : v < 80 ? 4 : v < 140 ? 2 : 1);
+  por('pgJitter', jit, 1, v => v < 5 ? 5 : v < 12 ? 4 : v < 25 ? 2 : 1);
+  por('pgPerda', perda, 1, v => v < 0.5 ? 5 : v < 2 ? 4 : v < 5 ? 2 : 1);
+  por('pgPico', pico, 0, v => (base && v < base + 30) ? 5 : (base && v < base + 80) ? 2 : 1);
+
+  $('pgPingBase').textContent = base !== undefined ? ('calmo: ' + num(base,0) + ' ms') : '';
+  $('pgPerdaObs').textContent = perda !== null && perda > 2 ? 'isso teleporta o jogador' : 'de ' + todos.length + ' medidas';
+  $('pgTempo').textContent = 'partida: ' + duracao(p.duracao || 0);
+
+  const lado = (id, chave, rotulo) => {
+    const vals = serieDe(chave, 8).filter(v => v !== null);
+    const b = (p.bases || {})[chave];
+    const m = vals.length ? mediana(vals) : null;
+    $(id + 'V').textContent = m === null ? '--' : num(m, 1) + ' ms';
+    const d = (m !== null && b !== undefined) ? m - b : null;
+    $(id + 'S').textContent = d === null ? rotulo : (d > 4 ? '+' + num(d,0) + ' ms acima do calmo' : 'no nível normal');
+    $(id).classList.toggle('culpado', d !== null && d > 10);
+  };
+  lado('ladoVoce', 'roteador', 'roteador de casa');
+  lado('ladoMeio', 'referencia', 'servidor de referência');
+  lado('ladoAdv', 'adversario', 'até o adversário');
+}
+
+function mostrarProblemaAtual(p){
+  const pil = $('ppPilula'), txt = $('ppTexto'), cx = $('diagPartida');
+  const pr = p.problema_atual;
+  if(!pr){
+    pil.textContent = 'tudo certo'; pil.style.background = 'var(--n5)'; pil.style.color = 'var(--panel)';
+    cx.style.borderLeft = '3px solid var(--n5)';
+    txt.textContent = 'Conexão limpa com o adversário neste momento.';
+    $('ppDesde').textContent = '';
+    return;
+  }
+  const cor = pr.nivel === 'ruim' ? 'var(--n1)' : 'var(--n2)';
+  pil.textContent = pr.nivel === 'ruim' ? 'problema agora' : 'atenção';
+  pil.style.background = cor; pil.style.color = '#fff';
+  cx.style.borderLeft = '3px solid ' + cor;
+  txt.textContent = pr.texto;
+  $('ppDesde').textContent = pr.atraso > 0 ? ('+' + num(pr.atraso,0) + ' ms acima do normal') : '';
+}
+
+const NOME_LADO = { voce:'seu lado', adversario:'lado dele', meio:'caminho' };
+
+function mostrarEventosPartida(lista){
+  const cx = $('evPartida');
+  const problemas = lista.filter(e => e.tipo !== 'inicio');
+  if(!problemas.length){
+    cx.innerHTML = '<div class="vazio">Nada de errado até agora. Partida limpa.</div>';
+    return;
+  }
+  cx.textContent = '';
+  problemas.slice().reverse().forEach(e => {
+    const d = document.createElement('div');
+    d.className = 'ev ' + (e.nivel || 'neutro');
+    const selo = e.lado && NOME_LADO[e.lado]
+      ? '<span class="lado-selo lado-' + e.lado + '">' + NOME_LADO[e.lado] + '</span>' : '';
+    const dur = e.duracao ? (' · durou ' + num(e.duracao,1) + ' s') : '';
+    d.innerHTML = '<span class="h">' + (e.minuto !== undefined ? num(e.minuto,1) + "'" : hora(e.t)) + '</span>' +
+                  '<span class="t">' + selo + esc(e.texto) + dur + '</span>';
+    cx.appendChild(d);
+  });
+}
+
+function esc(s){ const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+
+function mostrarConexoes(lista, temContadores){
+  const tb = $('tbConexoes');
+  tb.textContent = '';
+  if(!lista.length){
+    tb.innerHTML = '<tr><td colspan="4" class="vazio">Nada ainda. Ligue o vigia e deixe o Xbox aceso.</td></tr>';
+    return;
+  }
+  lista.forEach(c => {
+    const tr = document.createElement('tr');
+    // Sem contagem de dados, o que temos é o relógio da conversa: há quanto
+    // tempo passou o último pacote por ali.
+    let movimento = temContadores
+      ? num(c.desce_kbps,0) + ' / ' + num(c.sobe_kbps,0) + ' <small>kbps</small>'
+      : (c.ativo ? '<span style="color:var(--n5)">passando agora</span>'
+                 : '<small>parada há ' + (c.parado_ha != null ? c.parado_ha + ' s' : '?') + '</small>');
+    if(c.teste_servidor) movimento += ' <small style="color:var(--ink3)">· jogo testando servidores</small>';
+    tr.innerHTML = '<td class="n">' + esc(c.ip) + ':' + esc(c.porta) + '</td>' +
+      '<td>' + (c.protocolo || '').toUpperCase() + '</td>' +
+      '<td class="n">' + movimento + '</td>' +
+      '<td class="n">' + (c.nota || 0) + '</td>';
+    tb.appendChild(tr);
+  });
+}
+
+function mostrarResumo(h){
+  const r = h.resumo || {};
+  const quem = h.quem || {}, dono = h.dono || {};
+  $('resumoTexto').innerHTML = '<b>Última partida</b> — contra ' + esc(h.ip) +
+    (dono.nome ? ' (' + esc(dono.nome) + ')' : '') + ', ' + duracao(r.duracao || 0) + ' de jogo.<br>' + esc(r.veredito || '');
+  const e = r.estatisticas || {};
+  const cel = (k, v, s) => '<div><div class="k">' + k + '</div><div class="v mono">' + v + '</div><div class="s">' + s + '</div></div>';
+  $('resumoPlacar').innerHTML =
+    cel('Ping médio', num(e.mediana,0) + '<small> ms</small>', 'no meio da partida') +
+    cel('Variação', num(e.jitter,1) + '<small> ms</small>', 'quanto menor, melhor') +
+    cel('Perdidos', num(e.perda,1) + '<small> %</small>', 'pacotes que sumiram') +
+    cel('Nota', num(e.nota,0), quem.rotulo ? quem.rotulo.split(',')[0] : '');
+  const cx = $('evResumo'); cx.textContent = '';
+  (h.eventos || []).filter(x => x.tipo !== 'inicio').slice().reverse().forEach(ev => {
+    const d = document.createElement('div');
+    d.className = 'ev ' + (ev.nivel || 'neutro');
+    const selo = ev.lado && NOME_LADO[ev.lado] ? '<span class="lado-selo lado-' + ev.lado + '">' + NOME_LADO[ev.lado] + '</span>' : '';
+    d.innerHTML = '<span class="h">' + (ev.minuto !== undefined ? num(ev.minuto,1) + "'" : '') + '</span><span class="t">' + selo + esc(ev.texto) + '</span>';
+    cx.appendChild(d);
+  });
+}
+
+const SERIES_P = [
+  { id:'adversario', nome:'Adversário', cor:'--s-destino' },
+  { id:'referencia', nome:'Servidor de referência', cor:'--s-operadora' },
+  { id:'roteador',   nome:'Seu roteador', cor:'--s-roteador' }
+];
+
+function desenharPartida(){
+  const cv = $('cvPartida');
+  if(!cv || $('pPartida').hidden) return;
+  const { c, w, h } = prepararCanvas(cv);
+  const pL = 38, pR = 10, pT = 18, pB = 18, gw = w-pL-pR, gh = h-pT-pB;
+  c.clearRect(0,0,w,h);
+  const dados = P.amostras.slice(-600);
+  if(dados.length < 2){
+    c.fillStyle = css('--ink3'); c.font = '13px "IBM Plex Sans",sans-serif';
+    c.fillText('medindo…', pL, pT + gh/2);
+    return;
+  }
+  const presentes = SERIES_P.filter(s => dados.some(a => a.ms[s.id] !== undefined));
+  let maxv = 10;
+  presentes.forEach(s => dados.forEach(a => { const v = a.ms[s.id]; if(v != null && v > maxv) maxv = v; }));
+  const passos = [30,40,60,80,100,150,200,300,500,800,1200];
+  const topo = passos.find(p => p >= maxv*1.15) || Math.ceil(maxv*1.15);
+
+  c.strokeStyle = css('--grid'); c.fillStyle = css('--ink3');
+  c.font = '10.5px "IBM Plex Mono",monospace'; c.lineWidth = 1;
+  for(let i=0;i<=4;i++){
+    const y = pT + gh*i/4;
+    c.beginPath(); c.moveTo(pL, y+.5); c.lineTo(w-pR, y+.5); c.stroke();
+    c.fillText(String(Math.round(topo*(1-i/4))), 4, y+3.5);
+  }
+  const t0 = dados[0].t, t1 = dados[dados.length-1].t;
+  const span = Math.max(1, t1 - t0);
+  const x = t => pL + gw*clamp((t - t0)/span, 0, 1);
+  const y = v => pT + gh*(1 - clamp(v,0,topo)/topo);
+
+  // faixa vermelha por trás dos momentos ruins
+  let ini = null;
+  dados.forEach((a, i) => {
+    const ruim = a.ms.adversario === null;
+    if(ruim && ini === null) ini = a.t;
+    if((!ruim || i === dados.length-1) && ini !== null){
+      c.fillStyle = comAlfa(css('--n1'), .14);
+      c.fillRect(x(ini), pT, Math.max(2, x(a.t)-x(ini)), gh);
+      ini = null;
+    }
+  });
+
+  presentes.forEach(s => {
+    c.strokeStyle = css(s.cor); c.lineWidth = s.id === 'adversario' ? 1.9 : 1.1;
+    c.globalAlpha = s.id === 'adversario' ? 1 : .75;
+    c.beginPath();
+    let caneta = false;
+    dados.forEach(a => {
+      const v = a.ms[s.id];
+      if(v === undefined) return;
+      if(v === null){ caneta = false; return; }
+      const px = x(a.t), py = y(v);
+      if(caneta) c.lineTo(px, py); else { c.moveTo(px, py); caneta = true; }
+    });
+    c.stroke(); c.globalAlpha = 1;
+  });
+
+  const leg = $('legPartida'); leg.textContent = '';
+  presentes.forEach(s => {
+    const vals = serieDe(s.id, 8).filter(v => v !== null);
+    const sp = document.createElement('span');
+    sp.innerHTML = '<i style="background:' + css(s.cor) + '"></i>' + s.nome +
+                   (vals.length ? ' <b>' + num(mediana(vals),1) + ' ms</b>' : '');
+    leg.appendChild(sp);
+  });
+}
+
+async function entrarNoRoteador(){
+  const b = $('btnEntrar'), err = $('erroEntrar');
+  err.hidden = true; $('dicaSsh').hidden = true;
+  b.disabled = true; b.textContent = 'Entrando…';
+  try{
+    await apiPost('/api/roteador/entrar', { usuario: $('inpUsuario').value || 'admin', senha: $('inpSenha').value });
+    $('inpSenha').value = '';
+    await lerPartida();
+    try{ await api('/api/partida/ligar', 10000); }catch(e){}
+    await lerPartida();
+  }catch(e){
+    err.hidden = false; err.textContent = e.message;
+    if(/SSH|conex|respondeu|recusou/i.test(e.message)) $('dicaSsh').hidden = false;
+  }finally{
+    b.disabled = false; b.textContent = 'Entrar no roteador';
+  }
+}
+
+async function alternarVigia(){
+  const b = $('btnPartida');
+  b.disabled = true;
+  try{ await api(P.ligado ? '/api/partida/desligar' : '/api/partida/ligar', 10000); }
+  catch(e){ alert(e.message); }
+  finally{ b.disabled = false; lerPartida(); }
+}
+
+$('btnContagem').addEventListener('click', async () => {
+  const b = $('btnContagem'), err = $('erroContagem');
+  err.hidden = true; b.disabled = true; b.textContent = 'Ligando…';
+  try{
+    await api('/api/roteador/contagem?ligar=1', 15000);
+    await lerPartida();
+  }catch(e){
+    err.hidden = false;
+    err.textContent = e.message + ' — sem problema: o resto continua funcionando, só o volume de dados fica de fora.';
+  }finally{ b.disabled = false; b.textContent = 'Ligar a contagem de dados'; }
+});
+$('btnPular').addEventListener('click', () => { P.pulouContagem = true; $('pContagem').hidden = true; });
+$('btnEntrar').addEventListener('click', entrarNoRoteador);
+$('inpSenha').addEventListener('keydown', e => { if(e.key === 'Enter') entrarNoRoteador(); });
+$('btnPartida').addEventListener('click', alternarVigia);
+$('btnAbrirRoteador').addEventListener('click', () => {
+  const ip = (E.rede && E.rede.roteador && E.rede.roteador.ip) || '192.168.50.1';
+  window.open('http://' + ip, '_blank', 'noopener');
+});
+
+/* =========================================================
+   Dica ao passar o mouse (e ao tocar, no celular)
+   ========================================================= */
+const balao = document.createElement('div');
+balao.id = 'dica'; balao.setAttribute('role','tooltip'); balao.hidden = true;
+document.body.appendChild(balao);
+let alvoDica = null, sumir;
+
+function posicionarDica(el){
+  const r = el.getBoundingClientRect(), b = balao.getBoundingClientRect();
+  let x = r.left + r.width/2 - b.width/2;
+  let y = r.bottom + 9;
+  x = clamp(x, 10, Math.max(10, window.innerWidth - b.width - 10));
+  if(y + b.height > window.innerHeight - 10) y = Math.max(10, r.top - b.height - 9);
+  balao.style.left = Math.round(x) + 'px';
+  balao.style.top = Math.round(y) + 'px';
+}
+
+function abrirDica(el){
+  const texto = el.getAttribute('data-dica');
+  if(!texto) return;
+  clearTimeout(sumir);
+  alvoDica = el;
+  balao.innerHTML = '<b>Para que serve</b>' + esc(texto);
+  balao.hidden = false;
+  posicionarDica(el);
+  requestAnimationFrame(() => balao.classList.add('on'));
+}
+
+function fecharDica(){
+  alvoDica = null;
+  balao.classList.remove('on');
+  sumir = setTimeout(() => { balao.hidden = true; }, 160);
+}
+
+document.addEventListener('pointerover', e => {
+  const el = e.target.closest && e.target.closest('[data-dica]');
+  if(el && el !== alvoDica) abrirDica(el);
+});
+document.addEventListener('pointerout', e => {
+  const el = e.target.closest && e.target.closest('[data-dica]');
+  if(el && el === alvoDica && !el.contains(e.relatedTarget)) fecharDica();
+});
+document.addEventListener('focusin', e => {
+  const el = e.target.closest && e.target.closest('[data-dica]');
+  if(el) abrirDica(el); else if(alvoDica) fecharDica();
+});
+document.addEventListener('focusout', () => { if(alvoDica) fecharDica(); });
+// No celular não existe "passar o mouse": um toque mostra a dica, o de fora fecha.
+document.addEventListener('click', e => {
+  const el = e.target.closest && e.target.closest('[data-dica]');
+  if(el){ if(el === alvoDica) return; abrirDica(el); clearTimeout(sumir); sumir = setTimeout(fecharDica, 6000); }
+  else if(alvoDica) fecharDica();
+}, true);
+document.addEventListener('keydown', e => { if(e.key === 'Escape' && alvoDica) fecharDica(); });
+window.addEventListener('scroll', () => { if(alvoDica) posicionarDica(alvoDica); }, { passive:true });
+
 let redesenho;
-window.addEventListener('resize', () => { clearTimeout(redesenho); redesenho = setTimeout(() => { desenharLatencia(); desenharCasa(); }, 150); });
+window.addEventListener('resize', () => { clearTimeout(redesenho); redesenho = setTimeout(() => { desenharLatencia(); desenharCasa(); desenharPartida(); }, 150); });
 
 // a faixa de status é atualizada de vez em quando (Xbox ligando, endereço mudando)
 setInterval(() => { if(!$('app').hidden) carregarRede(); }, 30000);
