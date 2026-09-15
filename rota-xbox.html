@@ -715,6 +715,15 @@ button[data-dica],a[data-dica],select[data-dica],input[data-dica]{cursor:pointer
           </div>
           <div class="pbody">
             <button class="btn sec" id="btnVarrer" type="button" data-dica="Procura de novo todos os aparelhos ligados. Use se você ligou o Xbox agora e ele ainda não apareceu na lista.">Procurar aparelhos</button>
+            <div class="entrada" id="avisoSegundoXbox" hidden style="margin-top:12px">
+              <div class="aviso" style="border-left-color:var(--n2)">
+                <b>É a hora certa de mexer na porta alternativa:</b> encontrei mais de um aparelho com cara de Xbox nesta
+                rede (<span id="nomeOutroXbox"></span>). Só um console consegue ficar com a porta principal (3074) aberta
+                de verdade — o outro fica jogando com o NAT fechado, sem nem avisar direito o motivo. Veja o passo a
+                passo em <b>"Porta alternativa do Xbox"</b>, logo abaixo.
+              </div>
+              <button class="btn sec mini" type="button" id="btnVerPortaAlternativa">Ver o passo a passo</button>
+            </div>
             <div class="aparelhos" id="aparelhos" style="margin-top:12px"></div>
           </div>
         </section>
@@ -762,10 +771,33 @@ button[data-dica],a[data-dica],select[data-dica],input[data-dica]{cursor:pointer
               <li>Meça a rota antes e depois do mesmo jeito para ver se mudou alguma coisa.</li>
             </ol>
           </div>
+          <div class="passo" id="passoPortaAlternativa">
+            <h3 data-dica="Cada Xbox só consegue ficar com o NAT totalmente aberto numa porta por vez. Com dois consoles na mesma casa, o segundo precisa de uma porta diferente, ou fica com conexão fechada sem nem avisar direito o motivo.">Porta alternativa do Xbox</h3>
+            <div class="quando">Quando tem mais de um Xbox em casa, ou o NAT não abre mesmo com tudo certo</div>
+            <ol>
+              <li><b>Use quando:</b> você tem <b>2 consoles</b> na mesma rede, o NAT continua <b>Moderado</b> ou <b>Restrito</b>
+                mesmo com tudo certo, ou o roteador acabou de <b>reiniciar ou resetar</b> — igual aconteceu agora, o UPnP
+                esquece as portas liberadas e é preciso abrir de novo.</li>
+              <li>No próprio Xbox: <b>Configurações → Geral → Configurações de rede → Configurações avançadas → Porta
+                alternativa para conexões multiplayer da rede Xbox</b>. Ligue e anote o número que ele mostrar.</li>
+              <li>No roteador, libere essa porta nova (UDP <b>e</b> TCP) apontando para o endereço do Xbox — do mesmo jeito
+                que se libera qualquer porta ali no encaminhamento de portas.</li>
+              <li>Volte no Xbox e rode <b>Testar conexão de rede</b>: o NAT precisa aparecer como <b>Aberto</b>.</li>
+            </ol>
+          </div>
         </div>
         <p class="nota"><b>Por que não existe botão de "escolher rota":</b> quem decide o caminho da internet é a operadora.
           Um túnel como a VPN é o único jeito de forçar outro caminho, e ele só vale a pena se a tabela mostrar nota maior.
           Muitas vezes a rota direta ganha. O monitor mede pelo IPv4.</p>
+        <p class="nota"><b>Para que serve cada porta que o Xbox usa</b> (isso explica por que liberar só uma não basta):</p>
+        <div class="id-grid" style="margin-top:8px">
+          <div><div class="k">UDP/TCP 3074</div><div class="v" style="font-size:13.5px;font-weight:500">Multiplayer</div><div class="s">A porta principal: é ela que carrega a partida em si. É a única que muda quando você liga a "porta alternativa".</div></div>
+          <div><div class="k">UDP/TCP 88</div><div class="v" style="font-size:13.5px;font-weight:500">Entrar na conta e chat</div><div class="s">Login na Xbox Live e a voz do chat de party. Sem ela, o Xbox nem entra online direito.</div></div>
+          <div><div class="k">UDP 500 e 3544</div><div class="v" style="font-size:13.5px;font-weight:500">Túnel Teredo</div><div class="s">Ajuda o Xbox a se conectar mesmo atrás de um NAT fechado, contornando o roteador. Não precisa mexer nelas.</div></div>
+          <div><div class="k">UDP 4500</div><div class="v" style="font-size:13.5px;font-weight:500">Continuação do Teredo</div><div class="s">Trabalha junto com a 500 e a 3544 no mesmo túnel. Também não precisa liberar na mão.</div></div>
+          <div><div class="k">TCP 80 e 443</div><div class="v" style="font-size:13.5px;font-weight:500">Loja e atualizações</div><div class="s">Download de jogo, loja e serviços do Xbox pela web. São as mesmas portas que qualquer site usa.</div></div>
+          <div><div class="k">UDP/TCP 53</div><div class="v" style="font-size:13.5px;font-weight:500">DNS</div><div class="s">A "lista telefônica" que transforma nome de servidor em endereço. Usada por tudo, não só pelo Xbox.</div></div>
+        </div>
       </div>
     </section>
   </div>
@@ -1532,8 +1564,18 @@ async function carregarAparelhos(varrer){
     });
     cx.appendChild(d);
   });
+
+  // A hora certa de mexer na porta alternativa: achou mais de um Xbox na rede.
+  const outros = lista.filter(a => a.provavel_xbox && a.ip !== r.xbox_ip);
+  $('avisoSegundoXbox').hidden = !outros.length;
+  if(outros.length){
+    $('nomeOutroXbox').textContent = outros.map(a => (a.nome ? a.nome.replace(/\.local$/,'') : a.ip)).join(', ');
+  }
 }
 $('btnVarrer').addEventListener('click', () => carregarAparelhos(true));
+$('btnVerPortaAlternativa').addEventListener('click', () => {
+  $('passoPortaAlternativa').scrollIntoView({ behavior:'smooth', block:'center' });
+});
 
 /* =========================================================
    Roteador e tema
