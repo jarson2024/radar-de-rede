@@ -1,0 +1,1241 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rota do Xbox</title>
+<meta name="theme-color" content="#0b1114">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#eaeef0; --panel:#ffffff; --panel2:#f4f7f8; --sunk:#eef2f4;
+  --line:#ccd6da; --line-soft:#e1e8ea;
+  --ink:#0e1a1f; --ink2:#42565f; --ink3:#6d818b;
+  --accent:#b35a00; --accent-ink:#ffffff; --accent-soft:#fdf0e0;
+  --grid:#dde5e8;
+  --n1:#bf2338; --n2:#c9611a; --n3:#9a7a00; --n4:#3c8a2c; --n5:#0b8a67;
+  --s-destino:#b35a00; --s-operadora:#2f6f9f; --s-roteador:#7a8e98; --s-xbox:#0f7f8c;
+  --shadow:0 1px 2px rgba(14,26,31,.06), 0 8px 24px -12px rgba(14,26,31,.22);
+  --radius:14px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0a1013; --panel:#121b20; --panel2:#18242a; --sunk:#0d161a;
+    --line:#25343c; --line-soft:#1c282e;
+    --ink:#e7eff3; --ink2:#a0b4be; --ink3:#6f8792;
+    --accent:#ff9f1c; --accent-ink:#1a1205; --accent-soft:#2b1e0b;
+    --grid:#1d2a31;
+    --n1:#ff5064; --n2:#ff8a3d; --n3:#f2c53d; --n4:#7fd957; --n5:#2ee6a8;
+    --s-destino:#ffae3d; --s-operadora:#6cb4ee; --s-roteador:#8aa0aa; --s-xbox:#3ec6d4;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -16px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0a1013; --panel:#121b20; --panel2:#18242a; --sunk:#0d161a;
+  --line:#25343c; --line-soft:#1c282e;
+  --ink:#e7eff3; --ink2:#a0b4be; --ink3:#6f8792;
+  --accent:#ff9f1c; --accent-ink:#1a1205; --accent-soft:#2b1e0b;
+  --grid:#1d2a31;
+  --n1:#ff5064; --n2:#ff8a3d; --n3:#f2c53d; --n4:#7fd957; --n5:#2ee6a8;
+  --s-destino:#ffae3d; --s-operadora:#6cb4ee; --s-roteador:#8aa0aa; --s-xbox:#3ec6d4;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -16px rgba(0,0,0,.8);
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;font-size:15px;line-height:1.55;padding:0 0 60px}
+h1,h2,h3{font-family:"IBM Plex Sans Condensed","IBM Plex Sans","Segoe UI",sans-serif;margin:0;text-wrap:balance}
+button,input,select{font:inherit;color:inherit}
+.mono{font-family:"IBM Plex Mono",ui-monospace,Consolas,monospace;font-variant-numeric:tabular-nums}
+[hidden]{display:none!important}
+
+.top{border-bottom:1px solid var(--line);background:var(--panel);position:sticky;top:0;z-index:40}
+.top-in{display:flex;align-items:center;gap:12px;padding:12px 18px;max-width:1360px;margin:0 auto;flex-wrap:wrap}
+.logo{width:34px;height:34px;border-radius:9px;flex:none;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:17px;font-family:"IBM Plex Sans Condensed",sans-serif}
+.top h1{font-size:19px;font-weight:700;line-height:1.1}
+.top .sub{font-size:11.5px;color:var(--ink3);letter-spacing:.08em;text-transform:uppercase;font-weight:500}
+.esp{flex:1}
+.ghost{background:transparent;border:1px solid var(--line);color:var(--ink2);border-radius:9px;padding:7px 12px;font-size:13px;cursor:pointer;font-weight:500;text-decoration:none;display:inline-flex;align-items:center;min-height:36px}
+.ghost:hover{border-color:var(--accent);color:var(--accent)}
+
+.wrap{max-width:1360px;margin:0 auto;padding:0 18px}
+@media(max-width:600px){
+  .top{position:static}
+  .top-in{flex-wrap:nowrap;gap:8px;padding:10px 12px}
+  .top .sub{display:none}
+  .top h1{font-size:17px;white-space:nowrap}
+  .logo{width:30px;height:30px;font-size:15px}
+  .ghost{padding:5px 9px;font-size:12px;min-height:32px;white-space:nowrap}
+  .wrap{padding:0 12px}
+  .faixa{gap:6px}
+  .chip{font-size:12px;padding:4px 10px}
+  .diag .texto{font-size:16.5px}
+  .pbody{padding:14px}
+  .caminho{padding:14px}
+  select,input[type=text]{min-width:0;width:100%}
+  .controls .field{flex:1 1 100%}
+  .controls .btn{flex:1 1 auto;justify-content:center}
+}
+.faixa{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.chip{display:inline-flex;align-items:center;gap:7px;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:12.5px;color:var(--ink2)}
+.chip b{color:var(--ink);font-weight:600}
+.bolinha{width:8px;height:8px;border-radius:50%;background:var(--ink3);flex:none}
+
+.grade{display:grid;gap:18px;margin-top:16px;grid-template-columns:minmax(0,1fr)}
+@media(min-width:1120px){.grade{grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);align-items:start}}
+.coluna{display:flex;flex-direction:column;gap:18px;min-width:0}
+
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.phead{padding:14px 18px;border-bottom:1px solid var(--line-soft);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.phead h2{font-size:17px;font-weight:700}
+.phead p{margin:2px 0 0;font-size:13px;color:var(--ink3);width:100%}
+.pbody{padding:16px 18px}
+
+/* diagnóstico */
+.diag{padding:18px 20px;display:grid;gap:10px;border-left:5px solid var(--line)}
+.diag .linha1{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.pilula{font-family:"IBM Plex Sans Condensed",sans-serif;font-weight:700;font-size:13px;letter-spacing:.07em;text-transform:uppercase;padding:4px 11px;border-radius:999px;background:var(--line);color:var(--panel)}
+.diag .desde{font-size:12.5px;color:var(--ink3)}
+.diag .texto{font-size:18px;line-height:1.4;font-weight:500;max-width:68ch;text-wrap:pretty}
+
+/* caminho */
+.caminho{display:grid;gap:0;grid-template-columns:minmax(0,1fr);padding:18px}
+@media(min-width:760px){.caminho{grid-template-columns:minmax(0,1fr) 44px minmax(0,1fr) 44px minmax(0,1fr) 44px minmax(0,1fr);align-items:stretch}}
+.no{background:var(--panel2);border:1px solid var(--line-soft);border-radius:12px;padding:12px 13px;min-width:0;border-top:3px solid var(--line)}
+.no .rot{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);font-weight:600}
+.no .nome{font-weight:600;font-size:14px;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.no .ms{font-family:"IBM Plex Mono",monospace;font-size:26px;font-weight:500;margin-top:4px;line-height:1.1;font-variant-numeric:tabular-nums}
+.no .ms small{font-size:12px;color:var(--ink3);font-weight:400}
+.no .base{font-size:12px;color:var(--ink3);margin-top:2px}
+.no .ip{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink3);margin-top:3px}
+.no.alerta{box-shadow:0 0 0 2px var(--n2) inset}
+.no.grave{box-shadow:0 0 0 2px var(--n1) inset}
+.elo{display:flex;align-items:center;justify-content:center;position:relative;min-height:26px}
+.elo i{display:block;background:var(--line);width:3px;height:26px;border-radius:2px}
+@media(min-width:760px){.elo i{width:100%;height:3px}}
+.elo span{position:absolute;font-size:10.5px;font-weight:600;color:var(--n1);background:var(--panel);padding:0 4px;white-space:nowrap;text-transform:uppercase;letter-spacing:.06em}
+@media(min-width:760px){.elo span{top:calc(50% + 6px)}}
+.elo.quente i{background:var(--n1)}
+.elo.morno i{background:var(--n2)}
+
+/* controles */
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+.field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.field label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);font-weight:600}
+select,input[type=text],input[type=number]{background:var(--sunk);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-height:44px;font-size:14.5px;color:var(--ink);max-width:100%}
+select{min-width:230px}
+input[type=text]{min-width:200px}
+select:focus-visible,input:focus-visible,button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn{background:var(--accent);color:var(--accent-ink);border:1px solid transparent;border-radius:10px;padding:10px 18px;min-height:44px;font-weight:600;font-size:14.5px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.btn:hover{filter:brightness(1.08)}
+.btn:disabled{opacity:.45;cursor:not-allowed;filter:none}
+.btn.sec{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.sec:hover{border-color:var(--accent);color:var(--accent);filter:none}
+.btn.parar{background:var(--n1);color:#fff}
+.btn.mini{min-height:32px;padding:5px 10px;font-size:12.5px;border-radius:8px}
+
+/* gráfico */
+.grafico{background:var(--sunk);border:1px solid var(--line-soft);border-radius:12px;padding:8px;margin-top:14px}
+canvas{display:block;width:100%}
+#cvLat{height:250px}
+#cvCasa{height:90px}
+.legenda{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12px;color:var(--ink2);margin-top:9px}
+.legenda span{display:inline-flex;align-items:center;gap:6px}
+.legenda i{width:14px;height:3px;border-radius:2px;display:inline-block}
+.legenda b{font-family:"IBM Plex Mono",monospace;font-weight:500;color:var(--ink)}
+.janelas{display:flex;gap:6px}
+.janelas button{background:var(--sunk);border:1px solid var(--line);border-radius:7px;padding:4px 10px;font-size:12.5px;cursor:pointer;color:var(--ink2);min-height:32px}
+.janelas button[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.casa-linha{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-top:14px}
+.casa-linha .k{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);font-weight:600}
+.casa-linha .v{font-family:"IBM Plex Mono",monospace;font-size:20px;font-variant-numeric:tabular-nums}
+.casa-linha .v small{font-size:12px;color:var(--ink3)}
+
+/* eventos */
+.eventos{display:flex;flex-direction:column;gap:7px;max-height:340px;overflow:auto}
+.ev{display:flex;gap:10px;align-items:flex-start;padding:9px 11px;border-radius:9px;background:var(--panel2);border:1px solid var(--line-soft);border-left:3px solid var(--line)}
+.ev .h{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink3);flex:none;padding-top:1px}
+.ev .t{font-size:13.5px;line-height:1.45}
+.ev.bom{border-left-color:var(--n5)} .ev.atencao{border-left-color:var(--n2)} .ev.ruim{border-left-color:var(--n1)}
+.vazio{color:var(--ink3);font-size:13.5px;padding:6px 2px}
+
+/* rota atual e rotas */
+.id-grid{display:grid;gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);border-radius:11px;overflow:hidden;grid-template-columns:repeat(2,minmax(0,1fr))}
+.id-grid>div{background:var(--panel);padding:10px 12px;min-width:0}
+.id-grid .k{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);font-weight:600}
+.id-grid .v{font-size:14.5px;font-weight:600;margin-top:2px;overflow-wrap:anywhere}
+.id-grid .s{font-size:12px;color:var(--ink3)}
+.cadeia{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:12px;font-size:13px}
+.cadeia .elo2{background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:3px 9px;font-weight:500}
+.cadeia .seta{color:var(--ink3)}
+.barra{height:8px;background:var(--sunk);border-radius:99px;overflow:hidden;margin-top:12px;border:1px solid var(--line-soft)}
+.barra i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s linear}
+.status{display:flex;align-items:center;gap:9px;margin-top:12px;font-size:13.5px;color:var(--ink2);background:var(--panel2);border:1px solid var(--line-soft);border-radius:10px;padding:10px 12px}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--ink3);flex:none}
+.dot.vivo{background:var(--n5);animation:pulso 1.4s infinite}
+.dot.aviso{background:var(--n3)} .dot.erro{background:var(--n1)}
+@keyframes pulso{0%,100%{opacity:1}50%{opacity:.25}}
+@media (prefers-reduced-motion: reduce){.dot.vivo{animation:none}.barra i{transition:none}}
+
+.tscroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{text-align:left;font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);font-weight:600;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:9px 10px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+td.n{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.melhor td{background:var(--accent-soft)}
+.selo{display:inline-block;white-space:nowrap;font-family:"IBM Plex Sans Condensed",sans-serif;font-weight:700;font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;margin:2px 6px 2px 0;vertical-align:1px}
+.rnome{font-weight:600}
+.selos{margin-top:3px}
+.tabela-rotas td:first-child{min-width:190px}
+.apagar{background:none;border:none;padding:0;margin-top:4px;font-size:12px;color:var(--ink3);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.apagar:hover{color:var(--n1)}
+.rcam{font-size:12px;color:var(--ink3);margin-top:1px}
+.recom{margin-top:14px;padding:13px 14px;border-radius:11px;background:var(--panel2);border:1px solid var(--line-soft);border-left:3px solid var(--accent);font-size:14px;color:var(--ink2);line-height:1.55}
+.recom b{color:var(--ink)}
+
+.aparelhos{display:flex;flex-direction:column;gap:7px}
+.ap{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:9px;background:var(--panel2);border:1px solid var(--line-soft);flex-wrap:wrap}
+.ap.xbox{border-color:var(--s-xbox);box-shadow:0 0 0 1px var(--s-xbox) inset}
+.ap .q{flex:1;min-width:150px}
+.ap .q b{font-weight:600}
+.ap .q small{display:block;font-size:12px;color:var(--ink3)}
+.ap .mono{font-size:12px;color:var(--ink3)}
+
+.guia{display:grid;gap:12px;grid-template-columns:minmax(0,1fr)}
+@media(min-width:900px){.guia{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.passo{background:var(--panel2);border:1px solid var(--line-soft);border-radius:12px;padding:14px 15px}
+.passo h3{font-size:15.5px;font-weight:700}
+.passo .quando{font-size:12px;color:var(--ink3);margin-top:2px}
+.passo ol{margin:9px 0 0;padding-left:19px;font-size:13.5px;color:var(--ink2);display:flex;flex-direction:column;gap:5px}
+.passo ol b{color:var(--ink)}
+.nota{font-size:12.5px;color:var(--ink3);margin-top:12px;line-height:1.6;max-width:80ch}
+.nota b{color:var(--ink2)}
+
+.sem-monitor{margin-top:18px;padding:22px;border-radius:var(--radius);background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--n2);box-shadow:var(--shadow)}
+.sem-monitor h2{font-size:20px}
+.sem-monitor p{color:var(--ink2);max-width:66ch}
+.sem-monitor code{font-family:"IBM Plex Mono",monospace;background:var(--sunk);border:1px solid var(--line);padding:1px 6px;border-radius:5px;font-size:13px}
+.end-grupo{display:flex;flex-direction:column;gap:9px;margin:16px 0}
+.end{display:flex;flex-direction:column;gap:2px;padding:13px 15px;border-radius:11px;background:var(--panel2);
+  border:1px solid var(--line);border-left:3px solid var(--accent);text-decoration:none;color:inherit}
+.end:hover{border-color:var(--accent);background:var(--accent-soft)}
+.end-quando{font-weight:600;font-size:15px}
+.end-link{font-family:"IBM Plex Mono",monospace;font-size:13.5px;color:var(--accent)}
+.end-obs{font-size:12.5px;color:var(--ink3)}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="top-in">
+    <div class="logo">R</div>
+    <div>
+      <h1>Rota do Xbox</h1>
+      <div class="sub">Monitor no notebook · mesmo roteador do console</div>
+    </div>
+    <div class="esp"></div>
+    <a class="ghost" href="radar-de-rede.html">Teste completo</a>
+    <button class="ghost" id="btnTema" type="button">Tema</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- sem o monitor do notebook ligado -->
+  <section class="sem-monitor" id="semMonitor" hidden>
+    <h2 id="semMonitorTitulo">O monitor do notebook não está ligado</h2>
+    <p id="semMonitorTexto">Esta página precisa do programa que mede a rede a partir do notebook, porque o navegador
+      sozinho não consegue traçar rota nem ler o roteador.</p>
+    <p id="semMonitorAcao">Dê dois cliques em <code>ABRIR RADAR NO NOTEBOOK.bat</code>, na pasta do site.
+      A página abre sozinha em seguida.</p>
+
+    <div id="enderecos" hidden>
+      <div class="end-grupo">
+        <a class="end" href="http://localhost:8321/rota-xbox.html">
+          <span class="end-quando">Estou no próprio notebook</span>
+          <span class="end-link">localhost:8321</span>
+        </a>
+        <a class="end" href="http://192.168.50.29:8321/rota-xbox.html">
+          <span class="end-quando">Estou em casa, no mesmo Wi-Fi</span>
+          <span class="end-link">192.168.50.29:8321</span>
+        </a>
+        <a class="end" href="http://100.78.55.99:8321/rota-xbox.html">
+          <span class="end-quando">Estou fora de casa</span>
+          <span class="end-link">100.78.55.99:8321</span>
+          <span class="end-obs">precisa do app Tailscale ligado neste aparelho</span>
+        </a>
+      </div>
+      <p class="nota">Em todos os casos, o notebook precisa estar ligado com o monitor aberto. Se o endereço de casa
+        não abrir, o número pode ter mudado: veja o endereço certo na tela do programa no notebook.</p>
+    </div>
+
+    <p id="semMonitorTentando" class="nota">Tentando conectar de novo a cada 3 segundos…</p>
+  </section>
+
+  <div id="app" hidden>
+    <div class="faixa" id="faixa"></div>
+
+    <div class="grade">
+      <div class="coluna">
+
+        <!-- DIAGNÓSTICO -->
+        <section class="panel">
+          <div class="diag" id="diag">
+            <div class="linha1">
+              <span class="pilula" id="diagPilula">desligado</span>
+              <span class="desde" id="diagDesde"></span>
+            </div>
+            <div class="texto" id="diagTexto">Ligue o monitor para ver, segundo a segundo, se há congestionamento e em qual trecho do caminho.</div>
+          </div>
+        </section>
+
+        <!-- CAMINHO -->
+        <section class="panel">
+          <div class="phead">
+            <h2>Caminho do Xbox até o servidor</h2>
+            <p>Cada caixa é um ponto da rota, medido agora. Embaixo, o nível dele com a rede calma.</p>
+          </div>
+          <div class="caminho" id="caminho">
+            <div class="no" id="noXbox"><div class="rot">Xbox</div><div class="nome" id="noXboxNome">procurando…</div><div class="ms mono" id="noXboxMs">--<small> ms</small></div><div class="base" id="noXboxBase">ligação com o roteador</div><div class="ip" id="noXboxIp"></div></div>
+            <div class="elo" id="elo1"><i></i><span></span></div>
+            <div class="no" id="noRoteador"><div class="rot">Roteador</div><div class="nome" id="noRoteadorNome">--</div><div class="ms mono" id="noRoteadorMs">--<small> ms</small></div><div class="base" id="noRoteadorBase">&nbsp;</div><div class="ip" id="noRoteadorIp"></div></div>
+            <div class="elo" id="elo2"><i></i><span></span></div>
+            <div class="no" id="noOperadora"><div class="rot">Saída da operadora</div><div class="nome" id="noOperadoraNome">--</div><div class="ms mono" id="noOperadoraMs">--<small> ms</small></div><div class="base" id="noOperadoraBase">&nbsp;</div><div class="ip" id="noOperadoraIp"></div></div>
+            <div class="elo" id="elo3"><i></i><span></span></div>
+            <div class="no" id="noDestino"><div class="rot">Servidor</div><div class="nome" id="noDestinoNome">--</div><div class="ms mono" id="noDestinoMs">--<small> ms</small></div><div class="base" id="noDestinoBase">&nbsp;</div><div class="ip" id="noDestinoIp"></div></div>
+          </div>
+        </section>
+
+        <!-- MONITOR -->
+        <section class="panel">
+          <div class="phead">
+            <h2>Monitor ao vivo</h2>
+            <p>Deixe ligado enquanto joga. A medição acontece no notebook, então pode minimizar esta janela.</p>
+          </div>
+          <div class="pbody">
+            <div class="controls">
+              <div class="field">
+                <label for="selDestino">Medir até</label>
+                <select id="selDestino"></select>
+              </div>
+              <div class="field" id="campoOutro" hidden>
+                <label for="inpOutro">Endereço do servidor</label>
+                <input type="text" id="inpOutro" placeholder="ex.: 35.71.106.103" autocomplete="off" spellcheck="false">
+              </div>
+              <div class="field">
+                <label for="selIntervalo">Ritmo</label>
+                <select id="selIntervalo" style="min-width:150px">
+                  <option value="1">1 medida por segundo</option>
+                  <option value="2">1 a cada 2 segundos</option>
+                </select>
+              </div>
+              <button class="btn" id="btnMonitor" type="button">Ligar monitor</button>
+            </div>
+            <div class="status" id="avisoMonitor" hidden><span class="dot erro"></span><span id="avisoMonitorTxt"></span></div>
+
+            <div class="grafico"><canvas id="cvLat"></canvas></div>
+            <div class="controls" style="justify-content:space-between;margin-top:10px">
+              <div class="legenda" id="legenda"></div>
+              <div class="janelas" id="janelas">
+                <button type="button" data-s="120" aria-pressed="true">2 min</button>
+                <button type="button" data-s="600" aria-pressed="false">10 min</button>
+                <button type="button" data-s="1800" aria-pressed="false">30 min</button>
+              </div>
+            </div>
+
+            <div class="casa-linha">
+              <div><div class="k">A casa inteira agora</div>
+                <div class="v mono"><span id="casaDesce">--</span><small> Mbps baixando</small> · <span id="casaSobe">--</span><small> Mbps enviando</small></div></div>
+            </div>
+            <div class="grafico"><canvas id="cvCasa"></canvas></div>
+            <div class="legenda"><span><i style="background:var(--s-operadora)"></i>baixando</span><span><i style="background:var(--s-destino)"></i>enviando</span></div>
+            <p class="nota" id="notaCasa">Tráfego somado de todos os aparelhos, lido do roteador. Fundo colorido no gráfico de cima marca os segundos com congestionamento.</p>
+          </div>
+        </section>
+
+        <!-- EVENTOS -->
+        <section class="panel">
+          <div class="phead"><h2>O que aconteceu</h2><p>Mudanças de rota, congestionamentos e o Xbox ligando ou desligando.</p></div>
+          <div class="pbody"><div class="eventos" id="eventos"><div class="vazio">Nada ainda.</div></div></div>
+        </section>
+      </div>
+
+      <div class="coluna">
+
+        <!-- ROTA ATUAL -->
+        <section class="panel">
+          <div class="phead">
+            <h2>Rota em uso agora</h2>
+            <p>Por onde a conexão deste notebook sai para a internet. O Xbox usa a mesma, desde que os dois estejam no mesmo perfil do roteador.</p>
+          </div>
+          <div class="pbody">
+            <div class="id-grid">
+              <div><div class="k">Operadora</div><div class="v" id="idOperadora">--</div><div class="s" id="idAsn"></div></div>
+              <div><div class="k">Endereço público</div><div class="v mono" id="idIp">--</div></div>
+              <div><div class="k">Entra na internet por</div><div class="v" id="idEntrada">--</div><div class="s" id="idSigla"></div></div>
+              <div><div class="k">Notebook ligado</div><div class="v" id="idNotebook">--</div><div class="s" id="idNotebookS"></div></div>
+            </div>
+            <div class="cadeia" id="cadeia"></div>
+
+            <div class="controls" style="margin-top:14px">
+              <div class="field" style="flex:1">
+                <label for="inpNomeRota">Nome desta rota (opcional)</label>
+                <input type="text" id="inpNomeRota" placeholder="ex.: Age direto, VPN São Paulo…" maxlength="60" autocomplete="off">
+              </div>
+              <div class="field">
+                <label for="selDuracao">Tempo</label>
+                <select id="selDuracao" style="min-width:120px">
+                  <option value="30">30 s</option>
+                  <option value="60" selected>1 min</option>
+                  <option value="120">2 min</option>
+                  <option value="300">5 min</option>
+                </select>
+              </div>
+              <button class="btn" id="btnMedir" type="button">Medir esta rota</button>
+            </div>
+            <div class="barra"><i id="barMedir"></i></div>
+            <div class="status"><span class="dot" id="dotMedir"></span><span id="txtMedir">A medição manda 2 pings por segundo até o servidor escolhido no monitor e guarda o resultado para comparar. Mais rápido que isso o caminho descarta pings e a perda sai falsa.</span></div>
+          </div>
+        </section>
+
+        <!-- ROTAS -->
+        <section class="panel">
+          <div class="phead">
+            <h2>Rotas medidas</h2>
+            <p>A de nota maior tem menos congestionamento. É essa que você coloca no Xbox.</p>
+          </div>
+          <div class="pbody">
+            <div class="tscroll">
+              <table class="tabela-rotas">
+                <thead><tr><th>Rota</th><th>Nota</th><th>Ping</th><th>Jitter</th><th>Pior</th><th>Perda</th></tr></thead>
+                <tbody id="tbRotas"></tbody>
+              </table>
+            </div>
+            <div class="vazio" id="rotasVazio">Nenhuma rota medida ainda. Aperte “Medir esta rota” acima.</div>
+            <div class="recom" id="recomendacao" hidden></div>
+          </div>
+        </section>
+
+        <!-- SALTOS -->
+        <section class="panel">
+          <div class="phead">
+            <h2>Saltos da rota</h2>
+            <p>Cada roteador por onde o pacote passa até o servidor, e de qual empresa ele é.</p>
+          </div>
+          <div class="pbody">
+            <button class="btn sec" id="btnTracar" type="button">Traçar a rota agora</button>
+            <div class="tscroll" style="margin-top:12px">
+              <table>
+                <thead><tr><th>#</th><th>Onde</th><th>Tempo</th><th>Respostas</th></tr></thead>
+                <tbody id="tbSaltos"></tbody>
+              </table>
+            </div>
+            <p class="nota">Salto que <b>não responde todas as sondas</b> é normal: roteadores limitam essas respostas para se proteger.
+              Atraso ou perda só são reais quando aparecem também no servidor, na última linha.</p>
+          </div>
+        </section>
+
+        <!-- APARELHOS -->
+        <section class="panel">
+          <div class="phead">
+            <h2>Aparelhos na rede</h2>
+            <p>Confirme qual deles é o Xbox. O monitor passa a vigiar a ligação dele com o roteador.</p>
+          </div>
+          <div class="pbody">
+            <button class="btn sec" id="btnVarrer" type="button">Procurar aparelhos</button>
+            <div class="aparelhos" id="aparelhos" style="margin-top:12px"></div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- GUIA DO ROTEADOR -->
+    <section class="panel" style="margin-top:18px">
+      <div class="phead">
+        <h2>Como trocar a rota no seu RT-AX82U</h2>
+        <p>Você faz as mudanças no roteador. Esta página mede antes e depois e mostra qual rota ganhou.</p>
+      </div>
+      <div class="pbody">
+        <div class="controls" style="margin-bottom:14px">
+          <button class="btn" id="btnRoteador" type="button">Abrir o roteador</button>
+          <span class="nota" style="margin:0">Abre a tela de entrada do roteador numa aba nova. <b>Você digita a senha lá.</b> Esta página nunca vê nem guarda sua senha.</span>
+        </div>
+        <div class="guia">
+          <div class="passo">
+            <h3>Colocar o Xbox numa rota diferente</h3>
+            <div class="quando">Muda o caminho de verdade, usando um túnel</div>
+            <ol>
+              <li>Tenha um serviço de VPN com servidor em <b>São Paulo</b> que entregue arquivo <b>WireGuard</b> ou <b>OpenVPN</b>.</li>
+              <li>No roteador, abra <b>VPN</b> e depois <b>VPN Fusion</b>. Adicione um perfil com esse arquivo.</li>
+              <li>Na lista de aparelhos do perfil, coloque <b>o Xbox e este notebook</b>. Sem o notebook junto, o monitor continua medindo a rota antiga.</li>
+              <li>Volte aqui, espere o aviso de rota mudada e aperte <b>Medir esta rota</b>.</li>
+              <li>Compare na tabela. Se a rota direta ganhar, tire o Xbox do perfil.</li>
+            </ol>
+          </div>
+          <div class="passo">
+            <h3>Tirar congestionamento de dentro de casa</h3>
+            <div class="quando">Vale para qualquer rota</div>
+            <ol>
+              <li>Ligue o Xbox na porta de rede do roteador com o desenho de <b>controle de videogame</b>, a porta de jogos.</li>
+              <li>No roteador, abra <b>QoS</b>, ligue o <b>QoS adaptável</b> e dê prioridade de <b>Jogos</b> ao Xbox.</li>
+              <li>Mantenha o Xbox no cabo. Wi-Fi coloca oscilação antes mesmo de sair de casa.</li>
+            </ol>
+          </div>
+          <div class="passo">
+            <h3>Trocar o DNS</h3>
+            <div class="quando">Só muda o servidor de download, não a rota do jogo</div>
+            <ol>
+              <li>No roteador, em <b>WAN</b>, troque o DNS para <b>1.1.1.1</b> e <b>8.8.8.8</b>.</li>
+              <li>Isso pode acelerar download de jogo na loja do Xbox, mas não diminui ping de partida.</li>
+              <li>Meça a rota antes e depois do mesmo jeito para ver se mudou alguma coisa.</li>
+            </ol>
+          </div>
+        </div>
+        <p class="nota"><b>Por que não existe botão de "escolher rota":</b> quem decide o caminho da internet é a operadora.
+          Um túnel como a VPN é o único jeito de forçar outro caminho, e ele só vale a pena se a tabela mostrar nota maior.
+          Muitas vezes a rota direta ganha. O monitor mede pelo IPv4.</p>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* =========================================================
+   Base
+   ========================================================= */
+const $ = id => document.getElementById(id);
+const num = (v, d = 1) => (v === null || v === undefined || !isFinite(v)) ? '--' : Number(v).toFixed(d).replace('.', ',');
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+async function api(caminho, prazoMs = 20000){
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), prazoMs);
+  try{
+    const r = await fetch(caminho, { headers:{ 'X-Radar':'1' }, cache:'no-store', signal:ctl.signal });
+    const j = await r.json().catch(() => ({}));
+    if(!r.ok) throw new Error(j.erro || ('erro ' + r.status));
+    return j;
+  }finally{ clearTimeout(t); }
+}
+
+function hora(t){ return new Date(t*1000).toLocaleTimeString('pt-BR'); }
+function duracao(seg){
+  seg = Math.round(seg);
+  if(seg < 60) return seg + ' s';
+  const m = Math.floor(seg/60), s = seg % 60;
+  if(m < 60) return m + ' min ' + String(s).padStart(2,'0') + ' s';
+  return Math.floor(m/60) + ' h ' + String(m % 60).padStart(2,'0') + ' min';
+}
+function mediana(a){ if(!a.length) return null; const s = a.slice().sort((x,y)=>x-y); return s[Math.floor((s.length-1)/2)]; }
+
+const COR_NIVEL = { bom:'var(--n5)', atencao:'var(--n2)', ruim:'var(--n1)', neutro:'var(--line)' };
+const NOME_NIVEL = { bom:'Sem congestionamento', atencao:'Atenção', ruim:'Congestionado', neutro:'Aprendendo' };
+function faixaNota(n){
+  if(n === null || n === undefined) return { nome:'--', cor:'var(--ink3)' };
+  if(n >= 90) return { nome:'Excelente', cor:'var(--n5)' };
+  if(n >= 75) return { nome:'Ótima', cor:'var(--n4)' };
+  if(n >= 55) return { nome:'Boa', cor:'var(--n3)' };
+  if(n >= 32) return { nome:'Ruim', cor:'var(--n2)' };
+  return { nome:'Péssima', cor:'var(--n1)' };
+}
+
+/* =========================================================
+   Estado
+   ========================================================= */
+const E = {
+  rede: null,
+  destinos: {},
+  seq: 0,
+  amostras: [],
+  alvos: [],
+  bases: {},
+  ativo: false,
+  janela: 120,
+  intervaloLeitura: null,
+  eventosVistos: 0,
+  medindo: false,
+  casaPico: 0
+};
+
+/* =========================================================
+   Conexão com o monitor do notebook
+   ========================================================= */
+/* A página pode ser aberta de dois lugares: pelo próprio monitor do notebook
+   (aí tudo funciona) ou pelo site publicado na internet (aí não existe monitor
+   nenhum para conversar, e o certo é mostrar por onde entrar). */
+function servidaPeloMonitor(){
+  const h = location.hostname;
+  if(h === 'localhost' || h === '127.0.0.1' || h === '') return true;
+  if(/^192\.168\.|^10\.|^172\.(1[6-9]|2\d|3[01])\./.test(h)) return true;
+  if(/^100\.(6[4-9]|[7-9]\d|1[01]\d|12[0-7])\./.test(h)) return true;  // faixa do Tailscale
+  if(h.endsWith('.ts.net')) return true;
+  return false;
+}
+
+async function conectar(){
+  if(!servidaPeloMonitor()){
+    $('app').hidden = true;
+    $('semMonitor').hidden = false;
+    $('semMonitorTitulo').textContent = 'Abra esta página pelo seu notebook';
+    $('semMonitorTexto').textContent = 'Esta parte não funciona pelo endereço da internet. Ela precisa falar com o ' +
+      'programa que roda no seu notebook, para medir ping de verdade, traçar a rota e ler o roteador. Escolha por onde você está entrando agora:';
+    $('semMonitorAcao').hidden = true;
+    $('enderecos').hidden = false;
+    $('semMonitorTentando').hidden = true;
+    return;
+  }
+  try{
+    await api('/api/saude', 3000);
+  }catch(e){
+    $('app').hidden = true;
+    $('semMonitor').hidden = false;
+    setTimeout(conectar, 3000);
+    return;
+  }
+  $('semMonitor').hidden = true;
+  $('app').hidden = false;
+  await carregarRede();
+  carregarAparelhos(false);
+  carregarRotas();
+  const m = await api('/api/monitor?desde=0').catch(() => null);
+  if(m){ aplicarMonitor(m, true); }
+  if(!E.intervaloLeitura) E.intervaloLeitura = setInterval(lerMonitor, 1000);
+  verificarMedicao();
+}
+
+/* =========================================================
+   Rede, identidade e faixa de status
+   ========================================================= */
+async function carregarRede(){
+  let r;
+  try{ r = await api('/api/rede'); }catch(e){ return; }
+  E.rede = r;
+  E.destinos = r.destinos || {};
+  montarDestinos();
+
+  const nb = r.notebook || {}, rot = r.roteador || {}, net = r.internet || {}, xb = r.xbox || {};
+  const faixa = $('faixa');
+  faixa.innerHTML = '';
+  const chip = (cor, html) => {
+    const c = document.createElement('span');
+    c.className = 'chip';
+    c.innerHTML = '<span class="bolinha" style="background:' + cor + '"></span>' + html;
+    faixa.appendChild(c);
+  };
+  chip(nb.tipo === 'cabo' ? 'var(--n5)' : 'var(--n2)',
+       'Notebook <b>' + (nb.tipo === 'cabo' ? 'no cabo' : nb.tipo === 'wifi' ? 'no Wi-Fi' : 'conectado') + '</b>' +
+       (nb.velocidade_mbps ? ' · ' + (nb.velocidade_mbps >= 1000 ? num(nb.velocidade_mbps/1000, 0) + ' Gbps' : nb.velocidade_mbps + ' Mbps') : ''));
+  chip(rot.upnp ? 'var(--n5)' : 'var(--n3)', 'Roteador <b>' + (rot.nome ? rot.nome.replace(/-[0-9A-F]{4}$/i,'') : (rot.ip || '--')) + '</b>' + (rot.ms != null ? ' · ' + num(rot.ms,1) + ' ms' : ''));
+  chip(xb.ip ? (xb.ms != null ? 'var(--n5)' : 'var(--n3)') : 'var(--ink3)',
+       xb.ip ? 'Xbox <b>' + xb.ip + '</b>' + (xb.ms != null ? ' · ' + num(xb.ms,1) + ' ms' : ' · sem resposta') : 'Xbox <b>não escolhido</b>');
+  if(rot.ligado_s) chip('var(--ink3)', 'Internet ligada há <b>' + duracao(rot.ligado_s) + '</b>');
+  if(rot.dupla_nat) chip('var(--n1)', '<b>Dois roteadores em sequência</b>: isso atrapalha o Xbox');
+
+  if(nb.tipo === 'wifi'){
+    chip('var(--n1)', '<b>Ligue o notebook no cabo</b> para a medida valer');
+  }
+
+  $('idOperadora').textContent = net.operadora || '--';
+  $('idAsn').textContent = net.asn ? 'rede número ' + net.asn : '';
+  $('idIp').textContent = net.ip || rot.ip_publico || '--';
+  $('idEntrada').textContent = net.entrada || '--';
+  $('idSigla').textContent = net.sigla ? 'ponto ' + net.sigla + ' da Cloudflare' : '';
+  $('idNotebook').textContent = nb.tipo === 'cabo' ? 'No cabo' : nb.tipo === 'wifi' ? 'No Wi-Fi' : '--';
+  $('idNotebookS').textContent = nb.descricao || '';
+
+  $('noRoteadorNome').textContent = rot.nome ? rot.nome.replace(/-[0-9A-F]{4}$/i,'') : 'Roteador';
+  $('noRoteadorIp').textContent = rot.ip || '';
+  $('noXboxNome').textContent = xb.ip ? 'Xbox Series' : 'não escolhido';
+  $('noXboxIp').textContent = xb.ip || '';
+}
+
+function montarDestinos(){
+  const sel = $('selDestino');
+  if(sel.options.length) return;
+  Object.entries(E.destinos).forEach(([id, d]) => {
+    const o = document.createElement('option');
+    o.value = d.host; o.textContent = d.nome;
+    sel.appendChild(o);
+  });
+  const o = document.createElement('option');
+  o.value = '__outro'; o.textContent = 'Outro endereço…';
+  sel.appendChild(o);
+  sel.addEventListener('change', () => { $('campoOutro').hidden = sel.value !== '__outro'; carregarRotas(); });
+  $('inpOutro').addEventListener('change', carregarRotas);
+}
+function destinoEscolhido(){
+  const sel = $('selDestino');
+  return sel.value === '__outro' ? $('inpOutro').value.trim() : sel.value;
+}
+function nomeDoDestino(host){
+  const d = Object.values(E.destinos).find(x => x.host === host);
+  return d ? d.nome : host;
+}
+
+/* =========================================================
+   Monitor
+   ========================================================= */
+$('btnMonitor').addEventListener('click', async () => {
+  const b = $('btnMonitor');
+  b.disabled = true;
+  $('avisoMonitor').hidden = true;
+  try{
+    if(E.ativo){
+      await api('/api/monitor/parar');
+    }else{
+      const destino = destinoEscolhido();
+      if(!destino){ throw new Error('escreva o endereço do servidor'); }
+      b.textContent = 'Ligando…';
+      await api('/api/monitor/iniciar?destino=' + encodeURIComponent(destino) + '&intervalo=' + $('selIntervalo').value);
+      E.amostras = []; E.seq = 0; E.eventosVistos = 0;
+    }
+    await lerMonitor(true);
+  }catch(e){
+    const msg = /inválido|vazio/.test(e.message)
+      ? 'Esse endereço não vale. Use só números e pontos, como 35.71.106.103, ou o nome do servidor, como exemplo.com.'
+      : 'Não consegui ligar o monitor: ' + e.message + '.';
+    $('avisoMonitorTxt').textContent = msg;
+    $('avisoMonitor').hidden = false;
+  }finally{
+    b.disabled = false;
+    atualizarBotaoMonitor();
+  }
+});
+
+function atualizarBotaoMonitor(){
+  const b = $('btnMonitor');
+  b.textContent = E.ativo ? 'Desligar monitor' : 'Ligar monitor';
+  b.classList.toggle('parar', E.ativo);
+  $('selDestino').disabled = E.ativo; $('selIntervalo').disabled = E.ativo; $('inpOutro').disabled = E.ativo;
+}
+
+async function lerMonitor(tudo){
+  let m;
+  try{ m = await api('/api/monitor?desde=' + (tudo ? 0 : E.seq), 8000); }
+  catch(e){
+    // o monitor do notebook foi fechado
+    try{ await api('/api/saude', 2000); }catch(_){ clearInterval(E.intervaloLeitura); E.intervaloLeitura = null; conectar(); }
+    return;
+  }
+  aplicarMonitor(m, tudo);
+}
+
+function aplicarMonitor(m, tudo){
+  if(tudo) E.amostras = [];
+  E.ativo = m.ativo;
+  E.alvos = m.alvos || [];
+  E.bases = m.bases || {};
+  E.casaPico = m.casa_pico || 0;
+  (m.amostras || []).forEach(a => { if(a.seq > E.seq || tudo) E.amostras.push(a); });
+  if(E.amostras.length > 7200) E.amostras.splice(0, E.amostras.length - 7200);
+  if(m.seq) E.seq = m.seq;
+  atualizarBotaoMonitor();
+
+  if(m.destino && E.ativo){
+    const sel = $('selDestino');
+    const antes = destinoEscolhido();
+    if([...sel.options].some(o => o.value === m.destino.texto)){
+      sel.value = m.destino.texto; $('campoOutro').hidden = true;
+    }else{
+      sel.value = '__outro'; $('campoOutro').hidden = false; $('inpOutro').value = m.destino.texto;
+    }
+    if(destinoEscolhido() !== antes) carregarRotas();
+  }
+  mostrarDiagnostico(m.ativo ? m.diagnostico : null, m.destino);
+  mostrarCaminho(m);
+  mostrarCasa(m);
+  desenharLatencia();
+  desenharCasa();
+  mostrarEventos(m.eventos || []);
+  if(m.rota && m.rota.caminho && m.rota.caminho.length) mostrarCadeia(m.rota.caminho);
+  if(m.rota && m.rota.saltos && m.rota.saltos.length && m.rota.saltos[0].tipo) mostrarSaltos(m.rota.saltos);
+}
+
+function mostrarDiagnostico(d, destino){
+  const pil = $('diagPilula'), txt = $('diagTexto'), desde = $('diagDesde'), caixa = $('diag');
+  if(!d){
+    pil.textContent = 'desligado'; pil.style.background = 'var(--line)'; pil.style.color = 'var(--ink2)';
+    caixa.style.borderLeftColor = 'var(--line)';
+    txt.textContent = 'Ligue o monitor para ver, segundo a segundo, se há congestionamento e em qual trecho do caminho.';
+    desde.textContent = '';
+    return;
+  }
+  const cor = COR_NIVEL[d.nivel] || 'var(--line)';
+  pil.textContent = d.estado === 'queda' ? 'Internet caiu' : d.estado === 'destino-fora' ? 'Servidor fora' : (NOME_NIVEL[d.nivel] || d.estado);
+  pil.style.background = cor; pil.style.color = 'var(--panel)';
+  caixa.style.borderLeftColor = cor;
+  txt.textContent = d.texto;
+  desde.textContent = d.desde ? 'assim há ' + duracao(Date.now()/1000 - d.desde) + (destino ? ' · medindo até ' + nomeDoDestino(destino.texto) : '') : '';
+}
+
+function valoresRecentes(id, n){
+  const out = [];
+  for(let i = E.amostras.length - 1; i >= 0 && out.length < n; i--){
+    const v = E.amostras[i].ms ? E.amostras[i].ms[id] : undefined;
+    if(v !== undefined) out.push(v);
+  }
+  return out;
+}
+
+function pintarNo(id, prefixo, limiteAtencao, rotulo){
+  const vals = valoresRecentes(id, 6);
+  const bons = vals.filter(v => v !== null);
+  const agora = bons.length ? mediana(bons) : null;
+  const base = E.bases[id];
+  const elMs = $(prefixo + 'Ms'), elBase = $(prefixo + 'Base'), no = $(prefixo.replace('no','no'));
+  const sm = elMs.querySelector('small');
+  elMs.textContent = vals.length ? (agora === null ? 'sem resposta' : num(agora, 1)) : '--';
+  if(sm && agora !== null) elMs.appendChild(sm);
+  elMs.style.fontSize = (vals.length && agora === null) ? '15px' : '';
+  const caixa = $(prefixo);
+  caixa.classList.remove('alerta','grave');
+  let cor = 'var(--line)';
+  if(vals.length){
+    const delta = (agora !== null && base !== undefined) ? agora - base : null;
+    const perdidos = vals.length - bons.length;
+    if(agora === null || perdidos >= 3 || (delta !== null && delta > limiteAtencao * 3)){ cor = 'var(--n1)'; caixa.classList.add('grave'); }
+    else if(perdidos >= 1 || (delta !== null && delta > limiteAtencao)){ cor = 'var(--n2)'; caixa.classList.add('alerta'); }
+    else cor = 'var(--n5)';
+  }
+  caixa.style.borderTopColor = cor;
+  elBase.textContent = base !== undefined ? rotulo + num(base, 1) + ' ms'
+                    : (E.ativo ? 'medindo o nível calmo…' : 'ligue o monitor');
+}
+
+function mostrarCaminho(m){
+  const alvo = id => (m.alvos || []).find(a => a.id === id);
+  const op = alvo('operadora'), ds = alvo('destino'), xb = alvo('xbox');
+  if(op){ const n = op.nome.replace(/^Saída da operadora · /, '') || 'Operadora'; $('noOperadoraNome').textContent = n; $('noOperadoraNome').title = n; $('noOperadoraIp').textContent = op.ip; }
+  if(ds){ const n = nomeDoDestino(ds.nome); $('noDestinoNome').textContent = n; $('noDestinoNome').title = n; $('noDestinoIp').textContent = ds.ip; }
+  if(xb){ $('noXboxNome').textContent = 'Xbox Series'; $('noXboxIp').textContent = xb.ip; }
+
+  pintarNo('xbox', 'noXbox', 2, 'calmo: ');
+  pintarNo('roteador', 'noRoteador', 3, 'calmo: ');
+  pintarNo('operadora', 'noOperadora', 6, 'calmo: ');
+  pintarNo('destino', 'noDestino', 6, 'calmo: ');
+  const xboxEscolhido = E.rede && E.rede.xbox && E.rede.xbox.ip;
+  if(!xboxEscolhido){ $('noXboxBase').textContent = 'escolha o Xbox em Aparelhos'; }
+  else if(!xb && E.ativo){ $('noXboxBase').textContent = 'religue o monitor para incluir o Xbox'; }
+
+  // elo aceso onde o diagnóstico aponta o problema
+  const d = m.ativo ? m.diagnostico : null;
+  ['elo1','elo2','elo3'].forEach(id => { const e = $(id); e.classList.remove('quente','morno'); e.querySelector('span').textContent = ''; });
+  if(d && (d.estado === 'congestao' || d.estado === 'queda')){
+    const classe = d.nivel === 'ruim' ? 'quente' : 'morno';
+    const mapa = { casa:['elo2','linha de casa cheia'], operadora:['elo2','na operadora'], caminho:['elo3','no caminho'] };
+    if(mapa[d.trecho]){
+      const e = $(mapa[d.trecho][0]); e.classList.add(classe); e.querySelector('span').textContent = mapa[d.trecho][1];
+    }
+  }
+}
+
+function mostrarCasa(m){
+  const ult = E.amostras.length ? E.amostras[E.amostras.length-1].casa : null;
+  $('casaDesce').textContent = ult ? num(ult.desce, ult.desce < 10 ? 1 : 0) : '--';
+  $('casaSobe').textContent = ult ? num(ult.sobe, ult.sobe < 10 ? 1 : 0) : '--';
+  if(m.casa_disponivel === false){
+    $('notaCasa').textContent = 'O roteador não está entregando o tráfego da casa. Confira se o UPnP está ligado nele.';
+  }
+}
+
+function mostrarEventos(lista){
+  const cx = $('eventos');
+  if(!lista.length){ cx.innerHTML = '<div class="vazio">Nada ainda.</div>'; return; }
+  const ultimo = lista[lista.length-1].seq;
+  if(ultimo === E.eventosVistos) return;
+  E.eventosVistos = ultimo;
+  cx.innerHTML = '';
+  lista.slice().reverse().forEach(ev => {
+    const d = document.createElement('div');
+    d.className = 'ev ' + (ev.nivel || '');
+    d.innerHTML = '<span class="h">' + hora(ev.t) + '</span><span class="t"></span>';
+    d.querySelector('.t').textContent = ev.texto;
+    cx.appendChild(d);
+  });
+}
+
+/* =========================================================
+   Gráficos
+   ========================================================= */
+function prepararCanvas(cv){
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const w = Math.max(cv.getBoundingClientRect().width, 260), h = cv.clientHeight;
+  cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr);
+  const c = cv.getContext('2d'); c.setTransform(dpr,0,0,dpr,0,0);
+  return { c, w, h };
+}
+function comAlfa(cor, a){
+  cor = cor.trim();
+  const m = cor.match(/^#([0-9a-f]{6})$/i);
+  if(!m) return cor;
+  const n = parseInt(m[1], 16);
+  return 'rgba(' + (n>>16) + ',' + ((n>>8)&255) + ',' + (n&255) + ',' + a + ')';
+}
+const SERIES = [
+  { id:'destino',   nome:'servidor',          cor:'--s-destino',   larg:2.2 },
+  { id:'operadora', nome:'saída da operadora',cor:'--s-operadora', larg:1.5 },
+  { id:'roteador',  nome:'roteador',          cor:'--s-roteador',  larg:1.2 },
+  { id:'xbox',      nome:'Xbox',              cor:'--s-xbox',      larg:1.2 }
+];
+
+function amostrasNaJanela(){
+  if(!E.amostras.length) return [];
+  const fim = E.amostras[E.amostras.length-1].t;
+  return E.amostras.filter(a => a.t >= fim - E.janela);
+}
+
+function desenharLatencia(){
+  const { c, w, h } = prepararCanvas($('cvLat'));
+  const pL = 38, pR = 10, pT = 22, pB = 20, gw = w-pL-pR, gh = h-pT-pB;
+  c.clearRect(0,0,w,h);
+  const dados = amostrasNaJanela();
+  const presentes = SERIES.filter(s => dados.some(a => a.ms && a.ms[s.id] !== undefined));
+
+  let maxv = 30;
+  dados.forEach(a => presentes.forEach(s => { const v = a.ms[s.id]; if(v !== null && v !== undefined) maxv = Math.max(maxv, v); }));
+  const passos = [30,40,60,80,100,150,200,300,500,800,1200];
+  const topo = passos.find(p => p >= maxv*1.15) || Math.ceil(maxv*1.15);
+
+  c.font = '11px "IBM Plex Mono", monospace'; c.textBaseline = 'middle';
+  for(let i=0;i<=4;i++){
+    const y = pT + gh*i/4;
+    c.strokeStyle = css('--grid'); c.lineWidth = 1;
+    c.beginPath(); c.moveTo(pL, Math.round(y)+.5); c.lineTo(w-pR, Math.round(y)+.5); c.stroke();
+    c.fillStyle = css('--ink3'); c.textAlign = 'right';
+    c.fillText(String(Math.round(topo*(1-i/4))), pL-6, y);
+  }
+  c.textAlign = 'left'; c.fillStyle = css('--ink3'); c.fillText('ms', 4, 9);
+
+  if(dados.length < 2){
+    c.textAlign = 'center'; c.font = '13px "IBM Plex Sans", sans-serif';
+    c.fillText(E.ativo ? 'Juntando as primeiras medidas…' : 'O gráfico aparece quando o monitor estiver ligado.', pL+gw/2, pT+gh/2);
+    $('legenda').innerHTML = '';
+    return;
+  }
+  const t0 = dados[dados.length-1].t - E.janela;
+  const x = t => pL + gw*clamp((t - t0)/E.janela, 0, 1);
+  const y = v => pT + gh*(1 - clamp(v,0,topo)/topo);
+
+  // segundos com congestionamento
+  const passo = Math.max(1.5, gw/Math.max(dados.length,1));
+  dados.forEach(a => {
+    if(!a.trecho) return;
+    c.fillStyle = comAlfa(css(a.nivel === 'ruim' ? '--n1' : '--n2'), .16);
+    c.fillRect(x(a.t)-passo/2, pT, passo, gh);
+  });
+
+  presentes.slice().reverse().forEach(s => {
+    c.strokeStyle = css(s.cor); c.lineWidth = s.larg; c.lineJoin = 'round';
+    c.beginPath(); let aberto = false;
+    dados.forEach(a => {
+      const v = a.ms[s.id];
+      if(v === null || v === undefined){ aberto = false; return; }
+      if(!aberto){ c.moveTo(x(a.t), y(v)); aberto = true; } else c.lineTo(x(a.t), y(v));
+    });
+    c.stroke();
+    // pacotes perdidos do servidor
+    if(s.id === 'destino'){
+      c.fillStyle = css('--n1');
+      dados.forEach(a => { if(a.ms.destino === null) c.fillRect(x(a.t)-1, pT+gh-6, 2.5, 6); });
+    }
+  });
+
+  c.fillStyle = css('--ink3'); c.textAlign = 'right'; c.font = '10.5px "IBM Plex Sans", sans-serif';
+  c.fillText('últimos ' + (E.janela >= 600 ? (E.janela/60) + ' min' : E.janela + ' s'), w-pR, 9);
+
+  $('legenda').innerHTML = presentes.map(s => {
+    const v = valoresRecentes(s.id, 1)[0];
+    return '<span><i style="background:var(' + s.cor + ')"></i>' + s.nome + ' <b>' + (v === null || v === undefined ? '--' : num(v,1)) + '</b></span>';
+  }).join('');
+}
+
+function desenharCasa(){
+  const { c, w, h } = prepararCanvas($('cvCasa'));
+  const pL = 38, pR = 10, pT = 10, pB = 12, gw = w-pL-pR, gh = h-pT-pB;
+  c.clearRect(0,0,w,h);
+  const dados = amostrasNaJanela().filter(a => a.casa);
+  let topo = Math.max(10, E.casaPico || 0);
+  dados.forEach(a => { topo = Math.max(topo, a.casa.desce, a.casa.sobe); });
+  topo = Math.ceil(topo*1.1/10)*10;
+  c.font = '10.5px "IBM Plex Mono", monospace'; c.textBaseline = 'middle'; c.fillStyle = css('--ink3'); c.textAlign = 'right';
+  c.fillText(String(topo), pL-6, pT+3); c.fillText('0', pL-6, pT+gh);
+  c.strokeStyle = css('--grid'); c.beginPath(); c.moveTo(pL, pT+gh+.5); c.lineTo(w-pR, pT+gh+.5); c.stroke();
+  if(dados.length < 2) return;
+  const t0 = amostrasNaJanela().slice(-1)[0].t - E.janela;
+  const x = t => pL + gw*clamp((t - t0)/E.janela, 0, 1);
+  const y = v => pT + gh*(1 - clamp(v,0,topo)/topo);
+  const area = (campo, cor) => {
+    c.beginPath(); c.moveTo(x(dados[0].t), y(0));
+    dados.forEach(a => c.lineTo(x(a.t), y(a.casa[campo])));
+    c.lineTo(x(dados[dados.length-1].t), y(0)); c.closePath();
+    c.fillStyle = comAlfa(css(cor), .22); c.fill();
+    c.beginPath(); dados.forEach((a,i) => i ? c.lineTo(x(a.t), y(a.casa[campo])) : c.moveTo(x(a.t), y(a.casa[campo])));
+    c.strokeStyle = css(cor); c.lineWidth = 1.4; c.stroke();
+  };
+  area('desce', '--s-operadora');
+  area('sobe', '--s-destino');
+}
+
+$('janelas').addEventListener('click', ev => {
+  const b = ev.target.closest('button'); if(!b) return;
+  E.janela = parseInt(b.dataset.s, 10);
+  [...$('janelas').children].forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
+  desenharLatencia(); desenharCasa();
+});
+
+/* =========================================================
+   Rota atual, saltos
+   ========================================================= */
+function mostrarCadeia(caminho){
+  const cx = $('cadeia');
+  const partes = ['<span class="elo2">Sua casa</span>'];
+  caminho.forEach(c => partes.push('<span class="seta">›</span><span class="elo2"></span>'));
+  cx.innerHTML = partes.join('');
+  [...cx.querySelectorAll('.elo2')].slice(1).forEach((el, i) => { el.textContent = caminho[i].nome; });
+}
+
+const TIPO_SALTO = { roteador:'Seu roteador', 'operadora-interna':'Equipamento da operadora', operadora:'Operadora', transito:'Rede de transporte', destino:'Servidor', oculto:'Não responde' };
+
+function mostrarSaltos(saltos){
+  const tb = $('tbSaltos');
+  tb.innerHTML = '';
+  let ocultos = 0;
+  const flush = () => {
+    if(!ocultos) return;
+    const tr = document.createElement('tr');
+    tr.innerHTML = '<td class="n" style="color:var(--ink3)">…</td><td colspan="3" style="color:var(--ink3)">' + ocultos + (ocultos === 1 ? ' salto escondido' : ' saltos escondidos') + ' pela rede, é normal</td>';
+    tb.appendChild(tr); ocultos = 0;
+  };
+  saltos.forEach(s => {
+    if(!s.ip){ ocultos++; return; }
+    flush();
+    const tr = document.createElement('tr');
+    const dono = s.dono ? s.dono.nome : '';
+    const resp = s.perda !== undefined ? Math.round((100 - s.perda) / 100 * 6) : null;
+    const corResp = s.tipo === 'destino' && s.perda > 0 ? 'var(--n1)' : 'var(--ink3)';
+    tr.innerHTML =
+      '<td class="n">' + s.ttl + '</td>' +
+      '<td><div class="rnome"></div><div class="rcam mono"></div></td>' +
+      '<td class="n">' + (s.ms === null ? '--' : num(s.ms, 1) + ' ms') + '</td>' +
+      '<td class="n" style="color:' + corResp + '">' + (resp === null ? '--' : resp + ' de 6') + '</td>';
+    tr.querySelector('.rnome').textContent = (TIPO_SALTO[s.tipo] || 'Salto') + (dono ? ' · ' + dono : '');
+    tr.querySelector('.rcam').textContent = s.ip;
+    tb.appendChild(tr);
+  });
+  flush();
+}
+
+$('btnTracar').addEventListener('click', async () => {
+  const b = $('btnTracar');
+  b.disabled = true; b.textContent = 'Traçando…';
+  try{
+    const r = await api('/api/rota?destino=' + encodeURIComponent(destinoEscolhido() || 'dynamodb.sa-east-1.amazonaws.com'), 60000);
+    mostrarSaltos(r.saltos);
+    mostrarCadeia(r.caminho);
+  }catch(e){
+    $('tbSaltos').innerHTML = '<tr><td colspan="4" style="color:var(--n1)">Não consegui traçar: ' + e.message + '</td></tr>';
+  }finally{ b.disabled = false; b.textContent = 'Traçar a rota agora'; }
+});
+
+/* =========================================================
+   Medição e comparação de rotas
+   ========================================================= */
+$('btnMedir').addEventListener('click', async () => {
+  const b = $('btnMedir');
+  if(E.medindo){
+    await api('/api/rota/cancelar').catch(() => {});
+    return;
+  }
+  const destino = destinoEscolhido();
+  if(!destino){ $('txtMedir').textContent = 'Escreva o endereço do servidor no monitor.'; return; }
+  try{
+    await api('/api/rota/medir?destino=' + encodeURIComponent(destino) + '&segundos=' + $('selDuracao').value +
+              '&nome=' + encodeURIComponent($('inpNomeRota').value.trim()));
+    verificarMedicao();
+  }catch(e){
+    $('txtMedir').textContent = 'Não deu para medir: ' + e.message + '.';
+    $('dotMedir').className = 'dot erro';
+  }
+});
+
+async function verificarMedicao(){
+  let m;
+  try{ m = await api('/api/rota/medicao'); }catch(e){ return; }
+  const b = $('btnMedir'), dot = $('dotMedir'), txt = $('txtMedir'), barra = $('barMedir');
+  if(m.ativa){
+    E.medindo = true;
+    b.textContent = 'Cancelar'; b.classList.add('parar');
+    dot.className = 'dot vivo';
+    barra.style.width = (m.progresso*100).toFixed(1) + '%';
+    const p = m.parcial;
+    txt.textContent = (m.fase === 'medindo'
+      ? 'Medindo · falta ' + duracao(m.segundos*(1-m.progresso))
+      : m.fase.charAt(0).toUpperCase() + m.fase.slice(1) + '…') +
+      (p && p.mediana !== null ? ' · ping ' + num(p.mediana,1) + ' ms, jitter ' + num(p.jitter,1) + ' ms' : '');
+    setTimeout(verificarMedicao, 1000);
+    return;
+  }
+  const estava = E.medindo;
+  E.medindo = false;
+  b.textContent = 'Medir esta rota'; b.classList.remove('parar');
+  if(!estava) return;
+  if(m.fase === 'pronta' && m.resultado){
+    const r = m.resultado, f = faixaNota(r.estat.nota);
+    dot.className = 'dot'; barra.style.width = '100%';
+    txt.textContent = 'Pronto: ' + r.nome + ' tirou nota ' + num(r.estat.nota,0) + ' (' + f.nome.toLowerCase() + ').';
+    $('inpNomeRota').value = '';
+    carregarRotas();
+  }else if(m.fase === 'cancelada'){
+    dot.className = 'dot'; barra.style.width = '0'; txt.textContent = 'Medição cancelada.';
+  }else if(m.fase === 'erro'){
+    dot.className = 'dot erro'; txt.textContent = 'A medição falhou: ' + (m.erro || 'erro desconhecido') + '.';
+  }
+}
+
+async function carregarRotas(){
+  let todas = [];
+  try{ todas = (await api('/api/rotas')).rotas || []; }catch(e){ return; }
+  // só dá para comparar rotas medidas até o MESMO servidor
+  const destino = destinoEscolhido();
+  const lista = todas.filter(r => r.destino === destino);
+  const outras = todas.length - lista.length;
+  const tb = $('tbRotas');
+  tb.innerHTML = '';
+  const vazio = $('rotasVazio');
+  vazio.hidden = lista.length > 0 && !outras;
+  vazio.textContent = lista.length
+    ? (outras === 1 ? '1 medição feita até outro servidor fica' : outras + ' medições feitas até outros servidores ficam') +
+      ' de fora da comparação. Troque o servidor no monitor para ' + (outras === 1 ? 'vê-la.' : 'vê-las.')
+    : 'Nenhuma rota medida até ' + nomeDoDestino(destino) + ' ainda. Aperte “Medir esta rota” acima.' +
+      (outras ? (outras === 1 ? ' Existe 1 medição até outro servidor.' : ' Existem ' + outras + ' medições até outros servidores.') : '');
+  const recom = $('recomendacao');
+  if(!lista.length){ recom.hidden = true; return; }
+
+  const ordenadas = lista.slice().sort((a,b) => (b.estat.nota ?? -1) - (a.estat.nota ?? -1));
+  const melhor = ordenadas[0];
+  const atual = E.rede && E.rede.internet ? E.rede.internet : null;
+
+  ordenadas.forEach(r => {
+    const e = r.estat, f = faixaNota(e.nota);
+    const tr = document.createElement('tr');
+    if(r.id === melhor.id && lista.length > 1) tr.className = 'melhor';
+    const caminho = (r.caminho || []).map(c => c.nome).join(' › ');
+    tr.innerHTML =
+      '<td><div class="rnome"></div><div class="selos"></div><div class="rcam"></div>' +
+      '<button class="apagar" type="button">apagar</button></td>' +
+      '<td class="n" style="color:' + f.cor + ';font-weight:600">' + num(e.nota,0) + '</td>' +
+      '<td class="n">' + num(e.mediana,1) + '</td>' +
+      '<td class="n">' + num(e.jitter,1) + '</td>' +
+      '<td class="n">' + num(e.p95,0) + '</td>' +
+      '<td class="n">' + num(e.perda,1) + '%</td>';
+    tr.querySelector('.rnome').textContent = r.nome;
+    const selos = tr.querySelector('.selos');
+    if(r.id === melhor.id && lista.length > 1){
+      const s = document.createElement('span'); s.className = 'selo'; s.textContent = 'menos congestionada';
+      s.style.background = 'var(--accent)'; s.style.color = 'var(--accent-ink)'; selos.appendChild(s);
+    }
+    if(atual && atual.ip === r.ip_publico && atual.asn === r.asn){
+      const s = document.createElement('span'); s.className = 'selo'; s.textContent = 'em uso agora';
+      s.style.border = '1px solid var(--line)'; s.style.color = 'var(--ink2)'; selos.appendChild(s);
+    }
+    if(!selos.children.length) selos.remove();
+    tr.querySelector('.rcam').textContent = new Date(r.quando*1000).toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' }) +
+      (caminho ? ' · ' + caminho : '') + (r.casa_desce_media >= 20 ? ' · casa baixando ' + num(r.casa_desce_media,0) + ' Mbps' : '');
+    tr.querySelector('.apagar').addEventListener('click', async () => {
+      if(!confirm('Apagar a medição "' + r.nome + '"?')) return;
+      await api('/api/rotas/apagar?id=' + encodeURIComponent(r.id)).catch(() => {});
+      carregarRotas();
+    });
+    tb.appendChild(tr);
+  });
+
+  recom.hidden = false;
+  if(lista.length === 1){
+    recom.innerHTML = 'Você tem uma rota medida, com nota <b>' + num(melhor.estat.nota,0) + '</b>. Para comparar, mude a rota no roteador ' +
+      'usando o guia no fim da página, espere o aviso de rota mudada e meça de novo.';
+    return;
+  }
+  const segunda = ordenadas[1];
+  const horas = Math.abs(melhor.quando - segunda.quando)/3600;
+  const dif = (melhor.estat.nota || 0) - (segunda.estat.nota || 0);
+  let texto;
+  if(dif < 3){
+    texto = 'As duas melhores rotas estão <b>empatadas</b> (diferença de ' + num(dif,1) + (Math.abs(dif - 1) < 0.05 ? ' ponto' : ' pontos') + '). Fique com a mais simples, normalmente a direta, sem túnel.';
+  }else{
+    texto = 'Coloque o Xbox na rota <b></b>. Ela tirou <b>' + num(melhor.estat.nota,0) + '</b> contra ' + num(segunda.estat.nota,0) +
+      ', com jitter de ' + num(melhor.estat.jitter,1) + ' ms e ' + num(melhor.estat.perda,1) + '% de perda.';
+  }
+  if(horas > 2) texto += ' <b>Atenção:</b> elas foram medidas com ' + Math.round(horas) + ' horas de diferença. Horário de pico muda tudo; meça as duas no mesmo horário para ter certeza.';
+  recom.innerHTML = texto;
+  const alvo = recom.querySelector('b');
+  if(dif >= 3 && alvo) alvo.textContent = melhor.nome;
+}
+
+/* =========================================================
+   Aparelhos
+   ========================================================= */
+async function carregarAparelhos(varrer){
+  const b = $('btnVarrer'), cx = $('aparelhos');
+  b.disabled = true; b.textContent = varrer ? 'Procurando…' : 'Carregando…';
+  let r;
+  try{ r = await api('/api/aparelhos' + (varrer ? '?varrer=1' : ''), 60000); }
+  catch(e){ cx.innerHTML = '<div class="vazio">Não consegui listar: ' + e.message + '</div>'; b.disabled = false; b.textContent = 'Procurar aparelhos'; return; }
+  b.disabled = false; b.textContent = 'Procurar de novo';
+  cx.innerHTML = '';
+  const lista = (r.aparelhos || []).filter(a => !a.roteador);
+  if(!lista.length){ cx.innerHTML = '<div class="vazio">Nenhum aparelho encontrado. Aperte Procurar aparelhos.</div>'; return; }
+  lista.sort((a,b) => (b.ip === r.xbox_ip) - (a.ip === r.xbox_ip) || (b.provavel_xbox - a.provavel_xbox));
+  lista.forEach(a => {
+    const d = document.createElement('div');
+    const ehXbox = a.ip === r.xbox_ip;
+    d.className = 'ap' + (ehXbox ? ' xbox' : '');
+    d.innerHTML = '<div class="q"><b></b><small></small></div><span class="mono"></span><button class="btn sec mini" type="button"></button>';
+    d.querySelector('b').textContent = a.nome ? a.nome.replace(/\.local$/,'') : 'Aparelho sem nome';
+    d.querySelector('small').textContent = a.sinais.length ? a.sinais.join(' · ') : (a.mac || '');
+    d.querySelector('.mono').textContent = a.ip + (a.ms != null ? ' · ' + num(a.ms,1) + ' ms' : '');
+    const bt = d.querySelector('button');
+    bt.textContent = ehXbox ? 'É o Xbox' : 'Este é o Xbox';
+    if(ehXbox){ bt.disabled = true; }
+    bt.addEventListener('click', async () => {
+      await api('/api/xbox?ip=' + encodeURIComponent(a.ip)).catch(() => {});
+      await carregarRede();
+      carregarAparelhos(false);
+      if(E.ativo){ $('txtMedir').textContent = 'Xbox trocado. Desligue e ligue o monitor para ele entrar no gráfico.'; }
+    });
+    cx.appendChild(d);
+  });
+}
+$('btnVarrer').addEventListener('click', () => carregarAparelhos(true));
+
+/* =========================================================
+   Roteador e tema
+   ========================================================= */
+$('btnRoteador').addEventListener('click', () => {
+  const ip = (E.rede && E.rede.roteador && E.rede.roteador.ip) || '192.168.50.1';
+  window.open('http://' + ip + '/', '_blank', 'noopener');
+});
+
+$('btnTema').addEventListener('click', () => {
+  const r = document.documentElement;
+  const escuro = r.getAttribute('data-theme') === 'dark' || (!r.getAttribute('data-theme') && matchMedia('(prefers-color-scheme: dark)').matches);
+  r.setAttribute('data-theme', escuro ? 'light' : 'dark');
+  try{ localStorage.setItem('radar-tema', escuro ? 'light' : 'dark'); }catch(e){}
+  desenharLatencia(); desenharCasa();
+});
+try{ const t = localStorage.getItem('radar-tema'); if(t) document.documentElement.setAttribute('data-theme', t); }catch(e){}
+
+let redesenho;
+window.addEventListener('resize', () => { clearTimeout(redesenho); redesenho = setTimeout(() => { desenharLatencia(); desenharCasa(); }, 150); });
+
+// a faixa de status é atualizada de vez em quando (Xbox ligando, endereço mudando)
+setInterval(() => { if(!$('app').hidden) carregarRede(); }, 30000);
+
+conectar();
+</script>
+</body>
+</html>
