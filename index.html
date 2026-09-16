@@ -535,10 +535,11 @@ button[data-dica],a[data-dica],select[data-dica],input[data-dica],label[data-dic
           </select>
         </div>
         <div class="field">
-          <label for="selCenario" data-dica="Se o teste roda com a internet vazia, com download pesado ao mesmo tempo, ou alternando. “Alternando” é o mais revelador: mostra o antes e o depois lado a lado.">Como está a internet</label>
-          <select id="selCenario" data-dica="Se o teste roda com a internet vazia, com download pesado ao mesmo tempo, ou alternando. “Alternando” é o mais revelador: mostra o antes e o depois lado a lado.">
+          <label for="selCenario" data-dica="Se o teste roda com a internet vazia, com download ou upload pesado ao mesmo tempo, ou alternando. Use download/upload separados para descobrir qual dos dois atrasa o seu comando.">Como está a internet</label>
+          <select id="selCenario" data-dica="Se o teste roda com a internet vazia, com download ou upload pesado ao mesmo tempo, ou alternando. Use download/upload separados para descobrir qual dos dois atrasa o seu comando.">
             <option value="livre">Livre, só o jogo</option>
             <option value="carga">Com download rodando o tempo todo</option>
+            <option value="cargasobe">Com upload rodando o tempo todo</option>
             <option value="alterna" selected>Alternando livre e com download</option>
           </select>
         </div>
@@ -560,7 +561,7 @@ button[data-dica],a[data-dica],select[data-dica],input[data-dica],label[data-dic
         <span><i style="background:var(--trace)"></i>latência: linha no pior pacote, faixa até o melhor</span>
         <span><i style="background:var(--ink3)"></i>mediana da partida</span>
         <span><i style="background:var(--n1)"></i>pacote perdido</span>
-        <span id="legCarga" hidden><i style="background:var(--ink3);opacity:.35"></i>fundo escuro: download rodando</span>
+        <span id="legCarga" hidden><i style="background:var(--ink3);opacity:.35"></i>fundo escuro: <span id="legCargaTxto">download</span> rodando</span>
       </div>
       <div class="timeline" id="timeline" aria-label="Qualidade segundo a segundo"></div>
       <div class="bar"><i id="barPartida"></i></div>
@@ -577,14 +578,14 @@ button[data-dica],a[data-dica],select[data-dica],input[data-dica],label[data-dic
         <div><div class="k" data-dica="Quantos por cento dos pacotes nunca chegaram. Cada um é um pedaço da jogada que o jogo teve que adivinhar.">Perda</div><div class="v mono" id="pPerda">--<small> %</small></div></div>
       </div>
       <div id="compara" hidden>
-        <div class="cmp-titulo">Com a internet livre contra com download rodando</div>
+        <div class="cmp-titulo" id="cmpTitulo">Com a internet livre contra com download rodando</div>
         <div class="tscroll">
           <table class="cmp">
             <thead>
               <tr>
                 <th data-dica="Qual medida está sendo comparada nesta linha.">O que</th>
                 <th data-dica="Como ficou com a internet vazia, só a partida rodando. É o melhor cenário possível da sua conexão.">Livre</th>
-                <th data-dica="Como ficou com download pesado rodando ao mesmo tempo. Imita alguém baixando jogo ou assistindo vídeo enquanto você joga.">Com download</th>
+                <th id="cmpColCarga" data-dica="Como ficou com download pesado rodando ao mesmo tempo. Imita alguém baixando jogo ou assistindo vídeo enquanto você joga.">Com download</th>
                 <th data-dica="O quanto piorou entre um caso e o outro. É aqui que aparece se sua internet sufoca quando alguém usa junto.">Diferença</th>
                 <th data-dica="O que essa diferença significa na prática, dentro da partida.">Efeito</th>
               </tr>
@@ -919,8 +920,9 @@ const APP = {
   rota: null,            // última leitura de por onde a conexão sai
   assinatura: null,      // latência base da rota atual
   estabilidadeDownload: null,
-  bandaCarga: null,
-  metrics: { ping:null, jitter:null, perda:null, p99:null, banda:null, bufa:null, srv:'edge' }
+  bandaCarga: null,      // última banda medida numa partida com download rodando
+  bandaCargaSobe: null,  // última banda medida numa partida com upload rodando
+  metrics: { ping:null, jitter:null, perda:null, p99:null, banda:null, bandaSobe:null, bufa:null, bufaLado:null, srv:'edge' }
 };
 
 /* ============================================================
@@ -1404,7 +1406,9 @@ document.querySelectorAll('.preset[data-min]').forEach(b => {
    partida, para medir o jogo do jeito que ele acontece de
    verdade na sua casa — com alguém baixando alguma coisa.
    ========================================================= */
-function criarCarga(){
+function criarCarga(tipo){
+  const transferir = tipo === 'subir' ? subir : baixar;
+  const meta = tipo === 'subir' ? 1e10 : 2e10;
   return {
     ativa: false,
     ctl: null,
@@ -1419,7 +1423,7 @@ function criarCarga(){
       this._t0 = performance.now();
       this.ctl = new AbortController();
       const eu = this;
-      baixar(2e10, conexoes || 4, function(b){ eu.baixados = eu._base + b; }, this.ctl.signal).catch(function(){});
+      transferir(meta, conexoes || 4, function(b){ eu.baixados = eu._base + b; }, this.ctl.signal).catch(function(){});
     },
     desligar(){
       if(!this.ativa) return;
@@ -1441,7 +1445,7 @@ function criarCarga(){
 const CARGA_MAX_BLOCO = 45000;
 function planoDeCarga(cenario, totalMs){
   if(cenario === 'livre') return { tipo:'livre', fracaoComCarga:0 };
-  if(cenario === 'carga'){
+  if(cenario === 'carga' || cenario === 'cargasobe'){
     // mesmo no modo cheio, um começo livre dá a linha de base para comparar
     const base = Math.min(20000, totalMs*0.15);
     return { tipo:'carga', baseMs:base, fracaoComCarga: 1 - base/totalMs };
@@ -1467,6 +1471,7 @@ btnPartida.addEventListener('click', async () => {
   const minutos = clamp(parseFloat(document.getElementById('inpMin').value) || 3, 0.5, 120);
   const intervalo = parseInt(document.getElementById('selTaxa').value, 10);
   const cenario = document.getElementById('selCenario').value;
+  const ehUpload = cenario === 'cargasobe';
   const totalMs = minutos*60000;
   const plano = planoDeCarga(cenario, totalMs);
 
@@ -1482,6 +1487,8 @@ btnPartida.addEventListener('click', async () => {
   esconderComparacao();
   const legC = document.getElementById('legCarga');
   if(legC) legC.hidden = (plano.tipo === 'livre');
+  const legCT = document.getElementById('legCargaTxto');
+  if(legCT) legCT.textContent = ehUpload ? 'upload' : 'download';
   const nSegs = montarTimeline(Math.round(minutos*60));
 
   const url = await prepararServidor(srv);
@@ -1495,8 +1502,8 @@ btnPartida.addEventListener('click', async () => {
   let enviados = 0, perdidos = 0, emVoo = 0;
   let envLivre = 0, perdLivre = 0, envCarga = 0, perdCarga = 0;
   const marcaFinal = { idx:0, env:0, perd:0, seg:0 };
-  const carga = criarCarga();
-  const conexoesCarga = 4;
+  const carga = criarCarga(ehUpload ? 'subir' : 'baixar');
+  const conexoesCarga = ehUpload ? 3 : 4;
   const t0 = performance.now();
   dot.className = 'dot live';
 
@@ -1550,7 +1557,7 @@ btnPartida.addEventListener('click', async () => {
           montarComparacao(
             estatisticas(amLivre, envLivre, perdLivre, (dt - carga.segundos()*1000)/1000),
             estatisticas(amCarga, envCarga, perdCarga, carga.segundos()),
-            carga, true);
+            carga, true, ehUpload);
         }
       }
 
@@ -1572,7 +1579,7 @@ btnPartida.addEventListener('click', async () => {
       const perdendoAgora = envAgora >= 4 && (perdAgora/envAgora) > 0.4;
       dot.className = caiu ? 'dot err' : (perdendoAgora ? 'dot warn' : 'dot live');
       const modo = carga.ativa
-        ? 'baixando ' + num(carga.baixados/1073741824, 2) + ' GB'
+        ? (ehUpload ? 'enviando ' : 'baixando ') + num(carga.baixados/1073741824, 2) + ' GB'
         : (plano.tipo === 'livre' ? 'internet livre' : 'trecho livre');
       txt.textContent = caiu
         ? 'Sem resposta de ' + srv.cidade + ' — a conexão caiu ou o caminho está bloqueado. O teste continua tentando.'
@@ -1602,7 +1609,8 @@ btnPartida.addEventListener('click', async () => {
   const segCarga = carga.segundos();
   const segLivre = Math.max(0, duracao - segCarga);
   if(segCarga > 8 && carga.baixados > 0){
-    APP.bandaCarga = carga.baixados*8/1e6/segCarga;   // só para estimar consumo
+    const bw = carga.baixados*8/1e6/segCarga;   // só para estimar consumo
+    if(ehUpload) APP.bandaCargaSobe = bw; else APP.bandaCarga = bw;
     atualizarAvisoDados();
   }
 
@@ -1620,24 +1628,24 @@ btnPartida.addEventListener('click', async () => {
   APP.metrics.perda = base.perda;
   APP.metrics.p99 = base.p99;
   APP.metrics.srv = srv.id;
-  if(stLivre && stCarga) APP.metrics.bufa = stCarga.mediana - stLivre.mediana;
+  if(stLivre && stCarga){ APP.metrics.bufa = stCarga.mediana - stLivre.mediana; APP.metrics.bufaLado = ehUpload ? 'upload' : 'download'; }
   atualizarVeredito();
 
-  if(stLivre && stCarga) montarComparacao(stLivre, stCarga, carga, false);
+  if(stLivre && stCarga) montarComparacao(stLivre, stCarga, carga, false, ehUpload);
   else esconderComparacao();
 
   if(FUNDO.desde !== null){ FUNDO.total += performance.now() - FUNDO.desde; FUNDO.desde = null; }
   const segFundo = FUNDO.total/1000;
   dot.className = segFundo > 5 ? 'dot warn' : 'dot';
   const extra = (stLivre && stCarga)
-    ? ' Com download rodando o ping foi de ' + num(stLivre.mediana,0) + ' para ' + num(stCarga.mediana,0) + ' ms.'
+    ? ' Com ' + (ehUpload ? 'upload' : 'download') + ' rodando o ping foi de ' + num(stLivre.mediana,0) + ' para ' + num(stCarga.mediana,0) + ' ms.'
     : '';
   txt.textContent = 'Terminou: ' + amostras.length + ' pacotes em ' + tempoTexto(duracao) +
                     ' até ' + srv.cidade + '. Nota ' + faixa(fim.nota).nome + '.' + extra +
-                    (segCarga > 1 ? ' O teste baixou ' + num(carga.baixados/1073741824,2) + ' GB.' : '') +
+                    (segCarga > 1 ? ' O teste ' + (ehUpload ? 'enviou' : 'baixou') + ' ' + num(carga.baixados/1073741824,2) + ' GB.' : '') +
                     (segFundo > 5 ? ' Atenção: a página ficou ' + tempoTexto(segFundo) +
                      ' fora da tela e esse trecho pode ter menos pacotes do que deveria.' : '');
-  salvarHistorico({ tipo:'Partida ' + num(minutos, minutos % 1 ? 1 : 0) + ' min' + (plano.tipo === 'livre' ? '' : ' (com carga)'),
+  salvarHistorico({ tipo:'Partida ' + num(minutos, minutos % 1 ? 1 : 0) + ' min' + (plano.tipo === 'livre' ? '' : ' (com ' + (ehUpload?'upload':'download') + ')'),
                     srv:srv.cidade, ping:base.mediana, jit:base.jitter, perda:base.perda, banda:null, nota:fim.nota });
   encerrarPartida();
 });
@@ -1664,11 +1672,23 @@ function esconderComparacao(){
   if(cx) cx.hidden = true;
 }
 
-function montarComparacao(livre, carga, estadoCarga, parcial){
+function montarComparacao(livre, carga, estadoCarga, parcial, ehUpload){
   const cx = document.getElementById('compara');
   const tb = document.getElementById('cmpBody');
   if(!cx || !tb) return;
   cx.hidden = false;
+  const palavra = ehUpload ? 'upload' : 'download';
+  const verbo = ehUpload ? 'enviando' : 'baixando';
+  const verboPassado = ehUpload ? 'enviou' : 'baixou';
+
+  const titulo = document.getElementById('cmpTitulo');
+  if(titulo) titulo.textContent = 'Com a internet livre contra com ' + palavra + ' rodando';
+  const colCarga = document.getElementById('cmpColCarga');
+  if(colCarga){
+    colCarga.textContent = 'Com ' + palavra;
+    colCarga.setAttribute('data-dica', 'Como ficou com ' + palavra + ' pesado rodando ao mesmo tempo. Imita alguém ' + verbo +
+      (ehUpload ? ' um vídeo, fazendo backup na nuvem ou uma live enquanto você joga.' : ' um jogo ou assistindo vídeo enquanto você joga.'));
+  }
 
   const linhas = [
     { nome:'Latência (mediana)', a:livre.mediana, b:carga.mediana, d:1, un:' ms', lim:[10,30,80] },
@@ -1691,7 +1711,7 @@ function montarComparacao(livre, carga, estadoCarga, parcial){
     tr.innerHTML =
       '<td>' + l.nome + '</td>' +
       '<td data-r="livre">' + num(l.a, l.d) + l.un + '</td>' +
-      '<td data-r="com download">' + num(l.b, l.d) + l.un + '</td>' +
+      '<td data-r="com ' + palavra + '">' + num(l.b, l.d) + l.un + '</td>' +
       '<td class="dif" data-r="diferença">' + (dif === null ? '--' : (dif > 0 ? '+' : '') + num(dif, l.d) + l.un) + '</td>' +
       '<td class="ef" style="color:' + ef.cor + '">' + ef.nome + '</td>';
     tb.appendChild(tr);
@@ -1705,23 +1725,25 @@ function montarComparacao(livre, carga, estadoCarga, parcial){
 
   let texto;
   if(piorEfeito === 0){
-    texto = 'Sua internet <b>não muda</b> quando alguém está baixando. Isso é raro e muito bom: significa que o ' +
+    texto = 'Sua internet <b>não muda</b> quando alguém está ' + verbo + '. Isso é raro e muito bom: significa que o ' +
             'roteador dá passagem ao jogo mesmo com a linha cheia. Pode jogar em qualquer horário da casa.';
   }else if(piorEfeito === 1){
-    texto = 'Com download rodando o jogo fica <b>um pouco mais pesado</b>' +
+    texto = 'Com ' + palavra + ' rodando o jogo fica <b>um pouco mais pesado</b>' +
             (salto !== null ? ', com o ping subindo ' + num(salto,0) + ' ms' : '') +
-            '. Dá para jogar sem sofrer, mas em partida decisiva vale pedir para pausarem o download.';
+            '. Dá para jogar sem sofrer, mas em partida decisiva vale pedir para pausarem o ' + palavra + '.';
   }else if(piorEfeito === 2){
-    texto = 'Quando a casa usa a internet, o jogo <b>sente de verdade</b>' +
+    texto = 'Quando a casa usa a internet ' + (ehUpload ? '(enviando algo)' : '(baixando algo)') + ', o jogo <b>sente de verdade</b>' +
             (salto !== null ? ': o ping sobe ' + num(salto,0) + ' ms' : '') +
-            '. Você vai notar jogador correndo estranho e passe saindo atrasado. O painel 07 mostra o ajuste ' +
-            'de roteador que resolve isso.';
+            (ehUpload ? '. Isso costuma ser exatamente o que faz seu <b>comando</b> chegar atrasado, porque o comando também sai pelo upload.'
+                      : '. Você vai notar jogador correndo estranho e passe saindo atrasado.') +
+            ' O painel 07 mostra o ajuste de roteador que resolve isso.';
   }else{
-    texto = 'Com download rodando sua partida <b>fica injogável</b>' +
+    texto = 'Com ' + palavra + ' rodando sua partida <b>fica injogável</b>' +
             (salto !== null ? ': o ping salta ' + num(salto,0) + ' ms' : '') +
-            '. É o caso clássico de fila no roteador, e tem conserto: veja a primeira ação do painel 07.';
+            (ehUpload ? '. É o seu comando (que sai pelo upload) que está sendo engolido pela fila do roteador.' : '') +
+            ' É o caso clássico de fila no roteador, e tem conserto: veja a primeira ação do painel 07.';
   }
-  if(gb > 0.05) texto += ' O teste baixou ' + num(gb,2) + ' GB para deixar a linha cheia de verdade.';
+  if(gb > 0.05) texto += ' O teste ' + verboPassado + ' ' + num(gb,2) + ' GB para deixar a linha cheia de verdade.';
   v.innerHTML = texto + cauda;
 }
 
@@ -2370,7 +2392,9 @@ document.getElementById('btnCarga').addEventListener('click', async () => {
   }
 
   APP.metrics.bufa = delta;
+  APP.metrics.bufaLado = piorEUpload ? 'upload' : 'download';
   if(APP.metrics.banda === null) APP.metrics.banda = bandaDescida;
+  APP.metrics.bandaSobe = bandaSubida;
   atualizarVeredito();
 
   dot.className = 'dot';
@@ -2456,9 +2480,10 @@ function textoVeredito(m, nota, f){
   }
   if(m.perda !== null && m.perda > 1) p.push('Perdendo ' + num(m.perda,2) + '% dos pacotes — acima de 1% já aparece como teleporte e tiro que não conta.');
   if(m.bufa !== null){
-    if(m.bufa > 100) p.push('<strong>Com download rodando o ping sobe ' + num(m.bufa,0) + ' ms</strong>, o que inviabiliza jogar em horário de pico na sua casa.');
-    else if(m.bufa > 30) p.push('Com download rodando o ping sobe ' + num(m.bufa,0) + ' ms, dá para jogar mas fica mais pesado.');
-    else p.push('Com download rodando o ping quase não mexe, sinal de roteador bem configurado.');
+    const ladoBufa = m.bufaLado === 'upload' ? 'upload' : 'download';
+    if(m.bufa > 100) p.push('<strong>Com ' + ladoBufa + ' rodando o ping sobe ' + num(m.bufa,0) + ' ms</strong>, o que inviabiliza jogar em horário de pico na sua casa.');
+    else if(m.bufa > 30) p.push('Com ' + ladoBufa + ' rodando o ping sobe ' + num(m.bufa,0) + ' ms, dá para jogar mas fica mais pesado.');
+    else p.push('Com a internet cheia o ping quase não mexe, sinal de roteador bem configurado.');
   }
   if(m.banda !== null) p.push('A ' + num(m.banda,0) + ' Mbps medidos, 1 GB leva cerca de ' + tempoTexto(8192/Math.max(m.banda,0.5)) + '.');
   if(m.bufa === null) p.push('Falta rodar o <strong>teste de carga</strong> (painel 04) para saber como fica em horário de pico.');
@@ -3183,21 +3208,25 @@ function atualizarAvisoDados(){
 
   const cenario = selC.value;
   if(cenario === 'livre'){ el.hidden = true; return; }
+  const ehUpload = cenario === 'cargasobe';
 
   const minutos = clamp(parseFloat(inpM.value) || 3, 0.5, 120);
   const totalMs = minutos*60000;
   const plano = planoDeCarga(cenario, totalMs);
   const segCarga = totalMs/1000 * plano.fracaoComCarga;
-  const medida = (APP.metrics.banda && APP.metrics.banda > 1) ? APP.metrics.banda
-               : (APP.bandaCarga && APP.bandaCarga > 1) ? APP.bandaCarga : null;
-  const mbps = medida || 100;
+  const medida = ehUpload
+    ? ((APP.metrics.bandaSobe && APP.metrics.bandaSobe > 0.5) ? APP.metrics.bandaSobe
+      : (APP.bandaCargaSobe && APP.bandaCargaSobe > 0.5) ? APP.bandaCargaSobe : null)
+    : ((APP.metrics.banda && APP.metrics.banda > 1) ? APP.metrics.banda
+      : (APP.bandaCarga && APP.bandaCarga > 1) ? APP.bandaCarga : null);
+  const mbps = medida || (ehUpload ? 10 : 100);
   const gb = mbps*segCarga/8/1024;
   const medido = !!medida;
 
   el.hidden = false;
-  el.innerHTML = 'Esse teste deixa a internet cheia por <b>' + tempoTexto(segCarga) + '</b> e vai baixar perto de ' +
+  el.innerHTML = 'Esse teste deixa a internet cheia por <b>' + tempoTexto(segCarga) + '</b> e vai ' + (ehUpload ? 'enviar' : 'baixar') + ' perto de ' +
     '<b>' + (gb >= 1 ? num(gb,1) + ' GB' : num(gb*1024,0) + ' MB') + '</b>' +
-    (medido ? ' na sua velocidade medida de ' + num(mbps,0) + ' Mbps' : ' (estimativa; rode o painel 03 para afinar)') +
+    (medido ? ' na sua velocidade medida de ' + num(mbps,0) + ' Mbps' : ' (estimativa' + (ehUpload ? '' : '; rode o painel 03 para afinar') + ')') +
     '. <b>Não use no 4G.</b>';
 }
 
