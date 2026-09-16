@@ -683,7 +683,8 @@ button[data-dica],a[data-dica],select[data-dica],input[data-dica],label[data-dic
     <div class="phead">
       <span class="pnum">04</span>
       <h2 data-dica="O teste mais importante para quem joga: enche sua internet de propósito e vê se o ping dispara. É o que explica por que você trava quando alguém em casa começa a baixar alguma coisa.">Latência com a internet ocupada</h2>
-      <p>Mede o ping sozinho, depois com a descida <b>e</b> a subida cheias ao mesmo tempo. É o teste que revela se você trava quando alguém baixa ou envia algo em casa.</p>
+      <p>Mede o ping sozinho, depois só com a descida cheia e só com a subida cheia, separadamente. Assim dá para saber se é o
+      <b>download</b> ou o <b>upload</b> que mais trava o seu jogo — muita gente acha que é o comando (upload) que atrasa, e aqui você confere se é isso mesmo.</p>
     </div>
     <div class="pbody">
       <div class="controls">
@@ -691,7 +692,7 @@ button[data-dica],a[data-dica],select[data-dica],input[data-dica],label[data-dic
           <label for="selSrvCarga" data-dica="Contra qual servidor medir o ping enquanto a internet está cheia. São Paulo é a melhor escolha para jogos brasileiros.">Servidor de referência</label>
           <select id="selSrvCarga" data-dica="Contra qual servidor medir o ping enquanto a internet está cheia. São Paulo é a melhor escolha para jogos brasileiros."></select>
         </div>
-        <button class="btn" id="btnCarga" type="button" data-dica="Roda o teste, que leva uns 40 segundos. Atenção: ele enche sua internet de propósito e consome uns 250 MB, então evite no 4G.">Rodar teste de carga</button>
+        <button class="btn" id="btnCarga" type="button" data-dica="Roda o teste, que leva uns 40 segundos. Atenção: ele enche sua internet de propósito e consome uns 150 MB, então evite no 4G.">Rodar teste de carga</button>
       </div>
 
       <div class="bar"><i id="barCarga"></i></div>
@@ -699,18 +700,21 @@ button[data-dica],a[data-dica],select[data-dica],input[data-dica],label[data-dic
 
       <div class="rgrid">
         <div><div class="k" data-dica="O ping com a internet vazia. É o melhor que a sua conexão consegue fazer.">Sem carga</div><div class="v mono" id="cLivre">--<small> ms</small></div></div>
-        <div><div class="k" data-dica="O ping com a internet totalmente ocupada, baixando e enviando ao mesmo tempo. Imita a hora em que a casa inteira está usando.">Linha cheia</div><div class="v mono" id="cCarga">--<small> ms</small></div></div>
-        <div><div class="k" data-dica="O quanto o ping piorou quando a internet encheu. Este é o número que mais importa: acima de 100 ms a partida fica injogável.">Aumento</div><div class="v mono" id="cDelta">--<small> ms</small></div></div>
-        <div><div class="k" data-dica="O quanto o ping ficou balançando com a linha cheia. Aviso honesto: no navegador este número sai maior que o real — confie mais no “Aumento”.">Jitter na carga</div><div class="v mono" id="cJit">--<small> ms</small></div></div>
+        <div><div class="k" data-dica="O ping com a internet totalmente ocupada, no lado que mais pesou (download ou upload). Imita a hora em que a casa inteira está usando.">Linha cheia</div><div class="v mono" id="cCarga">--<small> ms</small></div></div>
+        <div><div class="k" data-dica="O quanto o ping piorou no pior dos dois lados. Este é o número que mais importa: acima de 100 ms a partida fica injogável.">Aumento</div><div class="v mono" id="cDelta">--<small> ms</small></div></div>
+        <div><div class="k" data-dica="O quanto o ping piora quando é só o DOWNLOAD que enche a linha — alguém baixando um jogo, uma atualização, um vídeo.">Aumento — só download</div><div class="v mono" id="cDeltaBaixo">--<small> ms</small></div></div>
+        <div><div class="k" data-dica="O quanto o ping piora quando é só o UPLOAD que enche a linha — fazer live, mandar vídeo, backup na nuvem. É esse o lado que carrega o SEU comando no jogo.">Aumento — só upload</div><div class="v mono" id="cDeltaSobe">--<small> ms</small></div></div>
+        <div><div class="k" data-dica="O quanto o ping ficou balançando no lado que mais pesou. Aviso honesto: no navegador este número sai maior que o real — confie mais no “Aumento”.">Jitter na carga</div><div class="v mono" id="cJit">--<small> ms</small></div></div>
         <div><div class="k" data-dica="Quantos pacotes sumiram enquanto a internet estava cheia. É o que faz o jogador teleportar no meio da jogada.">Perda na carga</div><div class="v mono" id="cPerda">--<small> %</small></div></div>
         <div><div class="k" data-dica="Quanto tempo o ping leva para voltar ao normal depois que o download termina. Recuperação lenta significa que a fila do roteador demora a esvaziar.">Recuperação</div><div class="v mono" id="cRec">--<small> ms</small></div></div>
         <div><div class="k" data-dica="A velocidade que a linha atingiu nos dois sentidos durante o teste. Serve para conferir se o que você paga está chegando.">Banda (desce / sobe)</div><div class="v mono" id="cBanda">--<small> Mbps</small></div></div>
         <div><div class="k" data-dica="Nota de 0 a 100 juntando tudo. Acima de 80 sua internet aguenta jogo e download ao mesmo tempo sem você sentir.">Nota</div><div class="v mono" id="cNota">--</div></div>
       </div>
+      <div class="osc-veredito" id="direcaoVeredito" hidden></div>
       <p class="note">
-        O teste enche a descida <b>e</b> a subida de propósito por cerca de 20 segundos, então <b>ele consome dados
-        nos dois sentidos</b>: numa conexão de 100 Mbps são uns 250 MB baixados e uma parte enviada também. Evite
-        rodar no 4G.
+        O teste enche a descida e depois a subida <b>separadamente</b> (uns 9 segundos cada), pra descobrir qual das
+        duas pesa mais no seu ping. Ele consome dados nos dois sentidos: numa conexão de 100 Mbps são uns 150 MB
+        baixados e uma parte enviada também. Evite rodar no 4G.
         <br><br>
         Esse aumento tem nome: <b>bufferbloat</b>. O roteador segura pacotes numa fila quando a linha enche, e o
         jogo sente isso como lag mesmo com a velocidade contratada em dia. Aumento acima de 100 ms significa
@@ -2224,12 +2228,14 @@ document.getElementById('btnCarga').addEventListener('click', async () => {
 
   travarUI('carga'); btn.disabled = true;
   dot.className = 'dot warn'; txt.textContent = 'Abrindo conexão…';
-  ['cLivre','cCarga','cDelta','cJit','cPerda','cRec','cBanda','cNota'].forEach(id => {
+  ['cLivre','cCarga','cDelta','cDeltaBaixo','cDeltaSobe','cJit','cPerda','cRec','cBanda','cNota'].forEach(id => {
     const e = document.getElementById(id), sm = e.querySelector('small');
     e.textContent = '--';
     e.style.fontSize = ''; e.style.color = '';
     if(sm){ sm.hidden = false; e.appendChild(sm); }
   });
+  const eDVini = document.getElementById('direcaoVeredito');
+  if(eDVini) eDVini.hidden = true;
 
   const url = await prepararServidor(srv);
   if(!url){
@@ -2257,60 +2263,81 @@ document.getElementById('btnCarga').addEventListener('click', async () => {
   };
 
   // fase 1: sem carga
-  dot.className = 'dot live'; txt.textContent = 'Fase 1 de 3 — medindo com a internet parada…';
+  dot.className = 'dot live'; txt.textContent = 'Fase 1 de 4 — medindo com a internet parada…';
   const livre = [];
-  await coletar(10, livre, f => { barra.style.width = (f*30).toFixed(0)+'%'; });
+  await coletar(10, livre, f => { barra.style.width = (f*22).toFixed(0)+'%'; });
   const baseMed = mediana(livre) || 0;
   const e1 = document.getElementById('cLivre'), s1 = e1.querySelector('small');
   e1.textContent = num(baseMed,1); if(s1) e1.appendChild(s1);
 
-  // fase 2: com carga — descida E subida cheias ao mesmo tempo, como um teste
-  // de bufferbloat completo. Só descida deixaria escapar o travamento causado
-  // por quem está ENVIANDO algo em casa (upload de vídeo, backup na nuvem).
-  txt.textContent = 'Fase 2 de 3 — enchendo a descida e a subida ao mesmo tempo…';
-  const ctl = new AbortController();
-  let bytesDesce = 0, bytesSobe = 0;
-  const tCarga0 = performance.now();
-  baixar(4e9, 6, b => { bytesDesce = b; }, ctl.signal).catch(() => {});
-  subir(2e9, 3, b => { bytesSobe = b; }, ctl.signal).catch(() => {});
-  await new Promise(r => setTimeout(r, 2500)); // deixa a fila do roteador encher
+  /* fases 2 e 3: download e upload SEPARADOS, um de cada vez — para saber
+     qual dos dois pesa mais no ping. Testar junto (como era antes) até prova
+     se a linha trava, mas esconde qual lado é o culpado. */
+  txt.textContent = 'Fase 2 de 4 — enchendo só a descida (download)…';
+  const ctlD = new AbortController();
+  let bytesDesce = 0;
+  const tDesce0 = performance.now();
+  baixar(4e9, 6, b => { bytesDesce = b; }, ctlD.signal).catch(() => {});
+  await new Promise(r => setTimeout(r, 1500));
+  const cargaDescida = [];
+  const rD = await coletar(9, cargaDescida, f => { barra.style.width = (22+f*24).toFixed(0)+'%'; });
+  const tDesce = (performance.now()-tDesce0)/1000;
+  ctlD.abort();
+  const bandaDescida = bytesDesce*8/1e6/tDesce;
 
-  const carregado = [];
-  const r2 = await coletar(18, carregado, f => { barra.style.width = (30+f*50).toFixed(0)+'%'; });
-  const tCarga = (performance.now()-tCarga0)/1000;
-  ctl.abort();
-  const bandaDescida = bytesDesce*8/1e6/tCarga;
-  const bandaSubida = bytesSobe*8/1e6/tCarga;
+  txt.textContent = 'Fase 3 de 4 — enchendo só a subida (upload)…';
+  const ctlU = new AbortController();
+  let bytesSobe = 0;
+  const tSobe0 = performance.now();
+  subir(2e9, 3, b => { bytesSobe = b; }, ctlU.signal).catch(() => {});
+  await new Promise(r => setTimeout(r, 1500));
+  const cargaSubida = [];
+  const rU = await coletar(9, cargaSubida, f => { barra.style.width = (46+f*24).toFixed(0)+'%'; });
+  const tSobe = (performance.now()-tSobe0)/1000;
+  ctlU.abort();
+  const bandaSubida = bytesSobe*8/1e6/tSobe;
 
-  // fase 3: recuperação
-  txt.textContent = 'Fase 3 de 3 — vendo quanto tempo leva para normalizar…';
+  // fase 4: recuperação
+  txt.textContent = 'Fase 4 de 4 — vendo quanto tempo leva para normalizar…';
   const recup = [];
-  await coletar(8, recup, f => { barra.style.width = (80+f*20).toFixed(0)+'%'; });
+  await coletar(8, recup, f => { barra.style.width = (70+f*30).toFixed(0)+'%'; });
   barra.style.width = '100%';
 
-  const cargaMed = mediana(carregado) || 0;
+  const medDescida = mediana(cargaDescida) || 0;
+  const medSubida = mediana(cargaSubida) || 0;
   const recMed = mediana(recup) || 0;
-  const delta = cargaMed - baseMed;
-  const jitCarga = jitter(carregado);
-  const perdaCarga = r2.enviados ? r2.perdidos/r2.enviados*100 : 0;
+  const deltaDescida = medDescida - baseMed;
+  const deltaSubida = medSubida - baseMed;
+  const piorEUpload = deltaSubida > deltaDescida;
+  const cargaMed = Math.max(medDescida, medSubida);
+  const delta = Math.max(deltaDescida, deltaSubida);
+  const jitCarga = piorEUpload ? jitter(cargaSubida) : jitter(cargaDescida);
+  const perdaDescida = rD.enviados ? rD.perdidos/rD.enviados*100 : 0;
+  const perdaSubida = rU.enviados ? rU.perdidos/rU.enviados*100 : 0;
+  const perdaCarga = Math.max(perdaDescida, perdaSubida);
   const notaBufa = notaInversa(delta, [[10,100],[30,85],[60,68],[100,48],[200,22],[400,0]]);
 
   const put = (id, v, d) => { const e = document.getElementById(id), sm = e.querySelector('small'); e.textContent = num(v, d===undefined?1:d); if(sm) e.appendChild(sm); };
   put('cCarga', cargaMed); put('cJit', jitCarga);
 
   // "aumento" negativo confunde: quando o ping não sobe, diga isso com palavras
-  const eD = document.getElementById('cDelta'), smD = eD.querySelector('small');
-  if(delta <= 1){
-    eD.textContent = 'não subiu';
-    eD.style.fontSize = '17px';
-    eD.style.color = 'var(--n5)';
-    if(smD){ smD.hidden = true; eD.appendChild(smD); }   // some da vista, fica no DOM
-  }else{
-    eD.textContent = '+' + num(delta,1);
-    eD.style.fontSize = '';
-    eD.style.color = faixa(notaInversa(delta, [[10,100],[30,85],[60,68],[100,48],[200,22],[400,0]])).cor;
-    if(smD){ smD.hidden = false; eD.appendChild(smD); }
-  }
+  const escreverAumento = (id, v) => {
+    const e = document.getElementById(id), sm = e.querySelector('small');
+    if(v <= 1){
+      e.textContent = 'não subiu';
+      e.style.fontSize = '17px';
+      e.style.color = 'var(--n5)';
+      if(sm){ sm.hidden = true; e.appendChild(sm); }   // some da vista, fica no DOM
+    }else{
+      e.textContent = '+' + num(v,1);
+      e.style.fontSize = '';
+      e.style.color = faixa(notaInversa(v, [[10,100],[30,85],[60,68],[100,48],[200,22],[400,0]])).cor;
+      if(sm){ sm.hidden = false; e.appendChild(sm); }
+    }
+  };
+  escreverAumento('cDelta', delta);
+  escreverAumento('cDeltaBaixo', deltaDescida);
+  escreverAumento('cDeltaSobe', deltaSubida);
   put('cPerda', perdaCarga, 2); put('cRec', recMed);
 
   const eB = document.getElementById('cBanda'), smB = eB.querySelector('small');
@@ -2319,6 +2346,28 @@ document.getElementById('btnCarga').addEventListener('click', async () => {
   const eN = document.getElementById('cNota');
   eN.textContent = faixa(notaBufa).nome;
   eN.style.color = faixa(notaBufa).cor;
+
+  // diz com palavras qual dos dois lados (download ou upload) é o culpado
+  const eDV = document.getElementById('direcaoVeredito');
+  if(eDV){
+    const dif = Math.abs(deltaDescida - deltaSubida);
+    eDV.hidden = false;
+    if(delta <= 15){
+      eDV.innerHTML = '<span class="marca" style="background:var(--n5);color:#fff">TUDO BEM</span>' +
+        'Nem download nem upload pesaram no seu ping. Sua fila não enche de um jeito que estrague o jogo.';
+    }else if(dif <= 15){
+      eDV.innerHTML = '<span class="marca" style="background:var(--n3);color:#fff">OS DOIS PESAM</span>' +
+        'Download e upload pioraram o ping de um jeito parecido (+' + num(deltaDescida,0) + ' ms / +' + num(deltaSubida,0) + ' ms). Não é só um dos dois que atrapalha.';
+    }else if(piorEUpload){
+      eDV.innerHTML = '<span class="marca" style="background:var(--n2);color:#fff">UPLOAD PESA MAIS</span>' +
+        '<b>É o upload que mais trava seu ping</b> (+' + num(deltaSubida,0) + ' ms contra +' + num(deltaDescida,0) + ' ms do download). ' +
+        'Enviar dado — fazer live, mandar vídeo, sincronizar a nuvem — atrapalha mais que baixar algo. É por isso que o SEU comando (que sai pelo upload) pode chegar atrasado no servidor do jogo.';
+    }else{
+      eDV.innerHTML = '<span class="marca" style="background:var(--n2);color:#fff">DOWNLOAD PESA MAIS</span>' +
+        '<b>É o download que mais trava seu ping</b> (+' + num(deltaDescida,0) + ' ms contra +' + num(deltaSubida,0) + ' ms do upload). ' +
+        'Alguém baixando algo em casa — jogo, atualização, vídeo — atrapalha mais do que enviar dado.';
+    }
+  }
 
   APP.metrics.bufa = delta;
   if(APP.metrics.banda === null) APP.metrics.banda = bandaDescida;
