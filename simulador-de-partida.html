@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Radar de Rede</title>
+<title>Simulador de Partida Online</title>
 <meta name="theme-color" content="#0b1114">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -445,11 +445,10 @@ button[data-dica],a[data-dica],select[data-dica],input[data-dica],label[data-dic
   <div class="top-in">
     <div class="logo">R</div>
     <div>
-      <h1>Radar de Rede</h1>
-      <div class="sub">Latência · Jitter · Carga</div>
+      <h1>Simulador de Partida Online</h1>
+      <div class="sub">Veja se sua internet aguenta uma partida de futebol online</div>
     </div>
     <div class="top-spacer"></div>
-    <a class="ghost" href="rota-xbox.html" id="linkXbox" style="text-decoration:none" data-dica="Vai para a página que vigia o seu Xbox: mostra o endereço do adversário durante a partida e diz de que lado está o problema. Precisa do monitor rodando no notebook.">Rota do Xbox</a>
     <button class="ghost" id="btnTema" type="button" data-dica="Troca entre tela clara e tela escura. Só muda a aparência, não mexe em nenhuma medição.">Tema</button>
   </div>
 </div>
@@ -457,7 +456,7 @@ button[data-dica],a[data-dica],select[data-dica],input[data-dica],label[data-dic
 <div class="wrap">
 
   <!-- ======= VEREDITO ======= -->
-  <section class="verdict" id="verdict">
+  <section class="verdict" id="verdict" hidden>
     <div class="verdict-bar" id="vbar"></div>
     <div class="verdict-in">
       <div>
@@ -482,7 +481,7 @@ button[data-dica],a[data-dica],select[data-dica],input[data-dica],label[data-dic
   </section>
 
   <!-- ======= SERVIDORES ======= -->
-  <section class="panel">
+  <section class="panel" hidden>
     <div class="phead">
       <span class="pnum">01</span>
       <h2 data-dica="Mede o tempo de resposta até computadores de verdade espalhados pelo mundo. Serve para você ver quanto sua internet demora para falar com São Paulo, com os Estados Unidos e com a Europa.">Servidores reais</h2>
@@ -509,11 +508,9 @@ button[data-dica],a[data-dica],select[data-dica],input[data-dica],label[data-dic
   <!-- ======= PARTIDA ======= -->
   <section class="panel">
     <div class="phead">
-      <span class="pnum">02</span>
+      <span class="pnum">01</span>
       <h2 data-dica="Faz o seu navegador se comportar igual a um jogo online: manda pacotinhos sem parar, no mesmo ritmo de um FC ou UFL. No fim diz se a sua internet aguentaria a partida inteira sem travar.">Simulação de partida</h2>
-      <p>Envia pacotes em ritmo constante, como um jogo online faz, durante o tempo que você escolher.
-      Quer mandar só esse teste pronto para um amigo? <a href="simulador-de-partida.html">Abra a versão simples</a>,
-      sem as outras partes técnicas desta página.</p>
+      <p>Envia pacotes em ritmo constante, como um jogo online faz, durante o tempo que você escolher.</p>
     </div>
     <div class="pbody">
       <div class="controls">
@@ -607,7 +604,7 @@ button[data-dica],a[data-dica],select[data-dica],input[data-dica],label[data-dic
   </section>
 
   <!-- ======= DOWNLOAD ======= -->
-  <section class="panel">
+  <section class="panel" hidden>
     <div class="phead">
       <span class="pnum">03</span>
       <h2 data-dica="Baixa arquivos de verdade e mostra se a velocidade se mantém firme do começo ao fim. Serve para saber quanto tempo um jogo de 80 GB vai levar e se a sua internet cai no meio do caminho.">Download real</h2>
@@ -679,7 +676,7 @@ button[data-dica],a[data-dica],select[data-dica],input[data-dica],label[data-dic
   </section>
 
   <!-- ======= CARGA ======= -->
-  <section class="panel">
+  <section class="panel" hidden>
     <div class="phead">
       <span class="pnum">04</span>
       <h2 data-dica="O teste mais importante para quem joga: enche sua internet de propósito e vê se o ping dispara. É o que explica por que você trava quando alguém em casa começa a baixar alguma coisa.">Latência com a internet ocupada</h2>
@@ -726,7 +723,7 @@ button[data-dica],a[data-dica],select[data-dica],input[data-dica],label[data-dic
   </section>
 
   <!-- ======= LOJAS DE JOGOS ======= -->
-  <section class="panel" id="painelLojas">
+  <section class="panel" id="painelLojas" hidden>
     <div class="phead">
       <span class="pnum">05</span>
       <h2 data-dica="Mede a distância até as lojas de onde você baixa jogos: Xbox, PlayStation, Steam, Epic. Quanto menor o número, mais rápido o download engrena.">Servidores das lojas de jogos</h2>
@@ -747,7 +744,7 @@ button[data-dica],a[data-dica],select[data-dica],input[data-dica],label[data-dic
   </section>
 
   <!-- ======= PARA QUE SERVE ======= -->
-  <section class="panel">
+  <section class="panel" hidden>
     <div class="phead">
       <span class="pnum">06</span>
       <h2 data-dica="Pega todos os números que você mediu e responde em português: dá para jogar online? dá para assistir em 4K? dá para fazer chamada de vídeo? Cada atividade tem sua exigência.">Para o que sua internet serve</h2>
@@ -764,7 +761,7 @@ button[data-dica],a[data-dica],select[data-dica],input[data-dica],label[data-dic
 
 
   <!-- ======= COMO MELHORAR ======= -->
-  <section class="panel" id="painelMelhorar">
+  <section class="panel" id="painelMelhorar" hidden>
     <div class="phead">
       <span class="pnum">07</span>
       <h2 data-dica="A lista do que fazer para melhorar, já em ordem: a primeira ação é a que mais rende. Ela é montada com os seus números, não é conselho genérico de internet.">Como deixar melhor</h2>
@@ -795,7 +792,7 @@ button[data-dica],a[data-dica],select[data-dica],input[data-dica],label[data-dic
   </section>
 
   <!-- ======= VIGIA DE ROTA ======= -->
-  <section class="panel" id="painelRota">
+  <section class="panel" id="painelRota" hidden>
     <div class="phead">
       <span class="pnum">08</span>
       <h2 data-dica="Fica de olho no caminho da sua internet e avisa na hora se alguma coisa mudar: VPN que ligou, roteador que reiniciou, operadora que trocou a rota. Deixe ligado enquanto mexe nas configurações.">Vigia de rota</h2>
@@ -827,7 +824,7 @@ button[data-dica],a[data-dica],select[data-dica],input[data-dica],label[data-dic
   </section>
 
   <!-- ======= HISTÓRICO ======= -->
-  <section class="panel">
+  <section class="panel" hidden>
     <div class="phead">
       <span class="pnum">09</span>
       <h2 data-dica="Guarda todo teste que você faz, com data e hora. Serve para provar que sua internet piora no horário de pico: teste de madrugada, teste às 21h e compare as duas linhas.">Histórico por horário</h2>
