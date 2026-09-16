@@ -203,6 +203,14 @@ tr.melhor td{background:var(--accent-soft)}
 .ap .q small{display:block;font-size:12px;color:var(--ink3)}
 .ap .mono{font-size:12px;color:var(--ink3)}
 
+.brasilia-selo{display:inline-block;font-family:"IBM Plex Sans Condensed",sans-serif;font-weight:700;
+  font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:999px;
+  background:var(--n1);color:#fff;margin-right:7px;vertical-align:middle}
+.jog-nota{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--ink3);white-space:nowrap}
+.jog-historico{margin-top:8px;width:100%;font-size:12.5px;color:var(--ink2)}
+.jog-historico summary{cursor:pointer;color:var(--ink3)}
+.jog-historico ul{margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:3px}
+
 .guia{display:grid;gap:12px;grid-template-columns:minmax(0,1fr)}
 @media(min-width:900px){.guia{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .passo{background:var(--panel2);border:1px solid var(--line-soft);border-radius:12px;padding:14px 15px}
@@ -244,7 +252,18 @@ input[type=password]{background:var(--sunk);border:1px solid var(--line);border-
 .adv-ip{font-family:"IBM Plex Mono",monospace;font-size:27px;font-weight:500;line-height:1.1;overflow-wrap:anywhere}
 @media(max-width:600px){.adv-ip{font-size:22px}}
 .adv-dono{font-size:15px;font-weight:600}
+.adv-cidade{font-size:13.5px;color:var(--ink2);display:inline-flex;align-items:center;gap:6px;width:fit-content}
+.adv-cidade:empty{display:none}
+.adv-cidade.brasilia{
+  font-weight:700;color:#fff;background:var(--n1);padding:4px 10px;border-radius:999px;
+  animation:piscaBrasilia 1s ease-in-out infinite;
+}
+@keyframes piscaBrasilia{
+  0%,100%{background:var(--n1);box-shadow:0 0 0 0 rgba(191,35,56,.55)}
+  50%{background:#ff4d63;box-shadow:0 0 0 6px rgba(191,35,56,0)}
+}
 .adv-obs{font-size:13px;color:var(--ink3);line-height:1.5;max-width:60ch}
+.resumo-brasilia{font-weight:700;color:var(--n1)}
 .adv-rota{font-size:13px;color:var(--ink2);display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .adv-quem .btn{align-self:flex-start}
 
@@ -447,6 +466,7 @@ button[data-dica],a[data-dica],select[data-dica],input[data-dica]{cursor:pointer
             <span class="adv-tipo"><span class="bolinha" id="advBolinha"></span><span id="advTipo">adversário</span></span>
             <div class="adv-ip mono" id="advIp">--</div>
             <div class="adv-dono" id="advDono">--</div>
+            <div class="adv-cidade" id="advCidade" data-dica="De onde esse endereço parece ser, segundo geolocalização pública por IP. É uma estimativa: costuma acertar em banda larga fixa, mas pode errar em internet móvel."></div>
             <div class="adv-obs" id="advObs"></div>
             <div class="adv-rota" id="advRota"></div>
             <button class="btn parar mini" id="btnBloquearAdv" type="button" style="margin-top:10px"
@@ -528,6 +548,23 @@ button[data-dica],a[data-dica],select[data-dica],input[data-dica]{cursor:pointer
           novo — para isso, use também o <b>"Evitar este jogador"</b> nos jogadores recentes do próprio Xbox, que é
           mais confiável para não reencontrar alguém. <b>Se a internet dele for de rádio ou 4G</b>, o endereço pode
           mudar com o tempo, e o bloqueio deixa de valer sozinho.</p>
+      </div>
+    </section>
+
+    <!-- JOGADORES JÁ ENCONTRADOS -->
+    <section class="panel" id="painelJogadores" style="margin-top:18px">
+      <div class="phead">
+        <h2 data-dica="Cada adversário que o vigia já identificou numa partida, guardado para sempre — mesmo depois de reiniciar o monitor. Uma entrada por endereço, com o histórico de notas de cada partida contra ele.">Jogadores que você já pegou</h2>
+        <p>Todo adversário que o vigia identificou, com de onde ele parece ser e a nota de cada partida contra ele.</p>
+      </div>
+      <div class="pbody">
+        <div class="aparelhos" id="listaJogadores"></div>
+        <div class="vazio" id="jogadoresVazio">Ninguém ainda. Assim que o vigia encontrar uma partida, o adversário aparece aqui.</div>
+        <p class="nota"><b>De onde ele é</b> vem de um serviço público de geolocalização por IP — funciona bem para
+          banda larga fixa, mas pode errar em internet móvel. Quando a partida passa por um servidor do próprio jogo
+          (comum em futebol online), não dá para saber a cidade do adversário, e o site avisa isso em vez de arriscar
+          um palpite. <b>Não dá para saber</b> se ele está no Xbox, PlayStation ou PC: isso não aparece de jeito
+          nenhum pela rede, só o próprio jogo sabe.</p>
       </div>
     </section>
 
@@ -912,6 +949,7 @@ async function conectar(){
   lerPartida();
   if(!P.timer) P.timer = setInterval(lerPartida, 1000);
   lerBloqueios();
+  carregarJogadores();
 }
 
 /* =========================================================
@@ -1597,7 +1635,7 @@ try{ const t = localStorage.getItem('radar-tema'); if(t) document.documentElemen
 /* =========================================================
    Partida ao vivo: quem é o adversário e de quem é a culpa
    ========================================================= */
-const P = { amostras: [], seq: 0, idPartida: null, ligado: false, ocupado: false, timer: null, pulouContagem: false, ultimoBipSeq: 0 };
+const P = { amostras: [], seq: 0, idPartida: null, ligado: false, ocupado: false, timer: null, pulouContagem: false, ultimoBipSeq: 0, avisouBrasilia: null };
 
 /* =========================================================
    Bipe quando a conexão piora durante a partida
@@ -1633,19 +1671,22 @@ function atualizarBotaoSom(){
 }
 
 /* 'ruim' = dois bipes graves e fortes (problema sério); 'atencao' = um bipe
-   curto e mais fraco (só um aviso leve). */
+   curto e mais fraco (só um aviso leve); 'brasilia' = sirene longa (achou
+   adversário de Brasília/DF), pra dar tempo de você olhar pra tela. */
 function tocarBip(nivel){
   if(!somLigado()) return;
   const ctx = contextoDeAudio();
   if(!ctx) return;
   const t0 = ctx.currentTime;
-  const notas = nivel === 'ruim' ? [880, 880] : [520];
+  const notas = nivel === 'ruim' ? [880, 880]
+              : nivel === 'brasilia' ? [740, 990, 740, 990, 740, 990]
+              : [520];
   let t = t0;
   notas.forEach(freq => {
     const osc = ctx.createOscillator(), gain = ctx.createGain();
     osc.type = 'square'; osc.frequency.value = freq;
     osc.connect(gain); gain.connect(ctx.destination);
-    const pico = nivel === 'ruim' ? 0.4 : 0.22;
+    const pico = (nivel === 'ruim' || nivel === 'brasilia') ? 0.4 : 0.22;
     gain.gain.setValueAtTime(0.0001, t);
     gain.gain.exponentialRampToValueAtTime(pico, t + 0.02);
     gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.22);
@@ -1764,6 +1805,62 @@ function mostrarBloqueios(){
 $('btnBloquearAdv').addEventListener('click', () => alternarBloqueio($('btnBloquearAdv')));
 $('btnBloquearResumo').addEventListener('click', () => alternarBloqueio($('btnBloquearResumo')));
 
+/* =========================================================
+   Jogadores que você já pegou — histórico permanente, por endereço
+   ========================================================= */
+async function carregarJogadores(){
+  let r;
+  try{ r = await api('/api/jogadores'); }catch(e){ return; }
+  mostrarJogadores(r.lista || []);
+}
+
+function mostrarJogadores(lista){
+  const cx = $('listaJogadores');
+  if(!cx) return;
+  cx.textContent = '';
+  $('jogadoresVazio').hidden = lista.length > 0;
+  lista.forEach(j => {
+    const d = document.createElement('div');
+    d.className = 'ap';
+    const brasilia = ehBrasiliaDF(j);
+    const cidadeTxt = j.tipo === 'servidor'
+      ? 'servidor do jogo, não é casa de ninguém'
+      : (j.cidade || j.estado) ? [j.cidade, j.sigla || j.estado].filter(Boolean).join(' · ')
+      : 'cidade não identificada';
+    const ultima = j.ultima_vez ? new Date(j.ultima_vez * 1000).toLocaleString('pt-BR') : '--';
+    const ultimaPartida = (j.partidas && j.partidas[0]) || {};
+    const notaTxt = ultimaPartida.nota != null ? num(ultimaPartida.nota, 0) : null;
+
+    d.innerHTML = '<div class="q"><b></b><small></small></div><span class="mono"></span><span class="jog-nota"></span>';
+    const bEl = d.querySelector('b');
+    if(brasilia){
+      const selo = document.createElement('span');
+      selo.className = 'brasilia-selo';
+      selo.textContent = 'Brasília/DF';
+      bEl.appendChild(selo);
+    }
+    bEl.appendChild(document.createTextNode(j.dono ? (j.dono + (j.pais ? ' · ' + j.pais : '')) : 'Dono não identificado'));
+    d.querySelector('small').textContent = cidadeTxt + ' · ' + (j.total_partidas || 1) +
+      (j.total_partidas === 1 ? ' partida' : ' partidas') + ' · última vez ' + ultima;
+    d.querySelector('.mono').textContent = j.ip;
+    d.querySelector('.jog-nota').textContent = notaTxt === null ? '' : ('nota da última: ' + notaTxt);
+
+    if(j.partidas && j.partidas.length > 1){
+      const det = document.createElement('details');
+      det.className = 'jog-historico';
+      const linhas = j.partidas.map(part => {
+        const q = part.quando ? new Date(part.quando * 1000).toLocaleString('pt-BR') : '--';
+        const nota = part.nota != null ? num(part.nota, 0) : '--';
+        const extra = part.problemas ? (' · ' + part.problemas + ' problema(s)') : '';
+        return '<li>' + esc(q) + ' · nota ' + nota + ' · ' + duracao(part.duracao || 0) + extra + '</li>';
+      }).join('');
+      det.innerHTML = '<summary>Ver as ' + j.partidas.length + ' partidas contra ele</summary><ul>' + linhas + '</ul>';
+      d.appendChild(det);
+    }
+    cx.appendChild(d);
+  });
+}
+
 async function lerPartida(){
   if(P.ocupado) return;
   P.ocupado = true;
@@ -1807,6 +1904,7 @@ function mostrarPartida(r){
   $('pResumo').hidden = !!p || !(r.historico && r.historico.length);
 
   if(!p){
+    const terminouAgora = P.idPartida !== null;
     P.amostras = []; P.seq = 0; P.idPartida = null;
     $('dotProcura').className = 'dot ' + (r.ligado ? 'vivo' : '');
     $('txtProcura').textContent = r.erro
@@ -1814,6 +1912,7 @@ function mostrarPartida(r){
       : (r.ligado ? 'Vigiando o Xbox. Esperando você entrar numa partida…' : 'Vigia parado. Clique em “Vigiar partidas”.');
     mostrarConexoes(r.conexoes || [], rot.contadores);
     if(r.historico && r.historico.length) mostrarResumo(r.historico[0]);
+    if(terminouAgora) carregarJogadores();
     return;
   }
 
@@ -1841,12 +1940,47 @@ const ICONE_TIPO = { servidor:'Servidor do jogo', jogador:'Casa de outro jogador
                      indefinido:'Provavelmente um jogador', desconhecido:'Não identificado' };
 const COR_TIPO = { servidor:'var(--s-operadora)', jogador:'var(--n2)', indefinido:'var(--n3)', desconhecido:'var(--ink3)' };
 
+/* de onde é o adversário — só faz sentido mostrar quando o endereço é a casa
+   de alguém; servidor de nuvem mostraria a cidade do data center, não da
+   pessoa, e isso enganaria mais do que ajudaria. */
+function ehBrasiliaDF(c){
+  if(!c) return false;
+  const cidade = (c.cidade || '').toLowerCase();
+  const sigla = (c.sigla || '').toUpperCase();
+  const estado = (c.estado || '').toLowerCase();
+  return sigla === 'DF' || estado.indexOf('distrito federal') !== -1 ||
+         cidade === 'brasilia' || cidade === 'brasília';
+}
+function textoCidade(p, quem){
+  if(quem.tipo === 'servidor'){
+    return { texto: 'Não dá pra saber a cidade dele: a partida passa por um servidor da nuvem, não direto na casa dele.', brasilia:false };
+  }
+  const c = p.cidade;
+  if(!c || (!c.cidade && !c.estado)) return { texto:'', brasilia:false };
+  const partes = [c.cidade, c.sigla || c.estado].filter(Boolean);
+  return { texto: '📍 ' + partes.join(' · '), brasilia: ehBrasiliaDF(c) };
+}
+/* apita e pisca só na primeira vez que ESTA partida aparece como Brasília/DF —
+   não fica repetindo a cada segundo enquanto a partida continua. */
+function mostrarCidadeAdversario(p, quem){
+  const el = $('advCidade');
+  if(!el) return;
+  const info = textoCidade(p, quem);
+  el.textContent = info.texto;
+  el.classList.toggle('brasilia', info.brasilia);
+  if(info.brasilia && P.avisouBrasilia !== p.id){
+    P.avisouBrasilia = p.id;
+    tocarBip('brasilia');
+  }
+}
+
 function mostrarAdversario(p){
   const quem = p.quem || {}, dono = p.dono || {};
   $('advTipo').textContent = ICONE_TIPO[quem.tipo] || 'adversário';
   $('advBolinha').style.background = COR_TIPO[quem.tipo] || 'var(--ink3)';
   $('advIp').textContent = p.ip;
   $('advDono').textContent = dono.nome ? (dono.nome + (dono.pais ? ' · ' + dono.pais : '')) : 'dono não identificado';
+  mostrarCidadeAdversario(p, quem);
 
   const obs = [];
   if(quem.rotulo) obs.push(quem.rotulo + '.');
@@ -2012,8 +2146,10 @@ function mostrarConexoes(lista, temContadores){
 function mostrarResumo(h){
   const r = h.resumo || {};
   const quem = h.quem || {}, dono = h.dono || {};
+  const ci = textoCidade(h, quem);
+  const cidadeHtml = ci.texto ? ('<br><span' + (ci.brasilia ? ' class="resumo-brasilia"' : '') + '>' + esc(ci.texto) + '</span>') : '';
   $('resumoTexto').innerHTML = '<b>Última partida</b> — contra ' + esc(h.ip) +
-    (dono.nome ? ' (' + esc(dono.nome) + ')' : '') + ', ' + duracao(r.duracao || 0) + ' de jogo.<br>' + esc(r.veredito || '');
+    (dono.nome ? ' (' + esc(dono.nome) + ')' : '') + ', ' + duracao(r.duracao || 0) + ' de jogo.' + cidadeHtml + '<br>' + esc(r.veredito || '');
   const e = r.estatisticas || {};
   const cel = (k, v, s) => '<div><div class="k">' + k + '</div><div class="v mono">' + v + '</div><div class="s">' + s + '</div></div>';
   $('resumoPlacar').innerHTML =
