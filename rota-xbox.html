@@ -1825,8 +1825,7 @@ function mostrarJogadores(lista){
     const brasilia = ehBrasiliaDF(j);
     const cidadeTxt = j.tipo === 'servidor'
       ? 'servidor do jogo, não é casa de ninguém'
-      : (j.cidade || j.estado) ? [j.cidade, j.sigla || j.estado].filter(Boolean).join(' · ')
-      : 'cidade não identificada';
+      : (j.cidade || j.estado) || 'lugar não identificado';
     const ultima = j.ultima_vez ? new Date(j.ultima_vez * 1000).toLocaleString('pt-BR') : '--';
     const ultimaPartida = (j.partidas && j.partidas[0]) || {};
     const notaTxt = ultimaPartida.nota != null ? num(ultimaPartida.nota, 0) : null;
@@ -1951,14 +1950,18 @@ function ehBrasiliaDF(c){
   return sigla === 'DF' || estado.indexOf('distrito federal') !== -1 ||
          cidade === 'brasilia' || cidade === 'brasília';
 }
+/* Só o nome do lugar (ex: "São Paulo", "Brasília", "Curitiba") — nada de
+   endereço nem bairro. Geolocalização por IP não chega nem perto disso: no
+   máximo acerta a cidade, então mostrar só o nome do lugar já é honesto com
+   o tanto que dá pra saber de verdade. */
 function textoCidade(p, quem){
   if(quem.tipo === 'servidor'){
-    return { texto: 'Não dá pra saber a cidade dele: a partida passa por um servidor da nuvem, não direto na casa dele.', brasilia:false };
+    return { texto: 'Não dá pra saber de onde ele é: a partida passa por um servidor da nuvem, não direto na casa dele.', brasilia:false };
   }
   const c = p.cidade;
-  if(!c || (!c.cidade && !c.estado)) return { texto:'', brasilia:false };
-  const partes = [c.cidade, c.sigla || c.estado].filter(Boolean);
-  return { texto: '📍 ' + partes.join(' · '), brasilia: ehBrasiliaDF(c) };
+  const lugar = c && (c.cidade || c.estado);
+  if(!lugar) return { texto:'', brasilia:false };
+  return { texto: '📍 ' + lugar, brasilia: ehBrasiliaDF(c) };
 }
 /* apita e pisca só na primeira vez que ESTA partida aparece como Brasília/DF —
    não fica repetindo a cada segundo enquanto a partida continua. */
