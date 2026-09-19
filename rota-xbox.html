@@ -1745,22 +1745,35 @@ function jaBloqueado(ip){
   return B.lista.some(b => b.ip === ip);
 }
 
-function prepararBotaoBloqueio(btn, ip, dono, pais){
+/* Em futebol online (UFL, FC 26) o Xbox só conversa com o SERVIDOR do jogo,
+   nunca com a casa do outro jogador. Bloquear esse endereço não bloqueia a
+   pessoa — ela volta em outro dos milhares de servidores — e ainda faria o
+   SEU Xbox não conseguir entrar quando o jogo te colocasse naquele servidor.
+   Visto de verdade: 4 partidas de 15 min em servidores já bloqueados. */
+function prepararBotaoBloqueio(btn, ip, dono, pais, tipo){
   if(!btn) return;
   if(!ip){ btn.hidden = true; return; }
   btn.hidden = false;
   btn.dataset.ip = ip;
   btn.dataset.dono = dono || '';
   btn.dataset.pais = pais || '';
+  btn.dataset.tipo = tipo || '';
   const bloqueado = jaBloqueado(ip);
-  btn.textContent = bloqueado ? 'Desbloquear este endereço' : 'Bloquear este adversário';
-  btn.classList.toggle('parar', !bloqueado);
-  btn.classList.toggle('sec', bloqueado);
+  const servidor = tipo === 'servidor';
+  btn.disabled = servidor && !bloqueado;
+  btn.textContent = bloqueado ? 'Desbloquear este endereço'
+                  : servidor ? 'Não dá pra bloquear: é o servidor do jogo, não a pessoa'
+                  : 'Bloquear este adversário';
+  btn.setAttribute('data-dica', servidor
+    ? 'Neste jogo você e o adversário se ligam num servidor do jogo, não um no outro. Bloquear o servidor não bloqueia a pessoa e ainda te impediria de entrar nas partidas daquele servidor. Para evitar alguém, use o próprio Xbox: Jogadores recentes → perfil dele → Bloquear.'
+    : 'Fecha a passagem de dados deste endereço no seu roteador, nos dois sentidos.');
+  btn.classList.toggle('parar', !bloqueado && !servidor);
+  btn.classList.toggle('sec', bloqueado || servidor);
 }
 
 function atualizarBotoesBloqueio(){
   [$('btnBloquearAdv'), $('btnBloquearResumo')].forEach(btn => {
-    if(btn && !btn.hidden && btn.dataset.ip) prepararBotaoBloqueio(btn, btn.dataset.ip, btn.dataset.dono, btn.dataset.pais);
+    if(btn && !btn.hidden && btn.dataset.ip) prepararBotaoBloqueio(btn, btn.dataset.ip, btn.dataset.dono, btn.dataset.pais, btn.dataset.tipo);
   });
 }
 
@@ -1781,7 +1794,7 @@ async function alternarBloqueio(btn){
     alert(e.message);
   }finally{
     btn.disabled = false;
-    prepararBotaoBloqueio(btn, ip, btn.dataset.dono, btn.dataset.pais);
+    prepararBotaoBloqueio(btn, ip, btn.dataset.dono, btn.dataset.pais, btn.dataset.tipo);
   }
 }
 
@@ -2015,7 +2028,7 @@ function mostrarAdversario(p){
     cx.appendChild(t);
   }
 
-  prepararBotaoBloqueio($('btnBloquearAdv'), p.ip, dono.nome, dono.pais);
+  prepararBotaoBloqueio($('btnBloquearAdv'), p.ip, dono.nome, dono.pais, quem.tipo);
 }
 
 function serieDe(chave, n){
@@ -2192,7 +2205,7 @@ function mostrarResumo(h){
   });
 
   mostrarAcelerador('boxAceleradorResumo', 'acrPilula', 'acrOnde', 'acrTexto', h.acelerador);
-  prepararBotaoBloqueio($('btnBloquearResumo'), h.ip, dono.nome, dono.pais);
+  prepararBotaoBloqueio($('btnBloquearResumo'), h.ip, dono.nome, dono.pais, quem.tipo);
 }
 
 const SERIES_P = [
