@@ -1003,6 +1003,14 @@ async function carregarRede(){
          'O Cake é o controlador de fila do seu roteador — o melhor que existe contra travada por download. ' +
          'Ele segura a fila para o ping do jogo não subir quando alguém em casa começa a baixar algo. ' +
          'Já segurou ' + segurados + ' pacotes de propósito para isso, e é por isso que sua internet não engasga sob carga.');
+  }else if(r.fila && r.fila.cake === false){
+    const tipos = r.fila.tipos || {};
+    const nomes = Object.keys(tipos).filter(t => t !== 'noqueue').join(', ');
+    chip('var(--n1)', '<b>Cake desligado</b> no roteador',
+         'O controlador de fila do roteador (o Cake) não está ligado. Sem ele, quando alguém em casa baixa ou envia algo, ' +
+         'a fila enche e o jogo começa a atrasar e perder pacote. Com a casa parada não faz diferença; ' +
+         'ele só protege quando mais alguém está usando a internet. Para religar: no roteador, QoS → Ativar QoS → Tipo Cake.' +
+         (nomes ? ' Filas que o roteador está usando agora: ' + nomes + '.' : ''));
   }
 
   if(nb.tipo === 'wifi'){
@@ -2027,7 +2035,19 @@ function mostrarNumeros(p){
   const base = (p.bases || {}).adversario;
 
   const pico = bons.length ? Math.max.apply(null, bons.slice(-2000)) : null;
-  const perda = todos.length ? (todos.length - bons.length) / todos.length * 100 : null;
+  // Mesma regra do monitor: medindo num roteador do meio do caminho (o servidor
+  // do jogo não responde ping), só conta a perda que caiu junto com o servidor
+  // de referência — o resto é o roteador do meio ignorando ping, não o seu jogo.
+  const direto = !p.alvo || p.alvo.direto !== false;
+  let perdidas = 0;
+  if(direto){
+    perdidas = todos.length - bons.length;
+  }else{
+    const quedasRef = P.amostras.filter(a => 'referencia' in a.ms && a.ms.referencia === null).map(a => a.t);
+    perdidas = P.amostras.filter(a => 'adversario' in a.ms && a.ms.adversario === null)
+                         .filter(a => quedasRef.some(t => Math.abs(a.t - t) <= 2)).length;
+  }
+  const perda = todos.length ? perdidas / todos.length * 100 : null;
   let jit = null;
   if(bons.length > 3){
     let soma = 0, n = 0;
@@ -2045,7 +2065,8 @@ function mostrarNumeros(p){
   por('pgPico', pico, 0, v => (base && v < base + 30) ? 5 : (base && v < base + 80) ? 2 : 1);
 
   $('pgPingBase').textContent = base !== undefined ? ('calmo: ' + num(base,0) + ' ms') : '';
-  $('pgPerdaObs').textContent = perda !== null && perda > 2 ? 'isso teleporta o jogador' : 'de ' + todos.length + ' medidas';
+  $('pgPerdaObs').textContent = perda !== null && perda > 2 ? 'isso teleporta o jogador'
+    : (direto ? 'de ' + todos.length + ' medidas' : 'só conta a perda confirmada');
   $('pgTempo').textContent = 'partida: ' + duracao(p.duracao || 0);
 
   const lado = (id, chave, rotulo) => {
@@ -2158,7 +2179,8 @@ function mostrarResumo(h){
   $('resumoPlacar').innerHTML =
     cel('Ping médio', num(e.mediana,0) + '<small> ms</small>', 'no meio da partida') +
     cel('Variação', num(e.jitter,1) + '<small> ms</small>', 'quanto menor, melhor') +
-    cel('Perdidos', num(e.perda,1) + '<small> %</small>', 'pacotes que sumiram') +
+    cel('Perdidos', num(e.perda,1) + '<small> %</small>',
+        e.medido_no_meio ? 'só a perda confirmada' : 'pacotes que sumiram') +
     cel('Nota', num(e.nota,0), quem.rotulo ? quem.rotulo.split(',')[0] : '');
   const cx = $('evResumo'); cx.textContent = '';
   (h.eventos || []).filter(x => x.tipo !== 'inicio').slice().reverse().forEach(ev => {
