@@ -493,6 +493,21 @@ button[data-dica],a[data-dica],select[data-dica],input[data-dica]{cursor:pointer
             <div class="texto" id="ppTexto" style="font-size:16px">Conexão limpa com o adversário até agora.</div>
           </div>
 
+          <div class="diag" id="boxRota" style="padding:14px 16px;border-radius:11px;background:var(--panel2);border:1px solid var(--line-soft);margin-top:12px" hidden>
+            <div class="linha1">
+              <span class="pilula" id="rotaPilula" data-dica="Vigia cada ponto do caminho até o servidor do jogo e compara com o atraso normal daquele mesmo ponto. Atraso acima do normal, que continua nos pontos seguintes, é fila: congestionamento. Ponto que sobe sozinho é ele ignorando o teste, e o seu jogo passa direto.">rota do servidor</span>
+              <span class="desde" id="rotaResumo"></span>
+            </div>
+            <div class="texto" id="rotaTexto" style="font-size:15px">Aprendendo o normal de cada ponto do caminho…</div>
+            <div class="tscroll"><table id="rotaTabela"><thead><tr>
+              <th data-dica="Cada ponto do caminho que responde a teste, na ordem em que os dados passam.">Ponto do caminho</th>
+              <th data-dica="O atraso mais baixo que ESTE ponto mostrou nesta partida: o normal dele, sem fila.">Normal dele</th>
+              <th data-dica="O atraso deste ponto nos últimos 15 segundos.">Agora</th>
+              <th data-dica="Quanto está acima do normal dele. Acima de 15 ms é fila de verdade.">Acima</th>
+            </tr></thead><tbody></tbody></table></div>
+            <div class="nota" id="rotaCobertura" style="font-size:12.5px;color:var(--ink3)"></div>
+          </div>
+
           <div class="diag" id="boxAcelerador" style="padding:14px 16px;border-radius:11px;background:var(--panel2);border:1px solid var(--line-soft);margin-top:12px" hidden>
             <div class="linha1">
               <span class="pilula" id="acPilula" data-dica="Compara o ping que você já alcançou nesta partida com o menor tempo que a distância até o outro lado permite. Quando os dois já estão perto, nenhum acelerador consegue melhorar — a velocidade da luz não negocia.">vale um acelerador?</span>
@@ -521,6 +536,7 @@ button[data-dica],a[data-dica],select[data-dica],input[data-dica]{cursor:pointer
         <div class="recom" id="resumoTexto"></div>
         <div class="placar" style="margin-top:14px" id="resumoPlacar"></div>
         <div id="laudoResumo" style="margin-top:14px"></div>
+        <div class="cmp-veredito" id="resumoRota" style="margin-top:12px" hidden></div>
         <div class="diag" id="boxAceleradorResumo" style="padding:14px 16px;border-radius:11px;background:var(--panel2);border:1px solid var(--line-soft);margin-top:14px" hidden>
           <div class="linha1">
             <span class="pilula" id="acrPilula" data-dica="Compara o melhor ping alcançado nesta partida com o menor tempo que a distância até o outro lado permite.">vale um acelerador?</span>
@@ -1926,6 +1942,7 @@ function mostrarPartida(r){
 
   if(!p){
     const terminouAgora = P.idPartida !== null;
+    mostrarRota(null);
     P.amostras = []; P.seq = 0; P.idPartida = null;
     $('dotProcura').className = 'dot ' + (r.ligado ? 'vivo' : '');
     $('txtProcura').textContent = r.erro
@@ -1951,6 +1968,7 @@ function mostrarPartida(r){
   mostrarAdversario(p);
   mostrarNumeros(p);
   mostrarProblemaAtual(p);
+  mostrarRota(p.rota_estado);
   mostrarAcelerador('boxAcelerador', 'acPilula', 'acOnde', 'acTexto', p.acelerador);
   apitarNovosEventos(p.eventos || []);
   mostrarEventosPartida(p.eventos || []);
@@ -2115,6 +2133,48 @@ function mostrarProblemaAtual(p){
   $('ppDesde').textContent = pr.atraso > 0 ? ('+' + num(pr.atraso,0) + ' ms acima do normal') : '';
 }
 
+const COR_ROTA = { livre:'var(--n5)', leve:'var(--n3)', congestionada:'var(--n1)', medindo:'var(--ink3)' };
+const ROTULO_ROTA = { livre:'rota livre', leve:'rota um pouco cheia', congestionada:'rota congestionada',
+                      medindo:'medindo a rota…' };
+
+/* Mostra ponto a ponto do caminho até o servidor: o normal de cada um e quanto
+   está acima agora. É assim que se acha fila — e é assim que se percebe que um
+   ponto subiu sozinho (ele ignorando ping) em vez de congestionamento real. */
+function mostrarRota(est){
+  const caixa = $('boxRota');
+  if(!caixa) return;
+  if(!est){ caixa.hidden = true; return; }
+  caixa.hidden = false;
+  const cor = COR_ROTA[est.estado] || 'var(--ink3)';
+  const pil = $('rotaPilula');
+  pil.textContent = ROTULO_ROTA[est.estado] || est.estado;
+  pil.style.background = cor;
+  pil.style.color = (est.estado === 'leve') ? '#1a1205' : '#fff';
+  caixa.style.borderLeft = '3px solid ' + cor;
+  $('rotaTexto').textContent = est.texto || '';
+
+  const medidos = (est.itens || []).filter(i => i.acima !== null && i.acima !== undefined);
+  $('rotaResumo').textContent = medidos.length
+    ? (medidos.length + ' ponto(s) vigiado(s)' + (est.ultimo_ttl ? ' · até o salto ' + est.ultimo_ttl : ''))
+    : '';
+
+  const corpo = $('rotaTabela').querySelector('tbody');
+  corpo.textContent = '';
+  (est.itens || []).forEach(i => {
+    const tr = document.createElement('tr');
+    const c = COR_ROTA[i.estado === 'alto' ? 'congestionada' : i.estado] || 'var(--ink3)';
+    const acima = (i.acima === null || i.acima === undefined) ? 'medindo…'
+                : '<b style="color:' + c + '">' + (i.acima >= 0 ? '+' : '') + num(i.acima, 1) + ' ms</b>';
+    tr.innerHTML = '<td>' + (i.ttl ? '<span style="color:var(--ink3)">' + i.ttl + '. </span>' : '') + esc(i.rotulo) +
+                   (i.ip ? ' <span class="mono" style="color:var(--ink3);font-size:11.5px">' + esc(i.ip) + '</span>' : '') + '</td>' +
+                   '<td class="mono">' + (i.normal === null || i.normal === undefined ? '--' : num(i.normal,1) + ' ms') + '</td>' +
+                   '<td class="mono">' + (i.agora === null || i.agora === undefined ? '--' : num(i.agora,1) + ' ms') + '</td>' +
+                   '<td class="mono">' + acima + '</td>';
+    corpo.appendChild(tr);
+  });
+  $('rotaCobertura').textContent = est.cobertura || '';
+}
+
 const COR_VEREDITO = { ajudaria:'var(--n2)', talvez:'var(--n3)', nao_ajudaria:'var(--n5)', sem_info:'var(--ink3)' };
 const ROTULO_VEREDITO = { ajudaria:'vale tentar', talvez:'ganho pequeno', nao_ajudaria:'não precisa', sem_info:'sem dados' };
 
@@ -2206,6 +2266,19 @@ function mostrarResumo(h){
   });
 
   mostrarLaudo(e.qualidade, e);
+  const cxR = $('resumoRota');
+  if(cxR){
+    const r = e.rota;
+    if(!r){ cxR.hidden = true; }
+    else{
+      cxR.hidden = false;
+      const pior = r.pior ? (' O pior momento foi aos ' + num(r.pior.minuto,1) + ' min, com +' +
+                             num(r.pior.acima,0) + ' ms em “' + esc(r.pior.ponto) + '”.') : '';
+      cxR.innerHTML = '<b>Rota até o servidor:</b> ficou acima do normal em <b>' + num(r.pct_fora,1) +
+                      '%</b> do tempo da partida.' + pior +
+                      (r.cobertura ? ' <span style="color:var(--ink3)">' + esc(r.cobertura) + '</span>' : '');
+    }
+  }
   mostrarAcelerador('boxAceleradorResumo', 'acrPilula', 'acrOnde', 'acrTexto', h.acelerador);
   prepararBotaoBloqueio($('btnBloquearResumo'), h.ip, dono.nome, dono.pais, quem.tipo);
 }
