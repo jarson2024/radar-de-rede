@@ -520,6 +520,7 @@ button[data-dica],a[data-dica],select[data-dica],input[data-dica]{cursor:pointer
       <div class="pbody" id="pResumo" hidden>
         <div class="recom" id="resumoTexto"></div>
         <div class="placar" style="margin-top:14px" id="resumoPlacar"></div>
+        <div id="laudoResumo" style="margin-top:14px"></div>
         <div class="diag" id="boxAceleradorResumo" style="padding:14px 16px;border-radius:11px;background:var(--panel2);border:1px solid var(--line-soft);margin-top:14px" hidden>
           <div class="linha1">
             <span class="pilula" id="acrPilula" data-dica="Compara o melhor ping alcançado nesta partida com o menor tempo que a distância até o outro lado permite.">vale um acelerador?</span>
@@ -2204,8 +2205,41 @@ function mostrarResumo(h){
     cx.appendChild(d);
   });
 
+  mostrarLaudo(e.qualidade, e);
   mostrarAcelerador('boxAceleradorResumo', 'acrPilula', 'acrOnde', 'acrTexto', h.acelerador);
   prepararBotaoBloqueio($('btnBloquearResumo'), h.ip, dono.nome, dono.pais, quem.tipo);
+}
+
+const COR_FAIXA = { 'excelente':'var(--n5)', 'bom':'var(--n4)', 'aceitável':'var(--n3)',
+                    'ruim':'var(--n2)', 'péssimo':'var(--n1)' };
+
+/* Laudo técnico: cada número com o limite usado e de onde esse limite sai.
+   A nota final é a do PIOR item, não a média — média deixa um ping ótimo
+   esconder uma perda ruim, e quem estraga a partida é o pior número. */
+function mostrarLaudo(q, e){
+  const cx = $('laudoResumo');
+  if(!cx) return;
+  if(!q){ cx.innerHTML = ''; return; }
+  const linhas = q.itens.map(i =>
+    '<tr><td>' + esc(i.rotulo) + '</td>' +
+    '<td class="mono">' + num(i.valor, i.valor < 10 ? 2 : 1) + ' ' + esc(i.unidade) + '</td>' +
+    '<td style="color:' + (COR_FAIXA[i.faixa] || 'var(--ink3)') + ';font-weight:600">' + esc(i.faixa) + '</td>' +
+    '<td class="mono" style="color:var(--ink3)">até ' + i.limite_bom + ' ' + esc(i.unidade) + '</td>' +
+    '<td style="color:var(--ink3);font-size:12px">' + esc(i.fonte) + '</td></tr>').join('');
+  const cor = COR_FAIXA[q.faixa] || 'var(--ink3)';
+  cx.innerHTML =
+    '<div class="cmp-titulo">Laudo técnico da partida</div>' +
+    '<div class="tscroll"><table><thead><tr><th>O que</th><th>Medido</th><th>Faixa</th>' +
+    '<th>Limite de excelente</th><th>De onde vem o limite</th></tr></thead><tbody>' + linhas + '</tbody></table></div>' +
+    '<div class="cmp-veredito" style="border-left-color:' + cor + '">' +
+      'Veredito: <b style="color:' + cor + '">' + esc(q.faixa) + '</b> — a partida vale o que vale o pior número dela, que aqui foi <b>' +
+      esc(q.pior_item) + '</b>.' +
+      (q.medido_direto ? '' :
+        ' <br>O servidor do jogo não responde teste, então o atraso foi medido no ponto mais próximo dele que responde. ' +
+        'Por isso a perda contada é só a confirmada: nesta partida o ping "perdeu" ' + num(e.perda_bruta, 2) + '%, ' +
+        'mas os dados do jogo continuaram chegando normalmente o tempo todo.') +
+      (e.engasgos != null ? ' <br>O jogo ficou sem receber dados por 1 s ou mais <b>' + e.engasgos + '</b> vez(es).' : '') +
+    '</div>';
 }
 
 const SERIES_P = [
